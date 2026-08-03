@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+	<!-- greffe le comp d'invitation sur les colonies vanilla. purement additif: on ajoute
+	     un <li> dans un nœud comps qui existe déjà, sans toucher aux cinq autres.
+	     Settlement.GetFloatMenuOptions appelle base en premier, donc l'option apparaît
+	     dans le menu de la caravane sans le moindre patch de code -->
+	<Operation Class="PatchOperationAdd">
+		<xpath>Defs/WorldObjectDef[defName="Settlement"]/comps</xpath>
+		<value>
+			<li Class="RimFeast.Planet.WorldObjectCompProperties_FeastInvite" />
+		</value>
+	</Operation>
+
+</Patch>

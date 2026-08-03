@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+	<!-- faction cachée neutre pour les cortèges de banquet, sinon les défenses les allument -->
+	<FactionDef ParentName="FactionBase">
+		<defName>RimFeast_Guests</defName>
+		<label>feast guests</label>
+		<description>Nobles and their retinue, riding to a banquet under the banner of their house.</description>
+		<pawnSingular>guest</pawnSingular>
+		<pawnsPlural>guests</pawnsPlural>
+		<fixedName>Feast Guests</fixedName>
+		<leaderTitle>steward</leaderTitle>
+		<techLevel>Medieval</techLevel>
+		<hidden>true</hidden>
+		<requiredCountAtGameStart>1</requiredCountAtGameStart>
+		<displayInFactionSelection>false</displayInFactionSelection>
+		<canGenerateQuestSites>false</canGenerateQuestSites>
+		<factionIconPath>World/WorldObjects/Expanding/Sites/DownedRefugee</factionIconPath>
+		<!-- kind vanilla par défaut, remplacé par le paysan MO via Patches/ quand MO est chargé -->
+		<basicMemberKind>Villager</basicMemberKind>
+		<backstoryFilters>
+			<li>
+				<categories>
+					<li>Tribal</li>
+				</categories>
+			</li>
+		</backstoryFilters>
+	</FactionDef>
+
+</Defs>

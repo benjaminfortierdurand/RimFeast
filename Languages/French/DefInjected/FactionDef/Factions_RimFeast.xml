@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+	<RimFeast_Guests.label>convives de banquet</RimFeast_Guests.label>
+	<RimFeast_Guests.description>Des nobles et leur suite, en route vers un banquet sous la bannière de leur maison.</RimFeast_Guests.description>
+	<RimFeast_Guests.pawnSingular>convive</RimFeast_Guests.pawnSingular>
+	<RimFeast_Guests.pawnsPlural>convives</RimFeast_Guests.pawnsPlural>
+	<RimFeast_Guests.fixedName>Convives</RimFeast_Guests.fixedName>
+	<RimFeast_Guests.leaderTitle>intendant</RimFeast_Guests.leaderTitle>
+
+</LanguageData>

@@ -1,0 +1,6 @@
+.research/
+obj/
+bin/
+.vs/
+*.user
+*.sln

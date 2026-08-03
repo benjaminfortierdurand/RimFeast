@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+	<!-- jouée quand l'hospitalité se rompt. commonality 0: jamais dans la rotation normale -->
+	<SongDef>
+		<defName>RimFeast_RedWeddingSong</defName>
+		<clipPath>Song/RimFeast_RedWedding</clipPath>
+		<volume>0.8</volume>
+		<commonality>0</commonality>
+		<tense>true</tense>
+	</SongDef>
+
+</Defs>

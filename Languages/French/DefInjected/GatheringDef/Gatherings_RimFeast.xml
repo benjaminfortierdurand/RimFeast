@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+	<RimFeast_Feast.label>banquet</RimFeast_Feast.label>
+	<RimFeast_Feast.letterTitle>Banquet</RimFeast_Feast.letterTitle>
+	<RimFeast_Feast.letterText>{ORGANIZER_labelShort} préside un banquet.</RimFeast_Feast.letterText>
+	<RimFeast_Feast.calledOffMessage>Le banquet a été interrompu.</RimFeast_Feast.calledOffMessage>
+	<RimFeast_Feast.finishedMessage>Le banquet touche à sa fin.</RimFeast_Feast.finishedMessage>
+
+	<RimFeast_GuestFeast.label>banquet</RimFeast_GuestFeast.label>
+	<RimFeast_GuestFeast.letterTitle>Banquet</RimFeast_GuestFeast.letterTitle>
+	<RimFeast_GuestFeast.letterText>Les convives festoient.</RimFeast_GuestFeast.letterText>
+	<RimFeast_GuestFeast.calledOffMessage>Le banquet a été interrompu.</RimFeast_GuestFeast.calledOffMessage>
+	<RimFeast_GuestFeast.finishedMessage>Le banquet touche à sa fin.</RimFeast_GuestFeast.finishedMessage>
+
+</LanguageData>

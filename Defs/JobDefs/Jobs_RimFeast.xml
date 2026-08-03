@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+	<!-- attablé, chope en main -->
+	<JobDef>
+		<defName>RimFeast_SitAtFeastJob</defName>
+		<driverClass>RimFeast.Jobs.JobDriver_SitAtFeast</driverClass>
+		<reportString>feasting at the table.</reportString>
+		<joyKind>Social</joyKind>
+		<joyDuration>3000</joyDuration>
+	</JobDef>
+
+	<!-- l'assassinat commandé depuis le haut bout de table -->
+	<JobDef>
+		<defName>RimFeast_AssassinateJob</defName>
+		<driverClass>RimFeast.Jobs.JobDriver_AssassinateGuest</driverClass>
+		<reportString>assassinating TargetA.</reportString>
+		<casualInterruptible>false</casualInterruptible>
+	</JobDef>
+
+</Defs>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+	<!-- gizmo -->
+	<RimFeast_InviteGizmoLabel>inviter une maison</RimFeast_InviteGizmoLabel>
+	<RimFeast_InviteGizmoDesc>Envoyer un messager porteur de présents pour inviter une maison noble à banqueter ici. Coûte {0} pièces d'argent pour une maison qui n'a jamais dîné chez vous. Une maison qui a festoyé ici récemment exige de plus riches présents, et se laisse moins impressionner une deuxième fois. Laissez passer une saison et la nouveauté revient.</RimFeast_InviteGizmoDesc>
+	<RimFeast_InviteDisabledBusy>un banquet est déjà prévu ou en cours</RimFeast_InviteDisabledBusy>
+	<RimFeast_InviteDisabledNoHouses>Aucune maison noble ne veut traiter avec vous.</RimFeast_InviteDisabledNoHouses>
+	<RimFeast_InviteOption>Inviter {0} (relations {1}, {2} argent)</RimFeast_InviteOption>
+	<RimFeast_InviteOptionAgain>Inviter {0} (relations {1}, {2} argent, a déjà festoyé ici {3}x)</RimFeast_InviteOptionAgain>
+	<RimFeast_NotEnoughSilver>Pas assez d'argent autour de votre colonie pour payer le messager ({0} requis).</RimFeast_NotEnoughSilver>
+
+	<!-- lettres et messages -->
+	<RimFeast_LabelInviteSent>Invitation envoyée</RimFeast_LabelInviteSent>
+	<RimFeast_TextInviteSent>Un messager part au galop porter vos présents et votre invitation à {0}. Si tout va bien, un cortège arrivera d'ici un jour ou deux.\n\nDressez une belle table avant leur venue : victuailles et boissons disposées autour du haut bout, dans une salle digne de ce nom.</RimFeast_TextInviteSent>
+	<RimFeast_LabelGuestsArrive>Cortège de banquet</RimFeast_LabelGuestsArrive>
+	<RimFeast_TextGuestsArrive>Un cortège de {0} est arrivé pour le banquet : {1} convives chevauchant sous la bannière de leur maison. Ils se dirigent vers votre salle de festin.</RimFeast_TextGuestsArrive>
+	<RimFeast_MessageFeastBegins>Le banquet commence. Les convives de {0} prennent place.</RimFeast_MessageFeastBegins>
+	<RimFeast_MessageBrawl>{0} et {1} en viennent aux mains entre deux chopes !</RimFeast_MessageBrawl>
+	<RimFeast_MessageToast>On porte un toast à {0}. La salle se tait pour écouter.</RimFeast_MessageToast>
+	<RimFeast_LabelFeastTriumph>Un banquet de légende</RimFeast_LabelFeastTriumph>
+	<RimFeast_TextFeastTriumph>Le banquet donné pour {0} restera dans les chansons : une salle fastueuse, une table croulante, la boisson coulant toute la nuit. La maison rentre en chantant vos louanges.\n\nEn remerciement, leur seigneur a laissé une bourse de {1} pièces d'argent sur votre table.</RimFeast_TextFeastTriumph>
+	<RimFeast_LabelFeastGood>Un beau banquet</RimFeast_LabelFeastGood>
+	<RimFeast_TextFeastGood>Les convives de {0} ont bien mangé et bien bu. Ils repartent le cœur léger et diront du bien de votre salle.</RimFeast_TextFeastGood>
+	<RimFeast_LabelFeastDecent>Un banquet modeste</RimFeast_LabelFeastDecent>
+	<RimFeast_TextFeastDecent>Le banquet donné pour {0} était convenable, sans plus. Personne n'en fera de chanson. Les convives prennent congé poliment.</RimFeast_TextFeastDecent>
+	<RimFeast_LabelFeastPoor>Une piètre réception</RimFeast_LabelFeastPoor>
+	<RimFeast_TextFeastPoor>Le banquet donné pour {0} est tombé à plat : maigre pitance, table sèche, ou salle indigne de ce nom. Les convives repartent déçus, et la rumeur voyagera.</RimFeast_TextFeastPoor>
+	<!-- duc et noces pourpres -->
+	<RimFeast_TextLeaderRides>{0}, à la tête de la maison {1}, chevauche en personne avec le cortège. Recevoir le chef d'une maison est un honneur rare, et une charge plus lourde encore.</RimFeast_TextLeaderRides>
+	<RimFeast_TextLeaderHonored>Le chef de la maison siégeait en personne à votre table : l'honneur fait à {0} n'en est que plus grand.</RimFeast_TextLeaderHonored>
+	<RimFeast_LabelBetrayed>Hospitalité rompue</RimFeast_LabelBetrayed>
+	<RimFeast_TextBetrayed>Le sang a coulé de votre main, sous votre propre toit. Les convives de {0} tirent l'acier et se battent pour gagner les portes. Ce que la maison en fera dépendra du nombre qui rentrera.</RimFeast_TextBetrayed>
+	<RimFeast_LabelRedWedding>Un banquet rouge</RimFeast_LabelRedWedding>
+	<RimFeast_TextRedWedding>Du cortège de {0}, {1} ne sont jamais ressortis de votre salle libres et vivants. La rumeur d'un hôte qui égorge ses convives à table courra jusqu'à la dernière maison : {0} jure vengeance et viendra chercher le sang, et plus personne ne rompra le pain sous votre toit avant longtemps.</RimFeast_TextRedWedding>
+	<RimFeast_TextBloodSpilled>Un convive de {0} a été blessé de votre main, et le cortège a fui votre salle. La maison se souviendra de cette entorse au droit de l'hôte.</RimFeast_TextBloodSpilled>
+	<RimFeast_InviteRefusedBetrayed>ne rompra plus jamais le pain chez vous</RimFeast_InviteRefusedBetrayed>
+	<RimFeast_InviteRefusedWord>la rumeur du banquet rouge court encore</RimFeast_InviteRefusedWord>
+	<RimFeast_InviteOptionRefused>{0} refuse : {1}</RimFeast_InviteOptionRefused>
+	<RimFeast_SpotFleeing>Les convives de {0} fuient votre salle.</RimFeast_SpotFleeing>
+	<RimFeast_SpotLeaving>Les convives de {0} prennent congé.</RimFeast_SpotLeaving>
+	<RimFeast_MessageTakingWounded>Les convives de {0} rassemblent leurs blessés pour les ramener chez eux.</RimFeast_MessageTakingWounded>
+
+	<!-- ce que la salle donne a voir pendant le festin -->
+	<RimFeast_QualHallLow>La salle les laisse froids.</RimFeast_QualHallLow>
+	<RimFeast_QualHallMid>La salle fait honnête figure.</RimFeast_QualHallMid>
+	<RimFeast_QualHallHigh>La salle en impose.</RimFeast_QualHallHigh>
+	<RimFeast_QualTableLow>La table est maigre.</RimFeast_QualTableLow>
+	<RimFeast_QualTableMid>La table est convenablement dressée.</RimFeast_QualTableMid>
+	<RimFeast_QualTableHigh>La table croule sous les mets.</RimFeast_QualTableHigh>
+	<RimFeast_QualDrinkLow>Les coupes restent vides.</RimFeast_QualDrinkLow>
+	<RimFeast_QualDrinkMid>Il y a de quoi boire, mais chichement.</RimFeast_QualDrinkMid>
+	<RimFeast_QualDrinkHigh>La boisson coule à flots.</RimFeast_QualDrinkHigh>
+	<RimFeast_QualEntLow>La salle est silencieuse.</RimFeast_QualEntLow>
+	<RimFeast_QualEntMid>Un toast a été porté.</RimFeast_QualEntMid>
+	<RimFeast_QualEntHigh>La salle résonne de toasts et de musique.</RimFeast_QualEntHigh>
+	<RimFeast_PreviewHeader>En l'état de la table, pour les {0} convives attendus :</RimFeast_PreviewHeader>
+	<RimFeast_CancelInviteLabel>annuler le banquet</RimFeast_CancelInviteLabel>
+	<RimFeast_CancelInviteDesc>Rappeler le messager avant que la {0} ne se mette en route. Les présents sont déjà dépensés, et ils ne reviendront pas.</RimFeast_CancelInviteDesc>
+	<RimFeast_MessageInviteCancelled>Le messager est rappelé. La {0} ne viendra pas.</RimFeast_MessageInviteCancelled>
+	<RimFeast_WardAwayLine>{0} est élevé à la cour de la {1}, de retour dans environ {2}.</RimFeast_WardAwayLine>
+	<RimFeast_PeriodDays>{0} jours</RimFeast_PeriodDays>
+	<RimFeast_PeriodYears>{0} ans</RimFeast_PeriodYears>
+
+	<!-- reglages -->
+	<RimFeast_SetInviteCost>Coût de l'invitation : {0} pièces d'argent</RimFeast_SetInviteCost>
+	<RimFeast_SetGift>Bourse après un banquet de légende : {0} pièces d'argent</RimFeast_SetGift>
+	<RimFeast_SetHours>Durée du festin : {0} heures</RimFeast_SetHours>
+	<RimFeast_SetCortege>Taille du cortège : environ {0} convives (les maisons envoient de {1} à {2} selon l'estime qu'elles vous portent)</RimFeast_SetCortege>
+	<RimFeast_SetSummon>Les colons lâchent leur travail pour le banquet</RimFeast_SetSummon>
+	<RimFeast_SetSummonTip>Quand les convives s'attablent, les colons posent ce qu'ils font et gagnent la salle. La chirurgie, les soins et les autres tâches qu'on ne lâche pas sont épargnés. Désactivez et ils arriveront un par un à mesure que leur travail se termine, comme les fêtes vanilla.</RimFeast_SetSummonTip>
+	<RimFeast_SetLeader>Les chefs de maison peuvent venir en personne</RimFeast_SetLeader>
+	<RimFeast_SetLeaderTip>Avec de bonnes relations et un banquet déjà à votre actif, le chef de la maison peut chevaucher avec le cortège. Le recevoir vaut davantage, le perdre coûte davantage.</RimFeast_SetLeaderTip>
+	<RimFeast_SetTradePact>Accords commerciaux</RimFeast_SetTradePact>
+	<RimFeast_SetTradePactTip>Un bon banquet vous envoie un marchand de la maison d'ici quelques jours.</RimFeast_SetTradePactTip>
+	<RimFeast_SetMarriage>Demandes en mariage</RimFeast_SetMarriage>
+	<RimFeast_SetMarriageTip>Un noble peut demander la main d'un de vos colons. Accepter, c'est le perdre définitivement au profit de la maison.</RimFeast_SetMarriageTip>
+	<RimFeast_SetProposalChance>Chance de demande : {0}% par vérification</RimFeast_SetProposalChance>
+	<RimFeast_SetDrinkLimit>Les convives arrêtent de boire à : {0}% ({1})</RimFeast_SetDrinkLimit>
+	<RimFeast_DrunkStageWarm>gais</RimFeast_DrunkStageWarm>
+	<RimFeast_DrunkStageTipsy>éméchés</RimFeast_DrunkStageTipsy>
+	<RimFeast_DrunkStageDrunk>ivres morts</RimFeast_DrunkStageDrunk>
+	<RimFeast_SetBrawlChance>Chance de rixe : {0}% par convive ivre, par vérification</RimFeast_SetBrawlChance>
+	<RimFeast_SetTreachery>Les maisons qui vous détestent peuvent venir avec du poison</RimFeast_SetTreachery>
+	<RimFeast_SetTreacheryTip>Sous le seuil de relations, une invitation peut être acceptée avec de mauvaises intentions. Désactivez et une maison froide n'est que froide.</RimFeast_SetTreacheryTip>
+	<RimFeast_SetTreacheryChance>Chance de traîtrise : {0}%</RimFeast_SetTreacheryChance>
+	<RimFeast_SetTreacheryGoodwill>Seuil de relations pour la traîtrise : {0}</RimFeast_SetTreacheryGoodwill>
+	<RimFeast_SetFadeDays>Une maison oublie un banquet tous les {0} jours</RimFeast_SetFadeDays>
+	<RimFeast_SetRedWeddingDays>La rumeur d'un banquet rouge court {0} jours</RimFeast_SetRedWeddingDays>
+
+	<!-- noces pourpres premeditees -->
+	<RimFeast_TrapGizmoLabel>préparer des noces pourpres</RimFeast_TrapGizmoLabel>
+	<RimFeast_TrapGizmoDesc>Le même messager, les mêmes présents, mais ce banquet est un piège. Une fois les convives à table, vous pourrez les marquer pour la lame, un par un. La maison ne pardonnera jamais, la rumeur courra jusqu'à la dernière salle, et vos propres gens porteront la honte. Les armures de plates, elles, restent.</RimFeast_TrapGizmoDesc>
+	<RimFeast_MessageNoAssassin>Personne n'est en état de faire la besogne.</RimFeast_MessageNoAssassin>
+	<RimFeast_KillingsReady>À table en ce moment : {0} des vôtres contre {1} convives. Laissez vos gens s'installer avant de donner le signal.</RimFeast_KillingsReady>
+	<RimFeast_AssassinateDisabledNotSeated>les convives ne sont pas encore à table</RimFeast_AssassinateDisabledNotSeated>
+	<RimFeast_StartKillingsLabel>commencer les meurtres</RimFeast_StartKillingsLabel>
+	<RimFeast_StartKillingsDesc>Désignez le convive qui meurt le premier, le chef de la maison, si vous pouvez l'atteindre. Votre combattant valide le plus proche s'avance lui ouvrir la gorge, et à l'instant où le sang touche le sol, tous vos combattants sont mobilisés et lâchés sur les survivants. L'acier contre l'acier, la cérémonie est finie. Les enfants et les incapables de violence restent en dehors.\n\nPlacez vos gens avant de frapper.</RimFeast_StartKillingsDesc>
+	<RimFeast_MessageSignalGiven>{0} s'avance vers {1}. Quand le sang touchera le sol, tout le monde attaque.</RimFeast_MessageSignalGiven>
+	<RimFeast_TextInviteSentPlanned>Un messager part au galop porter vos présents et votre invitation à {0}. Si tout va bien, un cortège arrivera d'ici un jour ou deux.\n\nDressez une belle table, et aiguisez les couteaux. Ils ne doivent se douter de rien avant que les portes se referment.</RimFeast_TextInviteSentPlanned>
+
+	<!-- empoisonnement -->
+	<RimFeast_InviteRisky>- rapports froids, à vos risques</RimFeast_InviteRisky>
+	<RimFeast_LabelPoisonerCaught>La main dans la marmite</RimFeast_LabelPoisonerCaught>
+	<RimFeast_TextPoisonerCaught>{0} du cortège de {1} a été surpris à glisser quelque chose dans les plats dressés pour le banquet. Le complot échoue et le cortège fuit votre salle.\n\nCe sont eux qui ont rompu le droit de l'hôte : aucune maison ne vous reprochera ce qui arrive aux empoisonneurs sur le chemin de la sortie.</RimFeast_TextPoisonerCaught>
+	<RimFeast_LabelPoisonSymptoms>Du poison à table</RimFeast_LabelPoisonSymptoms>
+	<RimFeast_TextPoisonSymptoms>Vos gens se plient en deux en plein banquet, et la main coupable appartient à {0} : le cortège de {1} a assaisonné votre table de poison. Ils fuient votre salle.\n\nBrûlez ce qui reste sur cette table. Et que personne ne pleure ce qui arrive aux empoisonneurs.</RimFeast_TextPoisonSymptoms>
+	<RimFeast_LabelPoisonRevealed>La traîtrise se révèle</RimFeast_LabelPoisonRevealed>
+	<RimFeast_TextPoisonRevealed>Dans les jours qui suivent le banquet, vos colons tombent malades l'un après l'autre, et la vérité remonte : le cortège de {0} a empoisonné votre table en souriant pendant que vous buviez à leur santé.\n\nBrûlez ce qui reste de ce festin.</RimFeast_TextPoisonRevealed>
+
+	<RimFeast_LabelProposal>Une demande en mariage</RimFeast_LabelProposal>
+	<RimFeast_TextProposal>{0} de {1} a le cœur pris par votre colon {2} d'un bout à l'autre de la table, et demande sa main.\n\nSi vous acceptez, {2} entre dans la maison par les liens du mariage et repart avec le cortège, scellant une parenté entre vous. Vous ne reverrez plus {2}, mais la maison vous appellera famille.\n\nSi vous refusez, sans mal : de telles demandes se font à tout grand banquet.</RimFeast_TextProposal>
+	<RimFeast_ProposalAccept>Donner votre bénédiction (mariage dans la maison, départ avec le cortège)</RimFeast_ProposalAccept>
+	<RimFeast_ProposalDecline>Refuser le parti</RimFeast_ProposalDecline>
+	<RimFeast_LabelBetrothed>Un mariage dans la maison</RimFeast_LabelBetrothed>
+	<RimFeast_TextBetrothed>{0} et {1} sont mariés. À la fin du banquet, {0} rassemble ses affaires et s'en va avec le cortège de {2}, noble de la maison désormais. Vos salles sont plus silencieuses, mais vous avez de la parenté dans la noblesse.</RimFeast_TextBetrothed>
+	<RimFeast_MessageProposalDeclined>Vous refusez le parti. La maison {0} le prend avec grâce.</RimFeast_MessageProposalDeclined>
+	<RimFeast_LabelPactOffered>Accord commercial</RimFeast_LabelPactOffered>
+	<RimFeast_TextPactOffered>{0} a quitté votre salle le ventre plein et le cœur content. Leur intendant vous enverra un marchand de la maison d'ici quelques jours, celui dont ils pourront se passer.</RimFeast_TextPactOffered>
+	<RimFeast_LabelPactChoice>Accord commercial proposé</RimFeast_LabelPactChoice>
+	<RimFeast_TextPactChoice>Un banquet pareil ne s'oublie pas de sitôt. Avant de reprendre la route, le seigneur de {0} vous laisse le choix parmi les marchands de la maison : nommez le négoce qui vous intéresse et cette caravane sera dépêchée d'ici quelques jours.\n\nSi vous ne dites rien, leur intendant enverra simplement celui dont ils pourront se passer.</RimFeast_TextPactChoice>
+	<RimFeast_PactPick>Faire venir leur {0}</RimFeast_PactPick>
+	<RimFeast_MessagePactSet>{0} enverra son {1}.</RimFeast_MessagePactSet>
+	<RimFeast_MessagePactLapsed>La caravane promise par {0} n'a pas pu atteindre votre colonie, et l'accord tombe à l'eau.</RimFeast_MessagePactLapsed>
+	<RimFeast_TextJaded>{0} a déjà dîné à votre table {1} fois. Votre salle a moins de merveilles à leur offrir désormais, et leurs remerciements s'en ressentent. Laissez-leur une saison pour oublier avant de les faire mander à nouveau.</RimFeast_TextJaded>
+	<RimFeast_LabelBrawlDeath>Du sang sur la jonchée</RimFeast_LabelBrawlDeath>
+	<RimFeast_TextBrawlDeath>La rixe d'ivrognes a dégénéré : un convive de {0} gît mort sur votre plancher, tué par l'un des siens. La maison ne vous en tient pas rigueur, mais le cortège remballe ses capes en silence. Un cadavre sous la table met fin à n'importe quel banquet.</RimFeast_TextBrawlDeath>
+	<RimFeast_LabelGuestsHarmed>Convives molestés</RimFeast_LabelGuestsHarmed>
+	<RimFeast_TextGuestsHarmed>Un convive de {0} a été blessé sous votre toit. Le cortège quitte les lieux en furie, et la maison se souviendra de cet affront aux lois de l'hospitalité.</RimFeast_TextGuestsHarmed>
+	<RimFeast_MessageGuestsLeftNoFeast>Le cortège de {0} n'a jamais pu atteindre votre salle et rebrousse chemin.</RimFeast_MessageGuestsLeftNoFeast>
+	<RimFeast_MessageGuestsLeaveWeather>Les convives de {0} ne supportent pas ce climat et prennent congé.</RimFeast_MessageGuestsLeaveWeather>
+	<RimFeast_MessageInviteVoid>Votre invitation à {0} est caduque : il n'y a plus de maison pour la recevoir, ou plus de paix entre vous.</RimFeast_MessageInviteVoid>
+	<RimFeast_MessageSpotDestroyed>Le haut bout de table a disparu. L'invitation à {0} est perdue.</RimFeast_MessageSpotDestroyed>
+
+	<!-- divers -->
+	<RimFeast_ReportFeasting>participe au banquet</RimFeast_ReportFeasting>
+	<RimFeast_ShowMarkerLabel>Afficher le marqueur</RimFeast_ShowMarkerLabel>
+	<RimFeast_ShowMarkerDesc>Dessiner le haut bout de table sur le sol. Désactivez et le marqueur disparaît de votre salle sans rien perdre de sa fonction. Vous pourrez toujours cliquer dessus pour le sélectionner.</RimFeast_ShowMarkerDesc>
+	<RimFeast_MarkerHidden>Marqueur masqué.</RimFeast_MarkerHidden>
+	<RimFeast_SpotIdle>Aucun banquet prévu.</RimFeast_SpotIdle>
+	<RimFeast_LabelRequest>Une requête à table</RimFeast_LabelRequest>
+	<RimFeast_TextRequestWeapon>{0}, de la {1}, se lève au haut bout de la table, coupe en main, et vante longuement l'acier qui sort de vos forges. Puis il en vient au fait : il aimerait emporter une de vos lames. Votre {2}.\n\nLa salle s'est tue. Ses chevaliers regardent.</RimFeast_TextRequestWeapon>
+	<RimFeast_TextRequestArt>{0}, de la {1}, se lève au haut bout de la table et contemple un long moment {2}, qu'il fixe depuis le deuxième service. Puis il demande si l'œuvre pourrait faire le voyage avec lui.\n\nLa salle s'est tue. Ses chevaliers regardent.</RimFeast_TextRequestArt>
+	<RimFeast_TextRequestRival>{0}, de la {1}, se lève au haut bout de la table et parle de la {2}, et de ce qu'il en pense. Puis il vous demande de renier cette maison ici et maintenant, devant tout le monde.\n\nLa salle s'est tue. Quelle que soit votre réponse, elle voyagera.</RimFeast_TextRequestRival>
+	<RimFeast_TextRequestWard>{0}, de la {1}, se lève au haut bout de la table et parle de sa propre maisonnée, des garçons et des filles qu'on y élève, des armes, des lettres et des belles manières. Puis il demande {2}, pour servir comme page dans sa salle et rentrer quand il sera en âge de porter les armes. Quelque {3} ans.\n\nIl serait sous son toit, comme lui est sous le vôtre ce soir.</RimFeast_TextRequestWard>
+	<RimFeast_MessageRequestWardDone>{0} part avec la {1}, pour revenir dans quelque {2} ans.</RimFeast_MessageRequestWardDone>
+	<RimFeast_LabelWardReturns>Un pupille revient</RimFeast_LabelWardReturns>
+	<RimFeast_TextWardReturns>{0} est de retour, {2} ans maintenant, arrivant de la {1}. Un enfant est parti, il en revient une lame, une langue de cour et des lettres.\n\nIl a rejoint votre colonie.</RimFeast_TextWardReturns>
+	<RimFeast_LabelWardLost>Un pupille est perdu</RimFeast_LabelWardLost>
+	<RimFeast_TextWardLost>{0} était élevé dans les salles de la {1}. Quoi qu'il se soit passé entre vous et cette maison, personne ne rentre. Vous ne le reverrez pas.</RimFeast_TextWardLost>
+	<RimFeast_TextWardDied>Un message arrive de la {1}. {0} est mort dans leur maisonnée. Ils renvoient le peu qu'il y a à renvoyer.</RimFeast_TextWardDied>
+	<RimFeast_TextRequestBed>{0}, de la {1}, a bu, et n'a pas quitté {2} des yeux depuis une bonne heure. Le voilà qui se lève et demande, à peu près poliment, si elle voudrait lui tenir compagnie cette nuit.\n\nVous pouvez le laisser lui poser la question lui-même, ou répondre à sa place. Elle ne dira pas forcément ce qu'il espère, et il le prendra mal.</RimFeast_TextRequestBed>
+	<RimFeast_TextRequestBedTaken>{0}, de la {1}, a bu, et n'a pas quitté {2} des yeux depuis une bonne heure. Il sait parfaitement qu'elle est à {3}. Il se lève et demande quand même, assez fort pour toute la tablée.\n\nVous pouvez le laisser lui poser la question lui-même, ou répondre à sa place. Elle ne dira pas forcément ce qu'il espère, et il le prendra mal.</RimFeast_TextRequestBedTaken>
+	<RimFeast_RequestBedAllow>Le laisser lui demander lui-même</RimFeast_RequestBedAllow>
+	<RimFeast_MessageBedAccepted>{0} prend {1} par la main et quitte la salle. La maison est ravie.</RimFeast_MessageBedAccepted>
+	<RimFeast_MessageBedRefused>{0} l'éconduit sèchement, devant toute la tablée. La {1} le prend très mal.</RimFeast_MessageBedRefused>
+	<RimFeast_RequestAccept>Accorder</RimFeast_RequestAccept>
+	<RimFeast_RequestRefuse>Refuser</RimFeast_RequestRefuse>
+	<RimFeast_RequestSteel>Il aura ma réponse par l'acier</RimFeast_RequestSteel>
+	<RimFeast_MessageAnsweredInSteel>{0} a demandé debout. Il ne se rassiéra pas.</RimFeast_MessageAnsweredInSteel>
+	<RimFeast_MessageRequestWeaponDone>{0} est portée au haut bout de la table. La {1} apprécie.</RimFeast_MessageRequestWeaponDone>
+	<RimFeast_MessageRequestArtDone>{0} est décrochée de votre salle et chargée sur leur chariot. La {1} apprécie.</RimFeast_MessageRequestArtDone>
+	<RimFeast_MessageRequestRivalDone>Vous reniez la {0} devant toute la salle. La {1} apprécie.</RimFeast_MessageRequestRivalDone>
+	<RimFeast_MessageRequestRefused>Vous refusez à la {0} devant ses chevaliers.</RimFeast_MessageRequestRefused>
+	<RimFeast_SetRequests>Requêtes à table</RimFeast_SetRequests>
+	<RimFeast_SetRequestsTip>À mi-banquet, le chef du cortège peut se lever et vous demander une faveur : une lame de votre forge, une œuvre de votre salle, un enfant à élever comme page dans sa maisonnée, une nuit avec l'un des vôtres s'il a assez bu pour oser, ou que vous reniiez une maison rivale. Accorder coûte et rapporte. Refuser les insulte.</RimFeast_SetRequestsTip>
+	<RimFeast_SetRequestChance>Chance d'une requête : {0} % par banquet</RimFeast_SetRequestChance>
+	<RimFeast_AwayVisitLabel>Se rendre au banquet de {0}</RimFeast_AwayVisitLabel>
+	<RimFeast_AwayVisitReport>en route vers un banquet de {0}</RimFeast_AwayVisitReport>
+	<RimFeast_LabelAwayInvited>Vous êtes invité</RimFeast_LabelAwayInvited>
+	<RimFeast_TextAwayInvited>Un cavalier arrive de la {0}. Ils dressent leur propre table à {1}, et ils vous y veulent.\n\nComptez environ {2} jours de route. Envoyez une caravane jusqu'à leurs portes, et envoyez quelqu'un qui sait tenir une conversation, ça comptera plus que ce que vous transportez. L'invitation tient {3} jours.</RimFeast_TextAwayInvited>
+	<RimFeast_SetAwayMaxTravel>Les maisons à plus de {0} jours de route ne vous invitent pas</RimFeast_SetAwayMaxTravel>
+	<RimFeast_AwaySeatInspect>Une table y est dressée pour vous ({0} jours restants).</RimFeast_AwaySeatInspect>
+	<RimFeast_MessageAwayNoDiplomat>Personne dans cette caravane n'est en état de s'asseoir à une table noble.</RimFeast_MessageAwayNoDiplomat>
+	<RimFeast_LabelAwayKnives>Les couteaux à leur table</RimFeast_LabelAwayKnives>
+	<RimFeast_TextAwayKnives>Le banquet de la {0} s'est déroulé comme se déroulent les banquets. De la bonne viande, une meilleure boisson, et leur seigneur debout, coupe levée à votre santé.\n\nPuis les portes se sont refermées et les hommes le long du mur ont tiré l'acier. Quoi qu'aient fait vos gens ensuite, ils l'ont fait le ventre plein et sans armure.</RimFeast_TextAwayKnives>
+	<RimFeast_TextAwayKnivesDead>{0} n'est pas ressorti de cette salle.</RimFeast_TextAwayKnivesDead>
+	<RimFeast_TextAwayKnivesHurt>{0} en a été tiré et ramené jusqu'à la caravane, en piteux état.</RimFeast_TextAwayKnivesHurt>
+	<RimFeast_TextAwayKnivesClean>Tous se sont taillé un chemin jusqu'à la porte et sont repartis. Personne ne les croira non plus.</RimFeast_TextAwayKnivesClean>
+	<RimFeast_LabelAwayAmbush>Il n'y a jamais eu de banquet</RimFeast_LabelAwayAmbush>
+	<RimFeast_TextAwayAmbush>Vos gens n'ont jamais atteint les portes. La {0} les a cueillis à une lieue des murs, là où il n'y aurait ni témoins ni table à laquelle rompre le droit de l'hôte.\n\nIls sont livrés à eux-mêmes là-bas.</RimFeast_TextAwayAmbush>
+	<RimFeast_LabelAwaySlight>Assis en bas bout</RimFeast_LabelAwaySlight>
+	<RimFeast_TextAwaySlight>La {0} a placé vos gens au fin fond de la salle, les a servis en dernier et les a renvoyés avant les musiciens. Toute la salle a parfaitement compris le message.</RimFeast_TextAwaySlight>
+	<RimFeast_LabelAwayDull>Une soirée sans histoire</RimFeast_LabelAwayDull>
+	<RimFeast_TextAwayDull>Vos gens ont mangé à la table de la {0}, ont dit ce qu'il fallait dire, et sont rentrés. Rien de gagné, rien de perdu, ce qui vaut mieux que certaines soirées.</RimFeast_TextAwayDull>
+	<RimFeast_LabelAwayFine>Une bonne soirée à leur table</RimFeast_LabelAwayFine>
+	<RimFeast_TextAwayFine>La {0} tenait une belle salle et vos gens vous y ont fait honneur. Les relations progressent de {1}.</RimFeast_TextAwayFine>
+	<RimFeast_LabelAwaySongs>On en parlera longtemps</RimFeast_LabelAwaySongs>
+	<RimFeast_TextAwaySongs>Vos gens ont été la coqueluche de la salle de la {0}. Leur seigneur n'a pas laissé la caravane repartir les mains vides. Les relations progressent de {1}.\n\nElle rentre avec {2}.</RimFeast_TextAwaySongs>
+	<RimFeast_SetAwayFeasts>Les maisons vous invitent à leur tour</RimFeast_SetAwayFeasts>
+	<RimFeast_SetAwayFeastsTip>Une maison qui a dîné à votre table, ou qui vous estime déjà assez, finira par dresser la sienne et vous y convier. Envoyez une caravane vers la tuile signalée. Le tour que prend la soirée dépend de votre meilleur négociateur, de l'estime qu'ils vous portent, du nombre de fois qu'ils ont mangé à votre table, et de si vous avez jadis égorgé leur cortège.</RimFeast_SetAwayFeastsTip>
+	<RimFeast_SetAwayDays>Une invitation arrive tous les {0} jours environ</RimFeast_SetAwayDays>
+	<RimFeast_SetAwayWindow>Une invitation tient {0} jours</RimFeast_SetAwayWindow>
+	<RimFeast_SpotInvited>Invitation envoyée à {0}.</RimFeast_SpotInvited>
+	<RimFeast_EtaLine>Ils arrivent {0}, {1}.</RimFeast_EtaLine>
+	<RimFeast_EtaToday>aujourd'hui</RimFeast_EtaToday>
+	<RimFeast_EtaTomorrow>demain</RimFeast_EtaTomorrow>
+	<RimFeast_EtaDays>dans {0} jours</RimFeast_EtaDays>
+	<RimFeast_EtaMorning>en matinée</RimFeast_EtaMorning>
+	<RimFeast_EtaMidday>vers midi</RimFeast_EtaMidday>
+	<RimFeast_EtaAfternoon>en fin d'après-midi</RimFeast_EtaAfternoon>
+	<RimFeast_EtaEvening>en soirée</RimFeast_EtaEvening>
+	<RimFeast_SpotTraveling>Cortège de {0} en route.</RimFeast_SpotTraveling>
+	<RimFeast_SpotFeasting>Banquet en cours avec {0}.</RimFeast_SpotFeasting>
+
+</LanguageData>

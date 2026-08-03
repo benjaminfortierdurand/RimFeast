@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+	<RimFeast_AttendedFeast.stages.0.label>a participé à un banquet</RimFeast_AttendedFeast.stages.0.label>
+	<RimFeast_AttendedFeast.stages.0.description>Un vrai banquet, comme dans les contes. La salle, la viande, l'hydromel, la compagnie.</RimFeast_AttendedFeast.stages.0.description>
+
+	<RimFeast_NightWithNoble.stages.0.label>une nuit avec un noble</RimFeast_NightWithNoble.stages.0.label>
+	<RimFeast_NightWithNoble.stages.0.description>De la soie, un vrai lit, et pour une fois quelqu'un aux mains propres et aux belles manières. On dira ce qu'on voudra de la noblesse.</RimFeast_NightWithNoble.stages.0.description>
+
+	<RimFeast_GuestRightBroken.stages.0.label>nous avons rompu le droit de l'hôte</RimFeast_GuestRightBroken.stages.0.label>
+	<RimFeast_GuestRightBroken.stages.0.description>Ils ont mangé à notre table. Ils ont bu notre hydromel. Et nous les avons mis en terre. Quoi que nous soyons désormais, nous ne sommes plus des hôtes.</RimFeast_GuestRightBroken.stages.0.description>
+
+</LanguageData>

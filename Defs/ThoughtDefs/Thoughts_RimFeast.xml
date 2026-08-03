@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+	<!-- souvenir colons, puissance modulée par le temps passé à table (flux vanilla des parties) -->
+	<ThoughtDef>
+		<defName>RimFeast_AttendedFeast</defName>
+		<thoughtClass>Thought_Memory</thoughtClass>
+		<durationDays>2</durationDays>
+		<stackLimit>1</stackLimit>
+		<stages>
+			<li>
+				<label>attended a feast</label>
+				<description>A real banquet, like in the tales. The hall, the meat, the mead, the company.</description>
+				<baseMoodEffect>12</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+
+	<!-- elle a dit oui, et elle a passé la soirée au haut bout de la table -->
+	<ThoughtDef>
+		<defName>RimFeast_NightWithNoble</defName>
+		<thoughtClass>Thought_Memory</thoughtClass>
+		<durationDays>5</durationDays>
+		<stackLimit>1</stackLimit>
+		<stages>
+			<li>
+				<label>a night with a noble</label>
+				<description>Silks, a proper bed, and someone with clean hands and good manners for once. Say what you like about the nobility.</description>
+				<baseMoodEffect>6</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+
+	<!-- toute la colonie sait ce qui s'est passé sous ce toit. les psychopathes s'en fichent -->
+	<ThoughtDef>
+		<defName>RimFeast_GuestRightBroken</defName>
+		<thoughtClass>Thought_Memory</thoughtClass>
+		<durationDays>6</durationDays>
+		<stackLimit>1</stackLimit>
+		<nullifyingTraits>
+			<li>Psychopath</li>
+			<li>Bloodlust</li>
+		</nullifyingTraits>
+		<stages>
+			<li>
+				<label>we broke the guest right</label>
+				<description>They ate at our table. They drank our mead. And we put them in the ground. Whatever we are now, we are no hosts.</description>
+				<baseMoodEffect>-6</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+
+</Defs>
