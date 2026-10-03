@@ -30,7 +30,7 @@
 	<RimFeast_TextFeastPoor>Le banquet donné pour {0} est tombé à plat : maigre pitance, table sèche, ou salle indigne de ce nom. Les convives repartent déçus, et la rumeur voyagera.</RimFeast_TextFeastPoor>
 	<!-- duc et noces pourpres -->
 	<RimFeast_TextLeaderRides>{0}, à la tête de la maison {1}, chevauche en personne avec le cortège. Recevoir le chef d'une maison est un honneur rare, et une charge plus lourde encore.</RimFeast_TextLeaderRides>
-	<RimFeast_TextLeaderHonored>Le chef de la maison siégeait en personne à votre table : l'honneur fait à {0} n'en est que plus grand.</RimFeast_TextLeaderHonored>
+	<RimFeast_TextLeaderHonored>Le chef de la maison siégeait en personne à votre table. L'honneur fait à {0} n'en est que plus grand.</RimFeast_TextLeaderHonored>
 	<RimFeast_TextLeaderShamed>Le chef de la maison a tout vu en personne. Une table maigre servie sous ces yeux-là coûte plus cher qu'une table maigre.</RimFeast_TextLeaderShamed>
 	<RimFeast_TextPoorTravels>Une table pauvre voyage aussi loin qu'une table riche. La maison {0} vous estime un peu moins.</RimFeast_TextPoorTravels>
 	<RimFeast_LabelBetrayed>Hospitalité rompue</RimFeast_LabelBetrayed>
@@ -144,16 +144,16 @@
 	<!-- divers -->
 	<RimFeast_ReportFeasting>participe au banquet</RimFeast_ReportFeasting>
 	<RimFeast_ShowMarkerLabel>Afficher le marqueur</RimFeast_ShowMarkerLabel>
-	<RimFeast_ShowMarkerDesc>Dessiner le haut bout de table sur le sol. Désactivez et le marqueur disparaît de votre salle sans rien perdre de sa fonction. Vous pourrez toujours cliquer dessus pour le sélectionner.</RimFeast_ShowMarkerDesc>
-	<RimFeast_AreaPlus>zone {0} +</RimFeast_AreaPlus>
-	<RimFeast_AreaMinus>zone {0} -</RimFeast_AreaMinus>
+	<RimFeast_ShowMarkerDesc>Afficher ou masquer le marqueur. Le banquet fonctionne dans les deux cas.</RimFeast_ShowMarkerDesc>
+	<RimFeast_AreaPlus>Rayon {0} +</RimFeast_AreaPlus>
+	<RimFeast_AreaMinus>Rayon {0} -</RimFeast_AreaMinus>
 	<RimFeast_AreaDesc>Jusqu'où s'étend le banquet autour du marqueur. Seuls les plats, la boisson, les chaises et les instruments à l'intérieur comptent, et les convives y restent. Sélectionnez le marqueur pour la voir au sol.</RimFeast_AreaDesc>
-	<RimFeast_AreaAuto>toute la salle</RimFeast_AreaAuto>
+	<RimFeast_AreaAuto>Auto</RimFeast_AreaAuto>
 	<RimFeast_AreaAutoDesc>Étendre le banquet jusqu'aux murs de la pièce où se trouve le marqueur, quelle que soit sa taille.</RimFeast_AreaAutoDesc>
 	<RimFeast_AreaNotEnclosed>Le marqueur n'est pas dans une pièce fermée. Utilisez le rayon.</RimFeast_AreaNotEnclosed>
 	<RimFeast_AreaFitted>Le banquet occupe maintenant toute la salle : {0} cases.</RimFeast_AreaFitted>
-	<RimFeast_SpotAreaRoom>Zone du banquet : toute la salle, {0} cases.</RimFeast_SpotAreaRoom>
-	<RimFeast_SpotAreaRadius>Zone du banquet : {0} cases autour du marqueur, dans cette pièce.</RimFeast_SpotAreaRadius>
+	<RimFeast_SpotAreaRoom>Le banquet occupe toute la salle, {0} cases.</RimFeast_SpotAreaRoom>
+	<RimFeast_SpotAreaRadius>Le banquet s'étend à {0} cases autour du marqueur, dans cette pièce.</RimFeast_SpotAreaRadius>
 	<RimFeast_MarkerHidden>Marqueur masqué.</RimFeast_MarkerHidden>
 	<RimFeast_SpotIdle>Aucun banquet prévu.</RimFeast_SpotIdle>
 	<RimFeast_LabelRequest>Une requête à table</RimFeast_LabelRequest>

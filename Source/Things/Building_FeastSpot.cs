@@ -35,7 +35,7 @@ namespace RimFeast
 			{
 				defaultLabel = "RimFeast_ShowMarkerLabel".Translate(),
 				defaultDesc = "RimFeast_ShowMarkerDesc".Translate(),
-				icon = TexCommand.GatherSpotActive,
+				icon = RimFeastTex.ShowMarker,
 				isActive = () => !hideMarker,
 				toggleAction = delegate
 				{

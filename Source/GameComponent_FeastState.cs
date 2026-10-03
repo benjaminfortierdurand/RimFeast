@@ -224,6 +224,36 @@ namespace RimFeast
 		}
 	}
 
+	// une nuit accordee a table. suivie hors du dossier du banquet: le cortege peut partir
+	// avant la fin, et les lits doivent etre rendus quoi qu'il arrive
+	public class LovinScene : IExposable
+	{
+		public const int Pending = 0;
+		public const int Running = 1;
+
+		public int caseId;
+		public int state;
+		public int startTick = -1;
+		public Pawn her;
+		public Pawn him;
+		public Building_Bed bed;
+		public List<Pawn> owners = new List<Pawn>();
+		public Building_Bed herBed;
+
+		public void ExposeData()
+		{
+			Scribe_Values.Look(ref caseId, "caseId");
+			Scribe_Values.Look(ref state, "state");
+			Scribe_Values.Look(ref startTick, "startTick", -1);
+			Scribe_References.Look(ref her, "her");
+			Scribe_References.Look(ref him, "him");
+			Scribe_References.Look(ref bed, "bed");
+			Scribe_Collections.Look(ref owners, "owners", LookMode.Reference);
+			Scribe_References.Look(ref herBed, "herBed");
+			if (Scribe.mode == LoadSaveMode.PostLoadInit && owners == null) owners = new List<Pawn>();
+		}
+	}
+
 	public class GameComponent_FeastState : GameComponent
 	{
 		private FeastCase current;
@@ -235,6 +265,7 @@ namespace RimFeast
 		private int nextId = 1;
 		private int redWeddingTick = -1;
 		private int nextAwayInviteTick = -1;
+		private LovinScene lovin;
 
 		// l'invitation en cours chez eux. pas d'objet sur la carte du monde: on se rend a
 		// leur vraie colonie, le comp greffe dessus ouvre l'option dans le menu de caravane
@@ -309,6 +340,10 @@ namespace RimFeast
 
 		// le signal du massacre est donne: plus rien de ce qui arrive aux convives n'est un accident
 		public bool SlaughterUnderway => current != null && current.slaughterOrdered;
+
+		// tant qu'ils sont au lit, le cortege ne se leve pas pour un toast: la transition
+		// couperait le job du noble et la scene avec
+		public bool LovinUnderway(int id) => lovin != null && lovin.caseId == id && lovin.state == LovinScene.Running;
 
 		// bascule symetrique. SetRelationDirect ecrit un sens, notifie (gros traitement qui
 		// peut jeter en plein vol, et nos postActions avalent les exceptions), puis ecrit
@@ -736,6 +771,7 @@ namespace RimFeast
 			if (raids.Count > 0) TickRaids();
 			if (reveals.Count > 0) TickReveals();
 			if (wards.Count > 0) TickWards();
+			if (lovin != null) TickLovin();
 			TickAwayInvites();
 
 			if (current == null) return;
@@ -2598,26 +2634,66 @@ namespace RimFeast
 			return best;
 		}
 
-		// on joue la scene pour de vrai quand la colonie a un lit pour ca. le driver vanilla
-		// revendique le lit au passage et delaisse son proprietaire, alors on note qui l'avait
-		// et on le lui rend a la fin du job. sans lit trouvable, l'ellipse suffira
-		private static void TryStageLovin(FeastCase c, Pawn her, Pawn him)
+		private const int LovinGiveUpTicks = 15000;
+
+		// la scene attend que le cortege soit rassis: un toast en cours la couperait aussitot.
+		// une fois lancee, on rend les lits des que plus personne n'est au lit
+		private void TickLovin()
 		{
-			Building_Bed bed = FindLovinBed(c.map, him);
-			if (bed == null) return;
-
-			List<Pawn> owners = bed.OwnersForReading.ToList();
-			Job job = JobMaker.MakeJob(JobDefOf.Lovin, her, bed);
-			him.jobs.TryTakeOrderedJob(job, JobTag.Misc);
-			if (him.CurJobDef != JobDefOf.Lovin) return;
-
-			him.jobs.curDriver?.AddFinishAction(delegate(JobCondition _)
+			LovinScene s = lovin;
+			if (s.state == LovinScene.Pending)
 			{
-				if (bed.Destroyed) return;
-				foreach (Pawn p in bed.OwnersForReading.ToList()) p.ownership?.UnclaimBed();
-				foreach (Pawn p in owners)
-					if (p != null && !p.Dead) p.ownership?.ClaimBedIfNonMedical(bed);
-			});
+				FeastCase c = current;
+				if (c == null || c.id != s.caseId || c.state != FeastCase.Feasting || c.lord == null)
+				{
+					lovin = null;
+					return;
+				}
+				if (c.lord.CurLordToil is LordToil_Toast) return;
+				if (!StartLovin(c, s)) lovin = null;
+				return;
+			}
+			bool busy = InLovin(s.her) || InLovin(s.him);
+			if (busy && Find.TickManager.TicksGame - s.startTick < LovinGiveUpTicks) return;
+			RestoreLovin(s);
+			lovin = null;
+		}
+
+		private static bool InLovin(Pawn p) => p != null && p.Spawned && p.CurJobDef == JobDefOf.Lovin;
+
+		// vanilla fait marcher le noble seul jusqu'au lit, et ne lance la partenaire qu'a son
+		// arrivee. sans lit trouvable, l'ellipse suffira
+		private static bool StartLovin(FeastCase c, LovinScene s)
+		{
+			Pawn her = s.her, him = s.him;
+			if (her == null || him == null || !her.Spawned || !him.Spawned || her.Dead || him.Dead
+				|| her.Downed || him.Downed || her.InMentalState || him.InMentalState) return false;
+			Building_Bed bed = FindLovinBed(c.map, him);
+			if (bed == null) return false;
+
+			s.owners = bed.OwnersForReading.ToList();
+			s.herBed = her.ownership?.OwnedBed;
+			him.jobs.TryTakeOrderedJob(JobMaker.MakeJob(JobDefOf.Lovin, her, bed), JobTag.Misc);
+			if (him.CurJobDef != JobDefOf.Lovin) return false;
+			s.bed = bed;
+			s.state = LovinScene.Running;
+			s.startTick = Find.TickManager.TicksGame;
+			return true;
+		}
+
+		// le driver vanilla fait revendiquer le lit aux deux. chacun retrouve le sien, elle
+		// comprise: sans ca elle perdait sa place a cote de son mari
+		private static void RestoreLovin(LovinScene s)
+		{
+			if (s.bed != null && !s.bed.Destroyed)
+			{
+				foreach (Pawn p in s.bed.OwnersForReading.ToList()) p.ownership?.UnclaimBed();
+				foreach (Pawn p in s.owners)
+					if (p != null && !p.Dead) p.ownership?.ClaimBedIfNonMedical(s.bed);
+			}
+			if (s.herBed != null && !s.herBed.Destroyed && s.her != null && !s.her.Dead
+				&& s.her.ownership != null && s.her.ownership.OwnedBed != s.herBed)
+				s.her.ownership.ClaimBedIfNonMedical(s.herBed);
 		}
 
 		// c'est elle qui repond. l'orientation tranche d'abord, le couple pese lourd, et le
@@ -2650,7 +2726,7 @@ namespace RimFeast
 			her.needs?.mood?.thoughts?.memories?.TryGainMemory(RimFeastDefOf.RimFeast_NightWithNoble);
 			// pas de rupture: une nuit de banquet ne dissout pas un mariage, mais il l'apprendra
 			partner?.needs?.mood?.thoughts?.memories?.TryGainMemory(ThoughtDefOf.CheatedOnMe, her);
-			TryStageLovin(c, her, him);
+			lovin = new LovinScene { caseId = c.id, her = her, him = him };
 
 			c.house?.TryAffectGoodwillWith(Faction.OfPlayer, 18, canSendMessage: true,
 				canSendHostilityLetter: false);
@@ -2852,6 +2928,7 @@ namespace RimFeast
 			Scribe_Values.Look(ref nextAwayInviteTick, "nextAwayInviteTick", -1);
 			Scribe_References.Look(ref awayHouse, "awayHouse");
 			Scribe_Values.Look(ref awayExpireTick, "awayExpireTick", -1);
+			Scribe_Deep.Look(ref lovin, "lovin");
 			if (Scribe.mode == LoadSaveMode.PostLoadInit)
 			{
 				if (memories == null) memories = new List<HouseFeastMemory>();

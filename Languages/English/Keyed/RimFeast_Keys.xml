@@ -30,7 +30,7 @@
 	<RimFeast_TextFeastPoor>The banquet for {0} fell flat: thin fare, a dry table, or a hall not worth the name. The guests leave unimpressed, and word of it will travel.</RimFeast_TextFeastPoor>
 	<!-- duc et noces pourpres -->
 	<RimFeast_TextLeaderRides>{0}, head of house {1}, rides with the cortege in person. Hosting the head of a house is a rare honor, and a heavier charge.</RimFeast_TextLeaderRides>
-	<RimFeast_TextLeaderHonored>The head of the house sat at your table in person: the honor done to {0} is all the greater.</RimFeast_TextLeaderHonored>
+	<RimFeast_TextLeaderHonored>The head of the house sat at your table in person. The honor done to {0} is all the greater.</RimFeast_TextLeaderHonored>
 	<RimFeast_TextLeaderShamed>The head of the house saw it all in person. A thin table served under those eyes costs more than a thin table.</RimFeast_TextLeaderShamed>
 	<RimFeast_TextPoorTravels>A poor table travels as far as a rich one. House {0} thinks a little less of you.</RimFeast_TextPoorTravels>
 	<RimFeast_LabelBetrayed>Hospitality broken</RimFeast_LabelBetrayed>
@@ -144,16 +144,16 @@
 	<!-- divers -->
 	<RimFeast_ReportFeasting>attending the feast</RimFeast_ReportFeasting>
 	<RimFeast_ShowMarkerLabel>Show marker</RimFeast_ShowMarkerLabel>
-	<RimFeast_ShowMarkerDesc>Draw the feast spot on the floor. Turn it off and the marker vanishes from your hall while the spot keeps working. You can still click it to select it.</RimFeast_ShowMarkerDesc>
-	<RimFeast_AreaPlus>area {0} +</RimFeast_AreaPlus>
-	<RimFeast_AreaMinus>area {0} -</RimFeast_AreaMinus>
+	<RimFeast_ShowMarkerDesc>Show or hide the marker. The feast keeps working either way.</RimFeast_ShowMarkerDesc>
+	<RimFeast_AreaPlus>Radius {0} +</RimFeast_AreaPlus>
+	<RimFeast_AreaMinus>Radius {0} -</RimFeast_AreaMinus>
 	<RimFeast_AreaDesc>How far the feast reaches from the spot. Only food, drink, chairs and instruments inside it count, and the guests stay inside it. Select the spot to see it on the floor.</RimFeast_AreaDesc>
-	<RimFeast_AreaAuto>whole hall</RimFeast_AreaAuto>
+	<RimFeast_AreaAuto>Auto</RimFeast_AreaAuto>
 	<RimFeast_AreaAutoDesc>Stretch the feast to the walls of the room the spot stands in, however big it is.</RimFeast_AreaAutoDesc>
 	<RimFeast_AreaNotEnclosed>The spot isnt in an enclosed room. Use the radius instead.</RimFeast_AreaNotEnclosed>
 	<RimFeast_AreaFitted>The feast now fills the hall: {0} cells.</RimFeast_AreaFitted>
-	<RimFeast_SpotAreaRoom>Feast area: the whole hall, {0} cells.</RimFeast_SpotAreaRoom>
-	<RimFeast_SpotAreaRadius>Feast area: {0} cells around the spot, within this room.</RimFeast_SpotAreaRadius>
+	<RimFeast_SpotAreaRoom>The feast fills the whole hall, {0} cells.</RimFeast_SpotAreaRoom>
+	<RimFeast_SpotAreaRadius>The feast reaches {0} cells around the spot, within this room.</RimFeast_SpotAreaRadius>
 	<RimFeast_MarkerHidden>Marker hidden.</RimFeast_MarkerHidden>
 	<RimFeast_SpotIdle>No feast planned.</RimFeast_SpotIdle>
 	<RimFeast_LabelRequest>A request at the table</RimFeast_LabelRequest>

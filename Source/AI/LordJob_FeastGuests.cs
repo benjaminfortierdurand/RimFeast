@@ -82,7 +82,8 @@ namespace RimFeast.AI
 			// TriggerData par index au chargement, une geometrie variable les decalerait
 			var raise = new Transition(feast, toast);
 			raise.AddTrigger(new Trigger_TickCondition(
-				() => lord.ticksInToil >= GameComponent_FeastState.ToastIntervalTicks && SpeakerReady(), 60));
+				() => lord.ticksInToil >= GameComponent_FeastState.ToastIntervalTicks && SpeakerReady()
+					&& !(GameComponent_FeastState.Get()?.LovinUnderway(caseId) ?? false), 60));
 			raise.AddPreAction(new TransitionAction_Custom((System.Action)delegate
 			{
 				GameComponent_FeastState.Get()?.Notify_ToastGiven(caseId);
