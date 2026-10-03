@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using RimWorld;
 using Verse;
 using Verse.AI;
@@ -6,7 +7,37 @@ using Verse.AI.Group;
 namespace RimFeast.AI
 {
 	// la tablee des colons. le menestrel est de la maison qui recoit, pas du cortege
-	public class LordToil_ColonistFeast : LordToil_Party
+	// la tablee lit la zone du marqueur, pas celle de vanilla: presence et loisir suivent
+	// ce que le joueur a regle
+	public class LordToil_FeastParty : LordToil_Party
+	{
+		private FeastUtility.FeastArea area;
+		private int areaTick = -1;
+
+		public LordToil_FeastParty(IntVec3 spot, GatheringDef gatheringDef)
+			: base(spot, gatheringDef) { }
+
+		public override void LordToilTick()
+		{
+			int now = Find.TickManager.TicksGame;
+			if (areaTick < 0 || now - areaTick >= 250)
+			{
+				area = FeastUtility.FeastArea.For(spot, Map);
+				areaTick = now;
+			}
+			List<Pawn> pawns = lord.ownedPawns;
+			for (int i = 0; i < pawns.Count; i++)
+			{
+				Pawn p = pawns[i];
+				if (!area.Contains(p.Position)) continue;
+				Data.presentForTicks.TryGetValue(p, out int t);
+				Data.presentForTicks[p] = t + 1;
+				p.needs?.joy?.GainJoy(DefaultJoyPerTick, JoyKindDefOf.Social);
+			}
+		}
+	}
+
+	public class LordToil_ColonistFeast : LordToil_FeastParty
 	{
 		public LordToil_ColonistFeast(IntVec3 spot, GatheringDef gatheringDef)
 			: base(spot, gatheringDef) { }

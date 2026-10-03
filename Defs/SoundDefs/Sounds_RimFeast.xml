@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-	<!-- la chanson jouée depuis l'instrument de la salle pendant les noces pourpres.
-	     modèle: Harp_Play de Royalty. le fondu de 5s est celui de la lettre de bilan -->
 	<SoundDef>
 		<defName>RimFeast_RedWeddingPerformance</defName>
 		<context>MapOnly</context>
 		<maxSimultaneous>1</maxSimultaneous>
 		<sustain>True</sustain>
-		<!-- obligatoire avec sustain: le defaut PrioritizeNewest est refuse par vanilla -->
 		<priorityMode>PrioritizeNearest</priorityMode>
 		<sustainFadeoutTime>5</sustainFadeoutTime>
 		<subSounds>
@@ -16,6 +13,27 @@
 				<grains>
 					<li Class="AudioGrain_Clip">
 						<clipPath>Song/RimFeast_RedWedding</clipPath>
+					</li>
+				</grains>
+				<volumeRange>55</volumeRange>
+				<distRange>15~60</distRange>
+				<muteWhenPaused>True</muteWhenPaused>
+			</li>
+		</subSounds>
+	</SoundDef>
+
+	<SoundDef>
+		<defName>RimFeast_CensoredPerformance</defName>
+		<context>MapOnly</context>
+		<maxSimultaneous>1</maxSimultaneous>
+		<sustain>True</sustain>
+		<priorityMode>PrioritizeNearest</priorityMode>
+		<sustainFadeoutTime>5</sustainFadeoutTime>
+		<subSounds>
+			<li>
+				<grains>
+					<li Class="AudioGrain_Clip">
+						<clipPath>Song/RimFeast_censored</clipPath>
 					</li>
 				</grains>
 				<volumeRange>55</volumeRange>

@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-	<!-- choix du marchand que la maison enverra, apres un banquet de légende -->
 	<LetterDef ParentName="PositiveEvent">
 		<defName>RimFeast_TradePact</defName>
 		<letterClass>RimFeast.ChoiceLetter_TradePact</letterClass>
 	</LetterDef>
 
-	<!-- un noble demande la main d'un colon -->
 	<LetterDef ParentName="PositiveEvent">
 		<defName>RimFeast_MarriageProposal</defName>
 		<letterClass>RimFeast.ChoiceLetter_MarriageProposal</letterClass>
 	</LetterDef>
 
-	<!-- le seigneur se lève à table et demande une faveur.
-	     pas de ParentName ici: NeutralEvent n'a pas d'attribut Name côté vanilla, seuls
-	     ThreatBig, NegativeEvent et PositiveEvent sont héritables. on recopie ses valeurs -->
 	<LetterDef>
 		<defName>RimFeast_FeastRequest</defName>
 		<letterClass>RimFeast.ChoiceLetter_FeastRequest</letterClass>

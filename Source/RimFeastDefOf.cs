@@ -26,6 +26,8 @@ namespace RimFeast
 
 		public static SongDef RimFeast_RedWeddingSong;
 		public static SoundDef RimFeast_RedWeddingPerformance;
+		public static SongDef RimFeast_CensoredSong;
+		public static SoundDef RimFeast_CensoredPerformance;
 
 		public static ThoughtDef RimFeast_AttendedFeast;
 		public static ThoughtDef RimFeast_NightWithNoble;

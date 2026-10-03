@@ -44,7 +44,7 @@ namespace RimFeast.AI
 			// on paie l'elargissement en testant l'edifice avant la piece, un sol vide sort
 			// sur une lecture de grille au lieu d'une recherche de region
 			Thing loose = null;
-			int cells = GenRadial.NumCellsInRadius(18f);
+			int cells = GenRadial.NumCellsInRadius(area.Reach());
 			for (int i = 0; i < cells; i++)
 			{
 				IntVec3 c = spot + GenRadial.RadialPattern[i];

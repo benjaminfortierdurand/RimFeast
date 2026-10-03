@@ -16,6 +16,8 @@
 	<RimFeast_LabelGuestsArrive>Feast cortege</RimFeast_LabelGuestsArrive>
 	<RimFeast_TextGuestsArrive>A cortege from {0} has arrived for the feast: {1} guests riding under their house banner. They are making for your feast hall.</RimFeast_TextGuestsArrive>
 	<RimFeast_MessageFeastBegins>The feast begins. The guests of {0} take their places.</RimFeast_MessageFeastBegins>
+	<RimFeast_LabelCortegeGift>A gift from {0}</RimFeast_LabelCortegeGift>
+	<RimFeast_TextCortegeGift>The cortege of {0} did not come empty-handed. {1} sets a present down at the head of the table before sitting:\n\n{2}</RimFeast_TextCortegeGift>
 	<RimFeast_MessageBrawl>{0} and {1} have come to blows over their cups!</RimFeast_MessageBrawl>
 	<RimFeast_MessageToast>A toast is raised to {0}. The hall falls quiet to listen.</RimFeast_MessageToast>
 	<RimFeast_LabelFeastTriumph>A feast for the ages</RimFeast_LabelFeastTriumph>
@@ -29,6 +31,8 @@
 	<!-- duc et noces pourpres -->
 	<RimFeast_TextLeaderRides>{0}, head of house {1}, rides with the cortege in person. Hosting the head of a house is a rare honor, and a heavier charge.</RimFeast_TextLeaderRides>
 	<RimFeast_TextLeaderHonored>The head of the house sat at your table in person: the honor done to {0} is all the greater.</RimFeast_TextLeaderHonored>
+	<RimFeast_TextLeaderShamed>The head of the house saw it all in person. A thin table served under those eyes costs more than a thin table.</RimFeast_TextLeaderShamed>
+	<RimFeast_TextPoorTravels>A poor table travels as far as a rich one. House {0} thinks a little less of you.</RimFeast_TextPoorTravels>
 	<RimFeast_LabelBetrayed>Hospitality broken</RimFeast_LabelBetrayed>
 	<RimFeast_TextBetrayed>Blood has been drawn by your hand, under your own roof. The guests of {0} draw steel and fight their way toward the gates. What the house makes of it will depend on how many make it home.</RimFeast_TextBetrayed>
 	<RimFeast_LabelRedWedding>A red feast</RimFeast_LabelRedWedding>
@@ -81,10 +85,12 @@
 	<RimFeast_DrunkStageTipsy>tipsy</RimFeast_DrunkStageTipsy>
 	<RimFeast_DrunkStageDrunk>falling-down drunk</RimFeast_DrunkStageDrunk>
 	<RimFeast_SetBrawlChance>Drunken brawl chance: {0}% per drunk guest, per check</RimFeast_SetBrawlChance>
-	<RimFeast_SetTreachery>Houses that hate you may come with poison</RimFeast_SetTreachery>
+	<RimFeast_SetTreachery>Guests in your hall may come with poison</RimFeast_SetTreachery>
 	<RimFeast_SetTreacheryTip>Below the goodwill threshold, an invitation may be accepted with bad intentions. Turn this off and a cold house is merely cold.</RimFeast_SetTreacheryTip>
 	<RimFeast_SetTreacheryChance>Treachery chance: {0}%</RimFeast_SetTreacheryChance>
 	<RimFeast_SetTreacheryGoodwill>Treachery goodwill threshold: {0}</RimFeast_SetTreacheryGoodwill>
+	<RimFeast_SetCensoredMusic>Use the alternate red feast tune</RimFeast_SetCensoredMusic>
+	<RimFeast_SetCensoredMusicTip>The red feast plays a cover of a certain song from a certain show. Tick this to use a different track instead, same scene, same cue, no copyright worries.</RimFeast_SetCensoredMusicTip>
 	<RimFeast_SetFadeDays>A house forgets one feast every {0} days</RimFeast_SetFadeDays>
 	<RimFeast_SetRedWeddingDays>Word of a red feast travels for {0} days</RimFeast_SetRedWeddingDays>
 
@@ -127,6 +133,9 @@
 	<RimFeast_TextBrawlDeath>The drunken brawl went too far and a guest of {0} lies dead on your floor, killed by one of their own. The house holds you blameless, but the cortege gathers its cloaks in silence. A corpse under the table ends any banquet.</RimFeast_TextBrawlDeath>
 	<RimFeast_LabelGuestsHarmed>Guests harmed</RimFeast_LabelGuestsHarmed>
 	<RimFeast_TextGuestsHarmed>A guest of {0} has come to harm under your roof. The cortege storms out, and the house will remember this insult to hospitality.</RimFeast_TextGuestsHarmed>
+	<RimFeast_LabelGuestsLeaveFighting>Guests leave the fighting</RimFeast_LabelGuestsLeaveFighting>
+	<RimFeast_TextGuestsLeaveFighting>Blades came out on your land while the cortege of {0} was under your roof, and one of theirs went down in the fighting. They gather their wounded and pull out. No house holds a raid against its host, but the evening is over.</RimFeast_TextGuestsLeaveFighting>
+	<RimFeast_TextGuestsLeaveFightingJudged>They had sat at your table long enough to judge it.</RimFeast_TextGuestsLeaveFightingJudged>
 	<RimFeast_MessageGuestsLeftNoFeast>The cortege of {0} never reached your hall and has turned back.</RimFeast_MessageGuestsLeftNoFeast>
 	<RimFeast_MessageGuestsLeaveWeather>The guests of {0} cannot endure this weather and take their leave.</RimFeast_MessageGuestsLeaveWeather>
 	<RimFeast_MessageInviteVoid>Your invitation to {0} is void: there is no longer a house to receive, or no longer peace between you.</RimFeast_MessageInviteVoid>
@@ -136,6 +145,15 @@
 	<RimFeast_ReportFeasting>attending the feast</RimFeast_ReportFeasting>
 	<RimFeast_ShowMarkerLabel>Show marker</RimFeast_ShowMarkerLabel>
 	<RimFeast_ShowMarkerDesc>Draw the feast spot on the floor. Turn it off and the marker vanishes from your hall while the spot keeps working. You can still click it to select it.</RimFeast_ShowMarkerDesc>
+	<RimFeast_AreaPlus>area {0} +</RimFeast_AreaPlus>
+	<RimFeast_AreaMinus>area {0} -</RimFeast_AreaMinus>
+	<RimFeast_AreaDesc>How far the feast reaches from the spot. Only food, drink, chairs and instruments inside it count, and the guests stay inside it. Select the spot to see it on the floor.</RimFeast_AreaDesc>
+	<RimFeast_AreaAuto>whole hall</RimFeast_AreaAuto>
+	<RimFeast_AreaAutoDesc>Stretch the feast to the walls of the room the spot stands in, however big it is.</RimFeast_AreaAutoDesc>
+	<RimFeast_AreaNotEnclosed>The spot isnt in an enclosed room. Use the radius instead.</RimFeast_AreaNotEnclosed>
+	<RimFeast_AreaFitted>The feast now fills the hall: {0} cells.</RimFeast_AreaFitted>
+	<RimFeast_SpotAreaRoom>Feast area: the whole hall, {0} cells.</RimFeast_SpotAreaRoom>
+	<RimFeast_SpotAreaRadius>Feast area: {0} cells around the spot, within this room.</RimFeast_SpotAreaRadius>
 	<RimFeast_MarkerHidden>Marker hidden.</RimFeast_MarkerHidden>
 	<RimFeast_SpotIdle>No feast planned.</RimFeast_SpotIdle>
 	<RimFeast_LabelRequest>A request at the table</RimFeast_LabelRequest>
@@ -146,6 +164,7 @@
 	<RimFeast_MessageRequestWardDone>{0} rides out with {1}, to return in some {2} years.</RimFeast_MessageRequestWardDone>
 	<RimFeast_LabelWardReturns>A ward comes home</RimFeast_LabelWardReturns>
 	<RimFeast_TextWardReturns>{0} is back, {2} years old now, riding in from {1}. They left a child and they come back with a sword hand, a courtier's tongue, and letters.\n\nThey have rejoined your colony.</RimFeast_TextWardReturns>
+	<RimFeast_TextWardHouseFell>{0} walks through your gate years early, {2} years old. House {1} has fallen, its halls stand empty, and there was nowhere else to go. Whatever they learned there, they bring home.\n\nThey have rejoined your colony.</RimFeast_TextWardHouseFell>
 	<RimFeast_LabelWardLost>A ward is lost</RimFeast_LabelWardLost>
 	<RimFeast_TextWardLost>{0} was being raised in the halls of {1}. Whatever passed between you and that house, no one is riding home. You will not see them again.</RimFeast_TextWardLost>
 	<RimFeast_TextWardDied>Word comes from {1}. {0} died in their household. They send what little there is to send.</RimFeast_TextWardDied>
@@ -169,6 +188,7 @@
 	<RimFeast_AwayVisitReport>travelling to a feast at {0}</RimFeast_AwayVisitReport>
 	<RimFeast_LabelAwayInvited>You are invited</RimFeast_LabelAwayInvited>
 	<RimFeast_TextAwayInvited>A rider comes from {0}. They are setting their own table at {1}, and they would have you at it.\n\nIt is roughly {2} days of travel. Send a caravan to their gates, and send someone who can hold a conversation, it will matter more than what you carry. The invitation stands for {3} days.</RimFeast_TextAwayInvited>
+	<RimFeast_SetAwayRisk>Risk at their table: {0}% of normal</RimFeast_SetAwayRisk>
 	<RimFeast_SetAwayMaxTravel>Houses more than {0} days of travel away do not invite you</RimFeast_SetAwayMaxTravel>
 	<RimFeast_AwaySeatInspect>A feast is being held here for you ({0} days left).</RimFeast_AwaySeatInspect>
 	<RimFeast_MessageAwayNoDiplomat>Nobody in this caravan is fit to sit at a noble table.</RimFeast_MessageAwayNoDiplomat>
@@ -202,5 +222,6 @@
 	<RimFeast_EtaEvening>in the evening</RimFeast_EtaEvening>
 	<RimFeast_SpotTraveling>Cortege of {0} on its way.</RimFeast_SpotTraveling>
 	<RimFeast_SpotFeasting>Feast underway with {0}.</RimFeast_SpotFeasting>
+	<RimFeast_SpotLeaderLine>{0}, head of the house, is here in person. Goodwill from this evening counts half again.</RimFeast_SpotLeaderLine>
 
 </LanguageData>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-	<!-- le haut bout de la table: pose-le dans la grande salle, invite une maison depuis son gizmo -->
 	<ThingDef ParentName="BuildingBase">
 		<defName>RimFeast_FeastSpot</defName>
 		<label>feast spot</label>
@@ -27,6 +26,9 @@
 			<ai_chillDestination>false</ai_chillDestination>
 			<artificialForMeditationPurposes>false</artificialForMeditationPurposes>
 		</building>
+		<comps>
+			<li Class="RimFeast.CompProperties_FeastArea" />
+		</comps>
 	</ThingDef>
 
 </Defs>

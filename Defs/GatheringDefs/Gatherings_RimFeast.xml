@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-	<!-- la tablée colons: duty Party vanilla, jamais tiré au sort comme fête spontanée -->
 	<GatheringDef>
 		<defName>RimFeast_Feast</defName>
 		<label>feast</label>
@@ -17,7 +16,6 @@
 		</gatherSpotDefs>
 	</GatheringDef>
 
-	<!-- la tablée invités: même chose avec la boisson en plus -->
 	<GatheringDef>
 		<defName>RimFeast_GuestFeast</defName>
 		<label>feast</label>

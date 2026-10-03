@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Patch>
-
-	<!-- avec MO, la faction cachée recrute ses figurants chez DankPyon -->
 	<Operation Class="PatchOperationFindMod">
 		<mods>
 			<li>Medieval Overhaul</li>

@@ -158,29 +158,63 @@ namespace RimFeast
 			return false;
 		}
 
-		// equivalent de GatheringsUtility.InGatheringArea sans la requete de pathfinding.
-		// vanilla teste "meme piece et atteignable sans ouvrir de porte", or une piece est
-		// un ensemble de regions connectees sans porte: le CanReach est redondant
+		// la zone reglee sur le marqueur, toujours bornee a sa piece
 		public struct FeastArea
 		{
 			private Map map;
 			private Room room;
 			private IntVec3 spot;
 			private bool wholeRoom;
+			private float radius;
 
 			public static FeastArea For(IntVec3 spot, Map map)
 			{
-				var a = new FeastArea { map = map, spot = spot };
+				var a = new FeastArea { map = map, spot = spot, radius = CompFeastArea.DefRadius };
+				if (map == null || !spot.InBounds(map)) return a;
 				a.room = spot.GetRoom(map);
-				a.wholeRoom = a.room != null && GatheringsUtility.UseWholeRoomAsGatheringArea(spot, map);
+				CompFeastArea comp = spot.GetFirstThing<Building_FeastSpot>(map)?.GetComp<CompFeastArea>();
+				if (comp != null) a.radius = comp.Radius;
+				a.wholeRoom = comp != null && comp.WholeRoom && a.room != null && !a.room.PsychologicallyOutdoors;
 				return a;
 			}
+
+			public bool WholeRoom => wholeRoom;
 
 			public bool Contains(IntVec3 cell)
 			{
 				if (room == null) return false;
-				if (!wholeRoom && !cell.InHorDistOf(spot, 18f)) return false;
+				if (!wholeRoom && !cell.InHorDistOf(spot, radius)) return false;
 				return cell.GetRoom(map) == room;
+			}
+
+			public float Reach()
+			{
+				if (!wholeRoom || room == null) return radius;
+				float far = 0f;
+				foreach (IntVec3 c in room.Cells)
+				{
+					float d = (c - spot).LengthHorizontal;
+					if (d > far) far = d;
+				}
+				return Mathf.Min(far + 1f, GenRadial.MaxRadialPatternRadius - 1f);
+			}
+
+			public List<IntVec3> Cells()
+			{
+				var list = new List<IntVec3>();
+				if (room == null) return list;
+				if (wholeRoom)
+				{
+					list.AddRange(room.Cells);
+					return list;
+				}
+				int n = GenRadial.NumCellsInRadius(radius);
+				for (int i = 0; i < n; i++)
+				{
+					IntVec3 c = spot + GenRadial.RadialPattern[i];
+					if (c.InBounds(map) && c.GetRoom(map) == room) list.Add(c);
+				}
+				return list;
 			}
 		}
 

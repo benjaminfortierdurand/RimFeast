@@ -22,6 +22,7 @@ namespace RimFeast
 		public int awayFeastDays = 20;        // delai moyen entre deux invitations recues
 		public int awayInviteWindowDays = 12; // plancher du delai, allonge selon la distance
 		public int awayMaxTravelDays = 30;    // au-dela, la maison est trop loin pour inviter
+		public float awayRiskFactor = 1f;     // multiplie le risque a leur table. 0 = jamais
 
 		// vanilla: 0.25 = eméché, 0.4 = ivre. au-dela on ramasse les convives a la petite cuiller
 		public float drinkLimit = 0.35f;
@@ -33,6 +34,7 @@ namespace RimFeast
 
 		public int fadeDays = 20;         // au bout de ca, la maison oublie un banquet
 		public int redWeddingDays = 60;   // duree du blacklist apres des noces pourpres
+		public bool censoredMusic;        // autre morceau pour les noces pourpres
 
 		public override void ExposeData()
 		{
@@ -52,6 +54,7 @@ namespace RimFeast
 			Scribe_Values.Look(ref awayFeastDays, "awayFeastDays", 20);
 			Scribe_Values.Look(ref awayInviteWindowDays, "awayInviteWindowDays", 12);
 			Scribe_Values.Look(ref awayMaxTravelDays, "awayMaxTravelDays", 30);
+			Scribe_Values.Look(ref awayRiskFactor, "awayRiskFactor", 1f);
 			Scribe_Values.Look(ref drinkLimit, "drinkLimit", 0.35f);
 			Scribe_Values.Look(ref brawlChance, "brawlChance", 0.03f);
 			Scribe_Values.Look(ref treacheryEnabled, "treacheryEnabled", true);
@@ -59,12 +62,20 @@ namespace RimFeast
 			Scribe_Values.Look(ref treacheryGoodwillMax, "treacheryGoodwillMax", -10);
 			Scribe_Values.Look(ref fadeDays, "fadeDays", 20);
 			Scribe_Values.Look(ref redWeddingDays, "redWeddingDays", 60);
+			Scribe_Values.Look(ref censoredMusic, "censoredMusic", false);
 		}
 	}
 
 	public class RimFeastMod : Mod
 	{
 		private static RimFeastSettings settings;
+
+		// la page a doublé de longueur: sans vue défilante, Listing bascule en seconde
+		// colonne et pousse tout ce qui suit hors de la fenêtre, invisible et incliquable.
+		// la hauteur se mesure toute seule d'une frame sur l'autre, donc elle suivra les
+		// réglages qu'on ajoutera ensuite
+		private static Vector2 scrollPos;
+		private static float viewHeight = 1200f;
 
 		// jamais null: si la classe Mod n'a pas ete instanciee (ou a echoue), tout le mod
 		// tomberait en NullRef au premier reglage lu
@@ -88,8 +99,16 @@ namespace RimFeast
 
 		public override void DoSettingsWindowContents(Rect inRect)
 		{
+			// on edite l'instance exacte que WriteSettings ecrira. sans ca, si S a ete lu
+			// avant la construction du Mod, on modifierait une copie jetable et la coche
+			// disparaitrait a la fermeture de la fenetre
+			settings = GetSettings<RimFeastSettings>();
+
 			var l = new Listing_Standard();
-			l.Begin(inRect);
+			var view = new Rect(0f, 0f, inRect.width - 24f, viewHeight);
+			Widgets.BeginScrollView(inRect, ref scrollPos, view);
+			l.maxOneColumn = true;
+			l.Begin(view);
 
 			l.Label("RimFeast_SetInviteCost".Translate(S.inviteCost));
 			S.inviteCost = Mathf.RoundToInt(l.Slider(S.inviteCost, 0f, 1000f) / 25f) * 25;
@@ -124,6 +143,8 @@ namespace RimFeast
 				S.awayInviteWindowDays = Mathf.RoundToInt(l.Slider(S.awayInviteWindowDays, 3f, 30f));
 				l.Label("RimFeast_SetAwayMaxTravel".Translate(S.awayMaxTravelDays));
 				S.awayMaxTravelDays = Mathf.RoundToInt(l.Slider(S.awayMaxTravelDays, 2f, 30f));
+				l.Label("RimFeast_SetAwayRisk".Translate(Mathf.RoundToInt(S.awayRiskFactor * 100f)));
+				S.awayRiskFactor = Mathf.Round(l.Slider(S.awayRiskFactor, 0f, 2f) * 20f) / 20f;
 			}
 			l.CheckboxLabeled("RimFeast_SetMarriage".Translate(), ref S.marriageEnabled,
 				"RimFeast_SetMarriageTip".Translate());
@@ -150,13 +171,18 @@ namespace RimFeast
 				S.treacheryGoodwillMax = Mathf.RoundToInt(l.Slider(S.treacheryGoodwillMax, -100f, 0f) / 5f) * 5;
 			}
 
+			l.CheckboxLabeled("RimFeast_SetCensoredMusic".Translate(), ref S.censoredMusic,
+				"RimFeast_SetCensoredMusicTip".Translate());
+
 			l.GapLine();
 			l.Label("RimFeast_SetFadeDays".Translate(S.fadeDays));
 			S.fadeDays = Mathf.RoundToInt(l.Slider(S.fadeDays, 1f, 60f));
 			l.Label("RimFeast_SetRedWeddingDays".Translate(S.redWeddingDays));
 			S.redWeddingDays = Mathf.RoundToInt(l.Slider(S.redWeddingDays, 0f, 180f) / 5f) * 5;
 
+			viewHeight = l.CurHeight + 24f;
 			l.End();
+			Widgets.EndScrollView();
 		}
 	}
 }

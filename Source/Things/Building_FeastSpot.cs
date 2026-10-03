@@ -190,6 +190,16 @@ namespace RimFeast
 				line = "RimFeast_SpotFeasting".Translate(c.house?.Name)
 					+ "\n" + GameComponent_FeastState.HallReport(c);
 
+			// le duc se lit ici toute la soiree, pas seulement dans la lettre d'arrivee:
+			// c'est lui qui change le prix de la soiree, et celui d'un massacre
+			Pawn head = c != null && c.leaderCame ? c.house?.leader : null;
+			if (head != null && c.guests.Contains(head)
+				&& c.state != FeastCase.Invited && c.state != FeastCase.Fleeing)
+				line += "\n" + "RimFeast_SpotLeaderLine".Translate(head.LabelShortCap);
+
+			string areaLine = GetComp<CompFeastArea>()?.InspectLine();
+			if (!areaLine.NullOrEmpty()) line += "\n" + areaLine;
+
 			string wardsLine = GameComponent_FeastState.Get()?.WardsInspect();
 			if (!wardsLine.NullOrEmpty()) line += "\n" + wardsLine;
 			return s.NullOrEmpty() ? line : s + "\n" + line;

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-	<!-- souvenir colons, puissance modulée par le temps passé à table (flux vanilla des parties) -->
 	<ThoughtDef>
 		<defName>RimFeast_AttendedFeast</defName>
 		<thoughtClass>Thought_Memory</thoughtClass>
@@ -16,7 +15,6 @@
 		</stages>
 	</ThoughtDef>
 
-	<!-- elle a dit oui, et elle a passé la soirée au haut bout de la table -->
 	<ThoughtDef>
 		<defName>RimFeast_NightWithNoble</defName>
 		<thoughtClass>Thought_Memory</thoughtClass>
@@ -31,7 +29,6 @@
 		</stages>
 	</ThoughtDef>
 
-	<!-- toute la colonie sait ce qui s'est passé sous ce toit. les psychopathes s'en fichent -->
 	<ThoughtDef>
 		<defName>RimFeast_GuestRightBroken</defName>
 		<thoughtClass>Thought_Memory</thoughtClass>

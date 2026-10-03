@@ -16,6 +16,8 @@
 	<RimFeast_LabelGuestsArrive>Cortège de banquet</RimFeast_LabelGuestsArrive>
 	<RimFeast_TextGuestsArrive>Un cortège de {0} est arrivé pour le banquet : {1} convives chevauchant sous la bannière de leur maison. Ils se dirigent vers votre salle de festin.</RimFeast_TextGuestsArrive>
 	<RimFeast_MessageFeastBegins>Le banquet commence. Les convives de {0} prennent place.</RimFeast_MessageFeastBegins>
+	<RimFeast_LabelCortegeGift>Un présent de {0}</RimFeast_LabelCortegeGift>
+	<RimFeast_TextCortegeGift>Le cortège de {0} n'est pas venu les mains vides. {1} pose un présent au haut bout de la table avant de s'asseoir :\n\n{2}</RimFeast_TextCortegeGift>
 	<RimFeast_MessageBrawl>{0} et {1} en viennent aux mains entre deux chopes !</RimFeast_MessageBrawl>
 	<RimFeast_MessageToast>On porte un toast à {0}. La salle se tait pour écouter.</RimFeast_MessageToast>
 	<RimFeast_LabelFeastTriumph>Un banquet de légende</RimFeast_LabelFeastTriumph>
@@ -29,6 +31,8 @@
 	<!-- duc et noces pourpres -->
 	<RimFeast_TextLeaderRides>{0}, à la tête de la maison {1}, chevauche en personne avec le cortège. Recevoir le chef d'une maison est un honneur rare, et une charge plus lourde encore.</RimFeast_TextLeaderRides>
 	<RimFeast_TextLeaderHonored>Le chef de la maison siégeait en personne à votre table : l'honneur fait à {0} n'en est que plus grand.</RimFeast_TextLeaderHonored>
+	<RimFeast_TextLeaderShamed>Le chef de la maison a tout vu en personne. Une table maigre servie sous ces yeux-là coûte plus cher qu'une table maigre.</RimFeast_TextLeaderShamed>
+	<RimFeast_TextPoorTravels>Une table pauvre voyage aussi loin qu'une table riche. La maison {0} vous estime un peu moins.</RimFeast_TextPoorTravels>
 	<RimFeast_LabelBetrayed>Hospitalité rompue</RimFeast_LabelBetrayed>
 	<RimFeast_TextBetrayed>Le sang a coulé de votre main, sous votre propre toit. Les convives de {0} tirent l'acier et se battent pour gagner les portes. Ce que la maison en fera dépendra du nombre qui rentrera.</RimFeast_TextBetrayed>
 	<RimFeast_LabelRedWedding>Un banquet rouge</RimFeast_LabelRedWedding>
@@ -81,10 +85,12 @@
 	<RimFeast_DrunkStageTipsy>éméchés</RimFeast_DrunkStageTipsy>
 	<RimFeast_DrunkStageDrunk>ivres morts</RimFeast_DrunkStageDrunk>
 	<RimFeast_SetBrawlChance>Chance de rixe : {0}% par convive ivre, par vérification</RimFeast_SetBrawlChance>
-	<RimFeast_SetTreachery>Les maisons qui vous détestent peuvent venir avec du poison</RimFeast_SetTreachery>
+	<RimFeast_SetTreachery>Les convives dans votre salle peuvent venir avec du poison</RimFeast_SetTreachery>
 	<RimFeast_SetTreacheryTip>Sous le seuil de relations, une invitation peut être acceptée avec de mauvaises intentions. Désactivez et une maison froide n'est que froide.</RimFeast_SetTreacheryTip>
 	<RimFeast_SetTreacheryChance>Chance de traîtrise : {0}%</RimFeast_SetTreacheryChance>
 	<RimFeast_SetTreacheryGoodwill>Seuil de relations pour la traîtrise : {0}</RimFeast_SetTreacheryGoodwill>
+	<RimFeast_SetCensoredMusic>Utiliser l&apos;autre morceau du banquet rouge</RimFeast_SetCensoredMusic>
+	<RimFeast_SetCensoredMusicTip>Le banquet rouge joue une reprise d'un certain air d'une certaine série. Cochez pour utiliser un autre morceau à la place, même scène, même signal, sans souci de droits.</RimFeast_SetCensoredMusicTip>
 	<RimFeast_SetFadeDays>Une maison oublie un banquet tous les {0} jours</RimFeast_SetFadeDays>
 	<RimFeast_SetRedWeddingDays>La rumeur d'un banquet rouge court {0} jours</RimFeast_SetRedWeddingDays>
 
@@ -127,6 +133,9 @@
 	<RimFeast_TextBrawlDeath>La rixe d'ivrognes a dégénéré : un convive de {0} gît mort sur votre plancher, tué par l'un des siens. La maison ne vous en tient pas rigueur, mais le cortège remballe ses capes en silence. Un cadavre sous la table met fin à n'importe quel banquet.</RimFeast_TextBrawlDeath>
 	<RimFeast_LabelGuestsHarmed>Convives molestés</RimFeast_LabelGuestsHarmed>
 	<RimFeast_TextGuestsHarmed>Un convive de {0} a été blessé sous votre toit. Le cortège quitte les lieux en furie, et la maison se souviendra de cet affront aux lois de l'hospitalité.</RimFeast_TextGuestsHarmed>
+	<RimFeast_LabelGuestsLeaveFighting>Les convives quittent la mêlée</RimFeast_LabelGuestsLeaveFighting>
+	<RimFeast_TextGuestsLeaveFighting>Des lames sont sorties sur vos terres pendant que le cortège de {0} était sous votre toit, et l'un des leurs est tombé dans la mêlée. Ils ramassent leurs blessés et se retirent. Aucune maison ne reproche un raid à son hôte, mais la soirée est finie.</RimFeast_TextGuestsLeaveFighting>
+	<RimFeast_TextGuestsLeaveFightingJudged>Ils étaient restés à votre table assez longtemps pour la juger.</RimFeast_TextGuestsLeaveFightingJudged>
 	<RimFeast_MessageGuestsLeftNoFeast>Le cortège de {0} n'a jamais pu atteindre votre salle et rebrousse chemin.</RimFeast_MessageGuestsLeftNoFeast>
 	<RimFeast_MessageGuestsLeaveWeather>Les convives de {0} ne supportent pas ce climat et prennent congé.</RimFeast_MessageGuestsLeaveWeather>
 	<RimFeast_MessageInviteVoid>Votre invitation à {0} est caduque : il n'y a plus de maison pour la recevoir, ou plus de paix entre vous.</RimFeast_MessageInviteVoid>
@@ -136,6 +145,15 @@
 	<RimFeast_ReportFeasting>participe au banquet</RimFeast_ReportFeasting>
 	<RimFeast_ShowMarkerLabel>Afficher le marqueur</RimFeast_ShowMarkerLabel>
 	<RimFeast_ShowMarkerDesc>Dessiner le haut bout de table sur le sol. Désactivez et le marqueur disparaît de votre salle sans rien perdre de sa fonction. Vous pourrez toujours cliquer dessus pour le sélectionner.</RimFeast_ShowMarkerDesc>
+	<RimFeast_AreaPlus>zone {0} +</RimFeast_AreaPlus>
+	<RimFeast_AreaMinus>zone {0} -</RimFeast_AreaMinus>
+	<RimFeast_AreaDesc>Jusqu'où s'étend le banquet autour du marqueur. Seuls les plats, la boisson, les chaises et les instruments à l'intérieur comptent, et les convives y restent. Sélectionnez le marqueur pour la voir au sol.</RimFeast_AreaDesc>
+	<RimFeast_AreaAuto>toute la salle</RimFeast_AreaAuto>
+	<RimFeast_AreaAutoDesc>Étendre le banquet jusqu'aux murs de la pièce où se trouve le marqueur, quelle que soit sa taille.</RimFeast_AreaAutoDesc>
+	<RimFeast_AreaNotEnclosed>Le marqueur n'est pas dans une pièce fermée. Utilisez le rayon.</RimFeast_AreaNotEnclosed>
+	<RimFeast_AreaFitted>Le banquet occupe maintenant toute la salle : {0} cases.</RimFeast_AreaFitted>
+	<RimFeast_SpotAreaRoom>Zone du banquet : toute la salle, {0} cases.</RimFeast_SpotAreaRoom>
+	<RimFeast_SpotAreaRadius>Zone du banquet : {0} cases autour du marqueur, dans cette pièce.</RimFeast_SpotAreaRadius>
 	<RimFeast_MarkerHidden>Marqueur masqué.</RimFeast_MarkerHidden>
 	<RimFeast_SpotIdle>Aucun banquet prévu.</RimFeast_SpotIdle>
 	<RimFeast_LabelRequest>Une requête à table</RimFeast_LabelRequest>
@@ -146,6 +164,7 @@
 	<RimFeast_MessageRequestWardDone>{0} part avec la {1}, pour revenir dans quelque {2} ans.</RimFeast_MessageRequestWardDone>
 	<RimFeast_LabelWardReturns>Un pupille revient</RimFeast_LabelWardReturns>
 	<RimFeast_TextWardReturns>{0} est de retour, {2} ans maintenant, arrivant de la {1}. Un enfant est parti, il en revient une lame, une langue de cour et des lettres.\n\nIl a rejoint votre colonie.</RimFeast_TextWardReturns>
+	<RimFeast_TextWardHouseFell>{0} passe votre porte des années avant l'heure, {2} ans. La {1} est tombée, ses salles sont vides, et il n'y avait nulle part où aller. Ce qu'il y a appris, il le ramène.\n\nIl a rejoint votre colonie.</RimFeast_TextWardHouseFell>
 	<RimFeast_LabelWardLost>Un pupille est perdu</RimFeast_LabelWardLost>
 	<RimFeast_TextWardLost>{0} était élevé dans les salles de la {1}. Quoi qu'il se soit passé entre vous et cette maison, personne ne rentre. Vous ne le reverrez pas.</RimFeast_TextWardLost>
 	<RimFeast_TextWardDied>Un message arrive de la {1}. {0} est mort dans leur maisonnée. Ils renvoient le peu qu'il y a à renvoyer.</RimFeast_TextWardDied>
@@ -169,6 +188,7 @@
 	<RimFeast_AwayVisitReport>en route vers un banquet de {0}</RimFeast_AwayVisitReport>
 	<RimFeast_LabelAwayInvited>Vous êtes invité</RimFeast_LabelAwayInvited>
 	<RimFeast_TextAwayInvited>Un cavalier arrive de la {0}. Ils dressent leur propre table à {1}, et ils vous y veulent.\n\nComptez environ {2} jours de route. Envoyez une caravane jusqu'à leurs portes, et envoyez quelqu'un qui sait tenir une conversation, ça comptera plus que ce que vous transportez. L'invitation tient {3} jours.</RimFeast_TextAwayInvited>
+	<RimFeast_SetAwayRisk>Risque à leur table : {0} % du normal</RimFeast_SetAwayRisk>
 	<RimFeast_SetAwayMaxTravel>Les maisons à plus de {0} jours de route ne vous invitent pas</RimFeast_SetAwayMaxTravel>
 	<RimFeast_AwaySeatInspect>Une table y est dressée pour vous ({0} jours restants).</RimFeast_AwaySeatInspect>
 	<RimFeast_MessageAwayNoDiplomat>Personne dans cette caravane n'est en état de s'asseoir à une table noble.</RimFeast_MessageAwayNoDiplomat>
@@ -202,5 +222,6 @@
 	<RimFeast_EtaEvening>en soirée</RimFeast_EtaEvening>
 	<RimFeast_SpotTraveling>Cortège de {0} en route.</RimFeast_SpotTraveling>
 	<RimFeast_SpotFeasting>Banquet en cours avec {0}.</RimFeast_SpotFeasting>
+	<RimFeast_SpotLeaderLine>{0}, chef de la maison, est là en personne. L'estime gagnée ce soir compte moitié plus.</RimFeast_SpotLeaderLine>
 
 </LanguageData>

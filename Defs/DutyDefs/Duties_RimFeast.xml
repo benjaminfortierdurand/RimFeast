@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-	<!-- copie du duty Party vanilla, avec un nœud boisson en plus pour les invités.
-	     hook HighPriority obligatoire: le hook MediumPriority n'existe que dans la branche
-	     colons du think tree, un invité neutre sans job de duty quitte la carte -->
 	<DutyDef>
 		<defName>RimFeast_FeastDuty</defName>
 		<label>feasting</label>
 		<hook>HighPriority</hook>
 		<thinkNode Class="ThinkNode_Priority">
 			<subNodes>
-				<li Class="ThinkNode_ConditionalInGatheringArea">
+				<li Class="RimFeast.AI.ThinkNode_ConditionalInFeastArea">
 					<subNodes>
-						<!-- manger -->
 						<li Class="ThinkNode_ConditionalRandom">
 							<chance>0.08</chance>
 							<subNodes>
-								<li Class="JobGiver_EatInGatheringArea" />
+								<li Class="RimFeast.AI.JobGiver_EatAtFeast" />
 							</subNodes>
 						</li>
 
-						<!-- boire -->
 						<li Class="ThinkNode_ConditionalRandom">
 							<chance>0.08</chance>
 							<subNodes>
@@ -28,7 +23,6 @@
 							</subNodes>
 						</li>
 
-						<!-- s'attabler: l'activité principale d'un banquet -->
 						<li Class="ThinkNode_ConditionalRandom">
 							<chance>0.7</chance>
 							<subNodes>
@@ -36,7 +30,6 @@
 							</subNodes>
 						</li>
 
-						<!-- discuter debout -->
 						<li Class="ThinkNode_ConditionalRandom">
 							<chance>0.35</chance>
 							<subNodes>
@@ -46,15 +39,13 @@
 							</subNodes>
 						</li>
 
-						<!-- flâner dans la salle -->
-						<li Class="JobGiver_WanderInGatheringArea">
+						<li Class="RimFeast.AI.JobGiver_WanderInFeastArea">
 							<ticksBetweenWandersRange>50~250</ticksBetweenWandersRange>
 						</li>
 					</subNodes>
 				</li>
 
-				<!-- rejoindre la salle -->
-				<li Class="JobGiver_WanderInGatheringArea">
+				<li Class="RimFeast.AI.JobGiver_WanderInFeastArea">
 					<ticksBetweenWandersRange>50~250</ticksBetweenWandersRange>
 					<locomotionUrgency>Jog</locomotionUrgency>
 				</li>
@@ -62,20 +53,18 @@
 		</thinkNode>
 	</DutyDef>
 
-	<!-- la tablée des colons: le duty Party vanilla, plus la boisson et les chaises.
-	     hook MediumPriority obligatoire, c'est par lui que les colons rejoignent la fête -->
 	<DutyDef>
 		<defName>RimFeast_ColonistFeastDuty</defName>
 		<label>feasting</label>
 		<hook>MediumPriority</hook>
 		<thinkNode Class="ThinkNode_Priority">
 			<subNodes>
-				<li Class="ThinkNode_ConditionalInGatheringArea">
+				<li Class="RimFeast.AI.ThinkNode_ConditionalInFeastArea">
 					<subNodes>
 						<li Class="ThinkNode_ConditionalRandom">
 							<chance>0.08</chance>
 							<subNodes>
-								<li Class="JobGiver_EatInGatheringArea" />
+								<li Class="RimFeast.AI.JobGiver_EatAtFeast" />
 							</subNodes>
 						</li>
 
@@ -109,13 +98,13 @@
 							</subNodes>
 						</li>
 
-						<li Class="JobGiver_WanderInGatheringArea">
+						<li Class="RimFeast.AI.JobGiver_WanderInFeastArea">
 							<ticksBetweenWandersRange>50~250</ticksBetweenWandersRange>
 						</li>
 					</subNodes>
 				</li>
 
-				<li Class="JobGiver_WanderInGatheringArea">
+				<li Class="RimFeast.AI.JobGiver_WanderInFeastArea">
 					<ticksBetweenWandersRange>50~250</ticksBetweenWandersRange>
 					<locomotionUrgency>Jog</locomotionUrgency>
 				</li>
@@ -123,7 +112,6 @@
 		</thinkNode>
 	</DutyDef>
 
-	<!-- le seigneur porte un toast au haut bout de la table -->
 	<DutyDef>
 		<defName>RimFeast_ToastDuty</defName>
 		<label>giving a toast</label>
@@ -145,7 +133,6 @@
 		</thinkNode>
 	</DutyDef>
 
-	<!-- le ménestrel du cortège. sans instrument il se rabat sur la tablée -->
 	<DutyDef>
 		<defName>RimFeast_MinstrelDuty</defName>
 		<label>playing for the feast</label>
@@ -154,7 +141,7 @@
 			<subNodes>
 				<li Class="RimFeast.AI.JobGiver_PlayAtFeast" />
 
-				<li Class="ThinkNode_ConditionalInGatheringArea">
+				<li Class="RimFeast.AI.ThinkNode_ConditionalInFeastArea">
 					<subNodes>
 						<li Class="JobGiver_StandAndBeSociallyActive">
 							<ticksRange>350~750</ticksRange>
@@ -162,7 +149,7 @@
 					</subNodes>
 				</li>
 
-				<li Class="JobGiver_WanderInGatheringArea">
+				<li Class="RimFeast.AI.JobGiver_WanderInFeastArea">
 					<ticksBetweenWandersRange>50~250</ticksBetweenWandersRange>
 					<locomotionUrgency>Jog</locomotionUrgency>
 				</li>

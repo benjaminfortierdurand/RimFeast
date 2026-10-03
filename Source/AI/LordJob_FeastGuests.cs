@@ -1,3 +1,4 @@
+using System.Linq;
 using RimWorld;
 using Verse;
 using Verse.AI;
@@ -48,10 +49,15 @@ namespace RimFeast.AI
 		public override StateGraph CreateGraph()
 		{
 			var graph = new StateGraph();
-			LordToil travel = graph.AttachSubgraph(new LordJob_Travel(spot).CreateGraph()).StartingToil;
+			// la route a deux toils: la marche, et la defense apres un premier coup. le coup
+			// arrive avant la mort, donc un convive tue en chemin tombe toujours depuis la
+			// defense. sans elle en source, l'egorger sur la route ne coutait rien
+			StateGraph road = graph.AttachSubgraph(new LordJob_Travel(spot).CreateGraph());
+			LordToil travel = road.StartingToil;
 			graph.StartingToil = travel;
+			LordToil[] onRoad = road.lordToils.Where(t => t != travel).ToArray();
 
-			var feast = new LordToil_Party(spot, RimFeastDefOf.RimFeast_GuestFeast);
+			var feast = new LordToil_FeastParty(spot, RimFeastDefOf.RimFeast_GuestFeast);
 			graph.AddToil(feast);
 			var toast = new LordToil_Toast(spot, speaker);
 			graph.AddToil(toast);
@@ -134,6 +140,7 @@ namespace RimFeast.AI
 			// ajoutee avant harmed, le premier match dans le graph gagne
 			var betrayed = new Transition(travel, fightOut);
 			betrayed.AddSources(feast, toast);
+			betrayed.AddSources(onRoad);
 			betrayed.AddTrigger(new Trigger_GuestLostToPlayer());
 			betrayed.AddPostAction(new TransitionAction_Custom((System.Action)delegate
 			{
@@ -146,6 +153,7 @@ namespace RimFeast.AI
 			// du sang par une autre main. les exits comptent pas
 			var harmed = new Transition(travel, exit);
 			harmed.AddSources(feast, toast);
+			harmed.AddSources(onRoad);
 			harmed.AddTrigger(new Trigger_PawnLost(PawnLostCondition.Incapped));
 			harmed.AddTrigger(new Trigger_PawnLost(PawnLostCondition.Killed));
 			harmed.AddTrigger(new Trigger_PawnLost(PawnLostCondition.MadePrisoner));
@@ -158,6 +166,7 @@ namespace RimFeast.AI
 
 			var weather = new Transition(travel, exit);
 			weather.AddSources(feast, toast);
+			weather.AddSources(onRoad);
 			weather.AddTrigger(new Trigger_PawnExperiencingDangerousTemperatures());
 			weather.AddPreAction(new TransitionAction_Message("RimFeast_MessageGuestsLeaveWeather".Translate(house?.Name)));
 			weather.AddPreAction(new TransitionAction_Custom((System.Action)delegate
@@ -171,6 +180,7 @@ namespace RimFeast.AI
 			// trajet compris, donc il doit suivre le reglage de duree et pas rester cable
 			var stale = new Transition(travel, exit);
 			stale.AddSources(feast, toast);
+			stale.AddSources(onRoad);
 			stale.AddTrigger(new Trigger_TicksPassed(
 				GameComponent_FeastState.FeastDurationTicks + 30000));
 			stale.AddPreAction(new TransitionAction_Custom((System.Action)delegate

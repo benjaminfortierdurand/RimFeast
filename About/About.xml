@@ -6,29 +6,17 @@
 	<supportedVersions>
 		<li>1.6</li>
 	</supportedVersions>
-	<modVersion>1.2.0</modVersion>
+	<modVersion>1.2.6</modVersion>
 	<modIconPath>UI/RimFeastIcon</modIconPath>
-	<description>Medieval feasts and court life.
+	<description>RimFeast lets you host medieval banquets. Place a feast spot in your great hall and send a messenger to a noble house. A cortege rides in under their banner, sits at your tables, eats your food and drinks your mead, and your colonists drop what they are doing to join them.
 
-Build a feast spot at the head of your great hall and send a messenger to a noble house. A day or so later a cortege rides in under their banner: the local lord, his knights, his standard bearer. They sit at your table, eat your food, drink your mead, and your colonists drop what they are doing and join them. Every so often someone rises to give a toast. Build an instrument in the hall and your best artist plays for the guests while they drink.
+The evening is judged on what you actually served: the beauty of the hall, the quality of the dishes, whether there was enough of the good stuff to go round, the drink, the toasts and the music. A good feast raises goodwill, sends merchants your way, and now and then a noble asks for a colonist's hand. A poor one travels just as far. Invite a house that hates you and someone will try to salt your table.
 
-The evening is judged on what you actually served. Hall beauty, meal quality, whether there was enough of the good stuff to go round, drink, toasts and music. A house that thinks highly of you sends its whole court, which sounds flattering until you have to feed nine nobles instead of five. Click the feast spot during the meal and your steward tells you how it is going, in plain words.
+There is a second invitation button. Same messenger, same gifts, different plan. Once the guests are seated you pick who dies first, and your hall becomes a killing floor. Break the guest right and every house on the rim hears about it.
 
-A good feast raises goodwill, and a legendary one leaves a purse of silver on your table. The house sends one of their merchants your way within a few days. A noble may take a liking to one of your colonists and ask for their hand. Mead does what mead does, and two guests can come to blows over their cups. Invite a house that hates you and they may accept for the wrong reasons, and someone will try to salt your table.
+Houses invite you back too. Take a caravan to their gates and find out whether they set a table or a trap. Who you send decides how the evening goes.
 
-There is a second invitation button, and it sends the same messenger with the same gifts. The difference is what you have planned. Once the guests are seated you pick who dies first, and every fighter you have is thrown at the rest. They draw steel and fight their way to the doors. Kill enough of them and that house never breaks bread with you again, they come back for blood, no other house accepts an invitation for a season, and your own colonists carry the shame of it.
-
-Guests are under your roof until they leave the map. Butchering them on the way out counts too.
-
-Everything is tunable in the mod settings: cost, feast length, cortege size, how drunk they get, brawl odds, treachery odds, and you can switch any outcome off entirely.
-
-No required dependencies. Any humanlike faction can be invited to your table. With Medieval Overhaul loaded, the noble houses send their corteges in full house livery, standard bearers and local lords and all, and there is mead on the table. Royalty or Ideology give the minstrel something to play on. Without them, toasts carry the whole evening instead.
-
-Third mod of the trilogy: RimJoust for the tourney, RimSiege for war, RimFeast for peace.
-
-Full French translation.
-
-BenFD</description>
+No required dependencies. Medieval Overhaul is optional but recommended: with it the houses arrive in full livery, standard bearers and local lords and all.</description>
 
 	<loadAfter>
 		<li>DankPyon.Medieval.Overhaul</li>

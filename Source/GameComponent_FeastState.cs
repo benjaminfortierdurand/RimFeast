@@ -190,6 +190,7 @@ namespace RimFeast
 		public Pawn ward;
 		public Faction house;
 		public Map map;
+		public int leftTick = -1;
 		public int returnTick;
 
 		public void ExposeData()
@@ -197,6 +198,7 @@ namespace RimFeast
 			Scribe_References.Look(ref ward, "ward");
 			Scribe_References.Look(ref house, "house");
 			Scribe_References.Look(ref map, "map");
+			Scribe_Values.Look(ref leftTick, "leftTick", -1);
 			Scribe_Values.Look(ref returnTick, "returnTick");
 		}
 	}
@@ -937,6 +939,39 @@ namespace RimFeast
 			Messages.Message("RimFeast_MessageFeastBegins".Translate(c.house?.Name),
 				new TargetInfo(c.spotCell, c.map), MessageTypeDefOf.PositiveEvent);
 			StartColonistLord(c);
+			TryBringGift(c);
+		}
+
+		// le cortege ne vient pas les mains vides quand la maison t'estime. meme generateur
+		// et meme bareme de richesse que le present des visiteurs vanilla, gradue sur
+		// l'estime. pose au haut bout par le plus haut rang, la ou le joueur regarde
+		private static void TryBringGift(FeastCase c)
+		{
+			if (c.house == null || c.lord == null || c.map == null) return;
+			int esteem = c.house.PlayerGoodwill;
+			if (esteem < 20 || !Rand.Chance(Mathf.InverseLerp(0f, 100f, esteem))) return;
+
+			var parms = default(ThingSetMakerParams);
+			parms.techLevel = c.house.def.techLevel;
+			parms.totalMarketValueRange = DiplomacyTuning.VisitorGiftTotalMarketValueRangeBase
+				* DiplomacyTuning.VisitorGiftTotalMarketValueFactorFromPlayerWealthCurve
+					.Evaluate(c.map.wealthWatcher.WealthTotal)
+				* Mathf.Lerp(0.5f, 1.5f, Mathf.InverseLerp(20f, 100f, esteem));
+			List<Thing> gifts = ThingSetMakerDefOf.VisitorGift.root.Generate(parms);
+
+			TargetInfo look = TargetInfo.Invalid;
+			for (int i = 0; i < gifts.Count; i++)
+			{
+				if (GenPlace.TryPlaceThing(gifts[i], c.spotCell, c.map, ThingPlaceMode.Near)) look = gifts[i];
+				else gifts[i].Destroy();
+			}
+			Pawn giver = SpeakerOf(c);
+			if (!look.IsValid || giver == null) return;
+
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelCortegeGift".Translate(c.house.Name),
+				"RimFeast_TextCortegeGift".Translate(c.house.Name, giver.LabelShortCap,
+					gifts.Where(g => g.Spawned).Select(g => g.LabelCap).ToLineList("   -")),
+				LetterDefOf.PositiveEvent, look, c.house);
 		}
 
 		public void Notify_ToastGiven(int id)
@@ -962,10 +997,17 @@ namespace RimFeast
 				return;
 			}
 
+			CloseFeast(c);
+		}
+
+		// bilan et verite differee du poison. le dossier reste ouvert tant qu'ils sont sur
+		// la carte: le bonus est verse mais les egorger en chemin declenchera quand meme
+		// les noces pourpres
+		private void CloseFeast(FeastCase c)
+		{
 			Sample(c);
 			ApplyOutcome(c);
 
-			// le poison a passe la soiree inapercu: la verite sortira dans un jour ou deux
 			if (c.tainted && !c.exposed)
 				reveals.Add(new PendingReveal
 				{
@@ -974,10 +1016,7 @@ namespace RimFeast
 					fireTick = Find.TickManager.TicksGame + Rand.Range(30000, 60000),
 				});
 
-			// le dossier reste ouvert tant qu'ils sont sur la carte: le bonus est verse mais
-			// les egorger en chemin declenchera quand meme les noces pourpres
-			c.state = FeastCase.Leaving;
-			c.fleeStartTick = Find.TickManager.TicksGame;
+			LeaveUnderOurRoof(c);
 		}
 
 		// un ivrogne assomme par un des siens reste des notres: le lord ne doit pas le perdre,
@@ -992,6 +1031,13 @@ namespace RimFeast
 		// lancee des le signal, pas au premier sang: la chanson doit monter pendant que le
 		// bourreau traverse la salle. depuis un instrument si la salle en a un, sinon la
 		// bande-son. sous filet, un clip pas charge emporterait tout le reste avec lui
+		// deux morceaux, un reglage. l'air d'origine est une reprise, certains n'en veulent pas
+		private static SongDef RedWeddingSong => RimFeastMod.S.censoredMusic
+			? RimFeastDefOf.RimFeast_CensoredSong : RimFeastDefOf.RimFeast_RedWeddingSong;
+
+		private static SoundDef RedWeddingPerformance => RimFeastMod.S.censoredMusic
+			? RimFeastDefOf.RimFeast_CensoredPerformance : RimFeastDefOf.RimFeast_RedWeddingPerformance;
+
 		public void StartRedWeddingMusic(FeastCase c)
 		{
 			if (c == null || c.musicStarted) return;
@@ -1004,7 +1050,7 @@ namespace RimFeast
 				if (inst != null)
 				{
 					Find.MusicManagerPlay?.ForceFadeoutAndSilenceFor(600f, 2f, preventDangerTransition: true);
-					redWeddingSound = RimFeastDefOf.RimFeast_RedWeddingPerformance.TrySpawnSustainer(
+					redWeddingSound = RedWeddingPerformance.TrySpawnSustainer(
 						SoundInfo.InMap(new TargetInfo(inst.Position, c.map), MaintenanceType.PerTick));
 					if (redWeddingSound == null)
 					{
@@ -1014,9 +1060,9 @@ namespace RimFeast
 				}
 				if (inst == null)
 				{
-					SongDef song = RimFeastDefOf.RimFeast_RedWeddingSong;
+					SongDef song = RedWeddingSong;
 					if (song?.clip == null)
-						Log.Warning("RimFeast: red wedding song clip not loaded (Sounds/Song/RimFeast_RedWedding.ogg)");
+						Log.Warning("RimFeast: red wedding song clip not loaded (" + song?.clipPath + ")");
 					else
 						Find.MusicManagerPlay?.ForcePlaySong(song, false);
 				}
@@ -1025,6 +1071,19 @@ namespace RimFeast
 			{
 				Log.Warning("RimFeast: couldnt start the song: " + e.Message);
 			}
+		}
+
+		// le premier sang, vu de l'ecran. StartFade va de la couleur courante vers la cible,
+		// donc un flash c'est aller au rouge vite puis revenir lentement. rouge sombre et
+		// semi-transparent: on doit continuer a voir sa salle et pouvoir agir
+		private static void FlashRed(FeastCase c)
+		{
+			if (c?.map == null || Find.CurrentMap != c.map) return;
+			// SetColor pose la couleur instantanement, StartFade repart de la couleur
+			// courante. deux StartFade enchaines dans la meme frame ne marchent pas: le
+			// second lit un fondu qui n'a pas encore bouge et efface le premier
+			ScreenFader.SetColor(new Color(0.5f, 0.03f, 0.03f, 0.5f));
+			ScreenFader.StartFade(Color.clear, 0.7f);
 		}
 
 		// premier sang de la main du joueur: on note, la sentence tombera au dernier sorti
@@ -1038,6 +1097,7 @@ namespace RimFeast
 			c.fleeStartTick = Find.TickManager.TicksGame;
 
 			StartRedWeddingMusic(c);
+			FlashRed(c);
 
 			// trahis, ils degainent: hostiles le temps du combat, le ciblage exige ca.
 			// la resolution remet la faction cachee au neutre pour les banquets suivants
@@ -1199,43 +1259,49 @@ namespace RimFeast
 					continue;
 				}
 
-				if (Find.TickManager.TicksGame < w.returnTick) continue;
+				// une maison tombee ne rend plus personne a l'heure: il rentre tout de suite,
+				// ou il est perdu si c'est toi qui l'as brulee
+				bool fallen = w.house == null || w.house.defeated;
+				if (!fallen && Find.TickManager.TicksGame < w.returnTick) continue;
 
-				// la colonie a change de carte: on repousse plutot que de perdre l'enfant
+				// la colonie a change de carte: on attend plutot que de perdre l'enfant
 				if (w.map == null || !Find.Maps.Contains(w.map))
 				{
 					w.map = Find.AnyPlayerHomeMap;
-					if (w.map == null) { w.returnTick += 60000; continue; }
+					if (w.map == null) continue;
 				}
 
 				wards.RemoveAt(i);
 				Find.WorldPawns.ForcefullyKeptPawns.Remove(p);
 
-				// tu as brule la maison ou il logeait. il etait sous leur toit, comme eux
-				// etaient sous le tien
-				if (w.house == null || w.house.defeated || w.house.HostileTo(Faction.OfPlayer))
+				// il etait sous leur toit, comme eux etaient sous le tien
+				if (w.house != null && w.house.HostileTo(Faction.OfPlayer))
 				{
 					Find.LetterStack.ReceiveLetter("RimFeast_LabelWardLost".Translate(),
-						"RimFeast_TextWardLost".Translate(p.LabelShortCap, w.house?.Name ?? "?"),
+						"RimFeast_TextWardLost".Translate(p.LabelShortCap, w.house.Name),
 						LetterDefOf.NegativeEvent, null, w.house);
 					continue;
 				}
 
-				ReturnWard(w, p);
+				ReturnWard(w, p, fallen);
 			}
 		}
 
-		private static void ReturnWard(PendingWard w, Pawn p)
+		private static void ReturnWard(PendingWard w, Pawn p, bool early)
 		{
 			if (p.Spawned) return;
 			if (Find.WorldPawns.Contains(p)) Find.WorldPawns.RemovePawn(p);
 
 			// des annees de cour et de cour d'armes. EnsureMinLevelWithMargin est le geste
-			// vanilla: on releve un plancher sans ecraser ce qu'il savait deja faire
-			p.skills?.GetSkill(SkillDefOf.Melee)?.EnsureMinLevelWithMargin(8);
-			p.skills?.GetSkill(SkillDefOf.Social)?.EnsureMinLevelWithMargin(8);
-			p.skills?.GetSkill(SkillDefOf.Shooting)?.EnsureMinLevelWithMargin(6);
-			p.skills?.GetSkill(SkillDefOf.Intellectual)?.EnsureMinLevelWithMargin(6);
+			// vanilla: on releve un plancher sans ecraser ce qu'il savait deja faire.
+			// rentre avant l'heure, il n'a appris qu'au prorata du temps passe la-bas
+			float done = !early || w.leftTick < 0 ? 1f
+				: Mathf.Clamp01((Find.TickManager.TicksGame - w.leftTick)
+					/ (float)Mathf.Max(1, w.returnTick - w.leftTick));
+			p.skills?.GetSkill(SkillDefOf.Melee)?.EnsureMinLevelWithMargin(Mathf.RoundToInt(8f * done));
+			p.skills?.GetSkill(SkillDefOf.Social)?.EnsureMinLevelWithMargin(Mathf.RoundToInt(8f * done));
+			p.skills?.GetSkill(SkillDefOf.Shooting)?.EnsureMinLevelWithMargin(Mathf.RoundToInt(6f * done));
+			p.skills?.GetSkill(SkillDefOf.Intellectual)?.EnsureMinLevelWithMargin(Mathf.RoundToInt(6f * done));
 
 			p.SetFaction(Faction.OfPlayer);
 			if (!RCellFinder.TryFindRandomPawnEntryCell(out IntVec3 entry, w.map,
@@ -1244,8 +1310,8 @@ namespace RimFeast
 			GenSpawn.Spawn(p, CellFinder.RandomClosewalkCellNear(entry, w.map, 4), w.map);
 
 			Find.LetterStack.ReceiveLetter("RimFeast_LabelWardReturns".Translate(),
-				"RimFeast_TextWardReturns".Translate(p.LabelShortCap, w.house?.Name,
-					p.ageTracker.AgeBiologicalYears),
+				(early ? "RimFeast_TextWardHouseFell" : "RimFeast_TextWardReturns")
+					.Translate(p.LabelShortCap, w.house?.Name ?? "?", p.ageTracker.AgeBiologicalYears),
 				LetterDefOf.PositiveEvent, p, w.house);
 		}
 
@@ -1282,7 +1348,8 @@ namespace RimFeast
 					// chemin de repli global. garde sur CurrentSong: morceau deja fini = on ne touche a rien
 					MusicManagerPlay music = Find.MusicManagerPlay;
 					if (music != null && music.IsPlaying
-						&& music.CurrentSong == RimFeastDefOf.RimFeast_RedWeddingSong)
+						&& (music.CurrentSong == RimFeastDefOf.RimFeast_RedWeddingSong
+							|| music.CurrentSong == RimFeastDefOf.RimFeast_CensoredSong))
 						music.ForceFadeoutAndSilenceFor(20f, 5f, preventDangerTransition: true);
 				}
 			}
@@ -1567,7 +1634,9 @@ namespace RimFeast
 
 			f /= 1f + 0.25f * FeastsRemembered(house);
 			if (HouseBetrayed(house)) f *= 4f;
-			return f;
+			// curseur dedie: la traitrise chez eux n'a rien a voir avec l'empoisonnement
+			// qu'on subit chez soi, et elle n'avait aucun reglage jusqu'ici
+			return f * RimFeastMod.S.awayRiskFactor;
 		}
 
 		public void ResolveAwayFeast(Caravan caravan, Settlement seat)
@@ -1801,6 +1870,22 @@ namespace RimFeast
 					"RimFeast_TextBrawlDeath".Translate(c.house?.Name),
 					LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map), c.house);
 				LeaveUnderOurRoof(c);
+				return;
+			}
+
+			// des lames sont sorties sur la carte, raid ou meute: on ne reproche pas a l'hote
+			// ce qu'il vient de repousser. le trigger l'excuse deja, le bilan doit suivre.
+			// s'ils ont eu le temps de juger la table, elle est jugee
+			if (GenHostility.AnyHostileActiveThreatToPlayer(c.map))
+			{
+				bool judged = c.state == FeastCase.Feasting
+					&& Find.TickManager.TicksGame - c.arrivedTick >= FeastDurationTicks / 2;
+				TaggedString text = "RimFeast_TextGuestsLeaveFighting".Translate(c.house?.Name);
+				if (judged) text += "\n\n" + "RimFeast_TextGuestsLeaveFightingJudged".Translate();
+				Find.LetterStack.ReceiveLetter("RimFeast_LabelGuestsLeaveFighting".Translate(), text,
+					LetterDefOf.NeutralEvent, new TargetInfo(c.spotCell, c.map), c.house);
+				if (judged) CloseFeast(c);
+				else LeaveUnderOurRoof(c);
 				return;
 			}
 
@@ -2406,7 +2491,11 @@ namespace RimFeast
 				// epingle avant meme qu'il quitte la carte: des qu'il passe cote monde, le
 				// ramasse-miettes le verra deja marque ForceKept et n'y touchera pas
 				Find.WorldPawns.ForcefullyKeptPawns.Add(kid);
-				wards.Add(new PendingWard { ward = kid, house = c.house, map = c.map, returnTick = back });
+				wards.Add(new PendingWard
+				{
+					ward = kid, house = c.house, map = c.map,
+					leftTick = Find.TickManager.TicksGame, returnTick = back,
+				});
 
 				goodwill = 25;
 				done = "RimFeast_MessageRequestWardDone".Translate(label, c.house?.Name, years);
@@ -2627,8 +2716,9 @@ namespace RimFeast
 			else
 			{
 				label = "RimFeast_LabelFeastPoor".Translate();
-				text = "RimFeast_TextFeastPoor".Translate(c.house?.Name);
-				goodwill = 0;
+				text = "RimFeast_TextFeastPoor".Translate(c.house?.Name)
+					+ "\n\n" + "RimFeast_TextPoorTravels".Translate(c.house?.Name);
+				goodwill = -5;
 			}
 
 			// la nouveaute s'emousse: le 4e banquet de la meme maison ne vaut plus le 1er.
@@ -2640,11 +2730,13 @@ namespace RimFeast
 				text += "\n\n" + "RimFeast_TextJaded".Translate(c.house?.Name, remembered);
 			}
 
-			// recevoir le chef de maison en personne grandit l'honneur de la soiree
-			if (c.leaderCame && goodwill > 0)
+			// recevoir le chef de maison en personne grandit l'honneur de la soiree, et la
+			// honte d'une table maigre servie sous ses yeux
+			if (c.leaderCame && goodwill != 0)
 			{
 				goodwill = Mathf.RoundToInt(goodwill * 1.5f);
-				text += "\n\n" + "RimFeast_TextLeaderHonored".Translate(c.house?.Name);
+				text += "\n\n" + (goodwill > 0 ? "RimFeast_TextLeaderHonored" : "RimFeast_TextLeaderShamed")
+					.Translate(c.house?.Name);
 			}
 
 			// le meme bilan que le marqueur affichait pendant la soiree. sans lui le joueur
@@ -2652,12 +2744,12 @@ namespace RimFeast
 			text += "\n\n" + HallReport(c);
 
 			Find.LetterStack.ReceiveLetter(label, text,
-				score >= DecentScore ? LetterDefOf.PositiveEvent : LetterDefOf.NeutralEvent,
+				score >= DecentScore ? LetterDefOf.PositiveEvent : LetterDefOf.NegativeEvent,
 				new TargetInfo(c.spotCell, c.map), c.house);
 
-			if (goodwill > 0)
+			if (goodwill != 0)
 				c.house?.TryAffectGoodwillWith(Faction.OfPlayer, goodwill, canSendMessage: true,
-					canSendHostilityLetter: false);
+					canSendHostilityLetter: goodwill < 0);
 
 			HouseFeastMemory m = MemoryFor(c.house, true);
 			if (m != null)
