@@ -17,8 +17,7 @@ namespace RimFeast
 		public static HediffDef AlcoholHigh =>
 			alcoholHigh ?? (alcoholHigh = DefDatabase<HediffDef>.GetNamedSilentFail("AlcoholHigh"));
 
-		// les instruments viennent de Royalty/Ideology. le verrou est dans le code vanilla
-		// (Log.ErrorOnce), pas seulement dans les defs, donc on teste les deux
+		// verrou des instruments aussi dans le code vanilla (Log.ErrorOnce), pas que dans les defs
 		public static bool MusicPossible
 		{
 			get
@@ -31,7 +30,6 @@ namespace RimFeast
 			}
 		}
 
-		// maisons MO, sniffees sur les noms de kinds. null = pas de maison
 		public static string HouseOf(Faction f)
 		{
 			if (f?.def?.pawnGroupMakers != null)
@@ -44,8 +42,6 @@ namespace RimFeast
 			return null;
 		}
 
-		// toute faction humanlike frequentable. les maisons MO gardent juste les plus
-		// beaux corteges
 		public static IEnumerable<Faction> InvitableHouses()
 		{
 			foreach (Faction f in Find.FactionManager.AllFactionsListForReading)
@@ -58,7 +54,6 @@ namespace RimFeast
 			}
 		}
 
-		// seigneur de fortune quand la faction n'a pas de maison noble
 		public static PawnKindDef EliteKindFor(Faction f)
 		{
 			PawnKindDef best = null;
@@ -121,9 +116,7 @@ namespace RimFeast
 			&& p.relations.GetFirstDirectRelationPawn(PawnRelationDefOf.Fiance) == null
 			&& p.relations.GetFirstDirectRelationPawn(PawnRelationDefOf.Lover) == null;
 
-		// on garde les verifs vanilla (genre, orientation, age, celibat) mais pas le portail
-		// d'opinion: un noble qui vient d'arriver est a 0, la fiction c'est que le banquet
-		// a fait le reste. invites generes sans parents, donc rien a tester cote inceste
+		// pas de portail d'opinion: un noble qui vient d'arriver est a 0
 		public static bool TryFindMarriagePair(Lord cortege, out Pawn noble, out Pawn colonist)
 		{
 			noble = null;
@@ -138,7 +131,6 @@ namespace RimFeast
 				.ToList();
 			if (colonists.Count == 0) return false;
 
-			// le plus haut rang d'abord, pour le panache. le chef de maison avant tout
 			foreach (Pawn g in cortege.ownedPawns.OrderByDescending(p =>
 				p.Faction?.leader == p ? 99999f : p.kindDef?.combatPower ?? 0f))
 			{
@@ -218,8 +210,7 @@ namespace RimFeast
 			}
 		}
 
-		// sans instrument dans la salle, pas de menestrel: le duty le sortirait de table
-		// pour rien, et JobGiver_PlayAtFeast le laisserait planter debout a bavarder
+		// pas d'instrument, pas de menestrel: le duty le sortirait de table pour rien
 		public static bool AnyInstrumentIn(IntVec3 spot, Map map)
 		{
 			if (!MusicPossible || map == null) return false;
@@ -236,8 +227,7 @@ namespace RimFeast
 			return p?.health?.hediffSet?.GetFirstHediffOfDef(AlcoholHigh)?.Severity ?? 0f;
 		}
 
-		// vanilla ne compte l'argent que sous une balise orbitale alimentee. en medieval
-		// il n'y en a pas: on compte la zone domestique et les stockages
+		// vanilla ne compte l'argent que sous une balise orbitale
 		public static int SilverAvailable(Map map)
 		{
 			if (map == null) return 0;

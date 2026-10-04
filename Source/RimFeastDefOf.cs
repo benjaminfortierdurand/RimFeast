@@ -11,8 +11,8 @@ namespace RimFeast
 
 		public static ThingDef RimFeast_FeastSpot;
 
-		public static GatheringDef RimFeast_Feast;      // colons a table
-		public static GatheringDef RimFeast_GuestFeast; // cortege invite
+		public static GatheringDef RimFeast_Feast;
+		public static GatheringDef RimFeast_GuestFeast;
 
 		public static DutyDef RimFeast_ToastDuty;
 		public static DutyDef RimFeast_MinstrelDuty;

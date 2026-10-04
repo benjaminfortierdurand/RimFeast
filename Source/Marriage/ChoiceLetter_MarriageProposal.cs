@@ -4,7 +4,6 @@ using Verse;
 
 namespace RimFeast
 {
-	// accepter, c'est perdre la colon pour toujours: le choix reste sur la pile jusqu'a decision
 	public class ChoiceLetter_MarriageProposal : ChoiceLetter
 	{
 		public int caseId;
@@ -18,8 +17,7 @@ namespace RimFeast
 				GameComponent_FeastState comp = GameComponent_FeastState.Get();
 				if (comp != null && comp.ProposalPending(caseId))
 				{
-					// RemoveLetter obligatoire: sinon un refus n'est pas definitif, on peut
-					// rouvrir la lettre et accepter quand meme
+					// RemoveLetter obligatoire, sinon un refus se rouvre et s'accepte
 					yield return new DiaOption("RimFeast_ProposalAccept".Translate())
 					{
 						action = delegate
@@ -42,7 +40,6 @@ namespace RimFeast
 					yield break;
 				}
 
-				// le cortege est parti ou l'un des promis n'est plus la
 				yield return Option_Close;
 			}
 		}

@@ -6,9 +6,7 @@ using Verse.AI.Group;
 
 namespace RimFeast.AI
 {
-	// la tablee des colons. le menestrel est de la maison qui recoit, pas du cortege
-	// la tablee lit la zone du marqueur, pas celle de vanilla: presence et loisir suivent
-	// ce que le joueur a regle
+	// presence et loisir lisent la zone du marqueur, pas celle de vanilla
 	public class LordToil_FeastParty : LordToil_Party
 	{
 		private FeastUtility.FeastArea area;
@@ -59,8 +57,6 @@ namespace RimFeast.AI
 		}
 	}
 
-	// l'orateur au haut bout, les autres en cercle. duty Spectate vanilla: chez des invites
-	// aucun travail ne peut passer devant
 	public class LordToil_Toast : LordToil
 	{
 		private IntVec3 spot;

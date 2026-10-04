@@ -10,12 +10,9 @@ namespace RimFeast
 	{
 		private bool hideMarker;
 
-		// l'apercu scanne la nourriture de la salle: pas a chaque frame d'inspection
 		private string cachedPreview;
 		private int cachedPreviewTick = -99999;
 
-		// le marqueur est un outil de joueur, pas du mobilier: on doit pouvoir le faire
-		// disparaitre d'une belle salle sans perdre sa fonction. il reste selectionnable
 		public override void Print(SectionLayer layer)
 		{
 			if (!hideMarker) base.Print(layer);
@@ -55,7 +52,6 @@ namespace RimFeast
 			if (comp != null && comp.Busy) cmd.Disable("RimFeast_InviteDisabledBusy".Translate());
 			yield return cmd;
 
-			// la meme invitation, un autre dessein
 			var trap = new Command_Action
 			{
 				defaultLabel = "RimFeast_TrapGizmoLabel".Translate(),
@@ -66,15 +62,8 @@ namespace RimFeast
 			if (comp != null && comp.Busy) trap.Disable("RimFeast_InviteDisabledBusy".Translate());
 			yield return trap;
 
-			// visible des l'invitation piege, grise tant qu'ils ne sont pas a table:
-			// un bouton absent se cherche, un bouton grise s'explique
-			// un seul bouton pour le massacre: tu designes la premiere gorge, et c'est elle
-			// qui donne le signal. tuer un convive met fin au banquet de toute facon, un
-			// assassinat "discret" separe n'aurait rien voulu dire
 			FeastCase cur = comp?.CurrentCase;
 
-			// tant que le cortege n'est pas parti, on peut rappeler le messager. les 200
-			// d'argent, eux, ne reviendront pas
 			if (cur != null && cur.state == FeastCase.Invited && cur.spotThing == this)
 				yield return new Command_Action
 				{
@@ -86,8 +75,6 @@ namespace RimFeast
 
 			if (cur != null && cur.planned && cur.spotThing == this)
 			{
-				// combien des tiens sont deja a table: frapper avant qu'ils arrivent, c'est
-				// envoyer un seul bourreau contre tout un cortege
 				int atTable = cur.colonistLord != null
 					&& Map.lordManager.lords.Contains(cur.colonistLord)
 					? cur.colonistLord.ownedPawns.Count : 0;
@@ -107,7 +94,7 @@ namespace RimFeast
 					},
 					action = t => GameComponent_FeastState.Get()?.OrderSlaughter((Pawn)t.Thing),
 				};
-				// Leaving compte aussi: la description promet qu'on peut les egorger en chemin
+				// Leaving compte aussi: on peut les egorger en chemin
 				if (cur.state != FeastCase.Feasting && cur.state != FeastCase.Fleeing
 					&& cur.state != FeastCase.Leaving)
 					kill.Disable("RimFeast_AssassinateDisabledNotSeated".Translate());
@@ -132,14 +119,12 @@ namespace RimFeast
 				string label = been > 0
 					? "RimFeast_InviteOptionAgain".Translate(h.Name, h.PlayerGoodwill, cost, been)
 					: "RimFeast_InviteOption".Translate(h.Name, h.PlayerGoodwill, cost);
-				// une maison qui te deteste peut venir avec autre chose que des cadeaux
 				if (h.PlayerGoodwill <= -10)
 					label += " " + "RimFeast_InviteRisky".Translate();
 				options.Add(new FloatMenuOption(label,
 					delegate
 					{
-						// deux menus ouverts, ou un debug entre-temps: sans ce test on paie
-						// 200 d'argent pour une invitation que StartInvite refusera
+						// deux menus ouverts: on paierait pour une invitation refusee
 						if (GameComponent_FeastState.Get()?.Busy ?? true)
 						{
 							Messages.Message("RimFeast_InviteDisabledBusy".Translate().CapitalizeFirst(),
@@ -190,8 +175,6 @@ namespace RimFeast
 				line = "RimFeast_SpotFeasting".Translate(c.house?.Name)
 					+ "\n" + GameComponent_FeastState.HallReport(c);
 
-			// le duc se lit ici toute la soiree, pas seulement dans la lettre d'arrivee:
-			// c'est lui qui change le prix de la soiree, et celui d'un massacre
 			Pawn head = c != null && c.leaderCame ? c.house?.leader : null;
 			if (head != null && c.guests.Contains(head)
 				&& c.state != FeastCase.Invited && c.state != FeastCase.Fleeing)

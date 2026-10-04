@@ -12,8 +12,6 @@ namespace RimFeast.AI
 		{
 			PawnDuty duty = pawn.mindState.duty;
 			if (duty == null) return null;
-			// assez bu pour ce soir. les enfants ne boivent pas, les ados oui: on est au
-			// moyen age, la petite biere se sert a table des l'adolescence
 			if (pawn.DevelopmentalStage.Juvenile()) return null;
 			if (pawn.IsTeetotaler()) return null;
 			if (FeastUtility.DrunkennessOf(pawn) > RimFeastMod.S.drinkLimit) return null;
@@ -32,7 +30,6 @@ namespace RimFeast.AI
 			{
 				if (!x.IngestibleNow || !x.def.IsDrug) return false;
 				if (x.def.ingestible == null || x.def.ingestible.drugCategory != DrugCategory.Social) return false;
-				// les rejets gratuits d'abord, le test de zone ensuite
 				if (x.IsForbidden(pawn)) return false;
 				if (!area.Contains(x.Position)) return false;
 				return pawn.CanReserve(x);

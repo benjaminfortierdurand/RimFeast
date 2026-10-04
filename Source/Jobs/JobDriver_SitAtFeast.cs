@@ -5,15 +5,12 @@ using Verse.AI;
 
 namespace RimFeast.Jobs
 {
-	// notre propre "assis a table": SocialRelax vanilla faisait l'affaire, mais il est
-	// lourdement patche par d'autres mods (CommonSense plante dessus) et suppose un pawn
-	// colon avec besoin de loisir. ici on maitrise tout, et un invite sans jauge de loisir
-	// s'attable quand meme
+	// SocialRelax vanilla est trop patche par d'autres mods (CommonSense plante dessus)
 	public class JobDriver_SitAtFeast : JobDriver
 	{
-		private const TargetIndex FocusInd = TargetIndex.A; // le haut bout de table
-		private const TargetIndex SeatInd = TargetIndex.B;  // la case de la chaise
-		private const TargetIndex DrinkInd = TargetIndex.C; // la chope, optionnelle
+		private const TargetIndex FocusInd = TargetIndex.A;
+		private const TargetIndex SeatInd = TargetIndex.B;
+		private const TargetIndex DrinkInd = TargetIndex.C;
 
 		private bool HasDrink => job.GetTarget(DrinkInd).HasThing;
 
@@ -43,7 +40,7 @@ namespace RimFeast.Jobs
 			{
 				pawn.rotationTracker.FaceCell(job.GetTarget(FocusInd).Cell);
 				pawn.GainComfortFromCellIfPossible(delta);
-				// null-safe: les invites n'ont pas tous une jauge de loisir
+				// les invites n'ont pas tous une jauge de loisir
 				pawn.needs?.joy?.GainJoy(delta * 0.36f / 2500f, JoyKindDefOf.Social);
 			};
 			sit.handlingFacing = true;

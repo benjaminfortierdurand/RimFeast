@@ -6,7 +6,6 @@ using Verse.AI.Group;
 
 namespace RimFeast.AI
 {
-	// la fete cote colons, greffee sur le flux vanilla des parties
 	public class LordJob_FeastColonists : LordJob_Joinable_Party
 	{
 		private bool trap;
@@ -20,16 +19,12 @@ namespace RimFeast.AI
 			durationTicks = GameComponent_FeastState.FeastDurationTicks;
 		}
 
-		// la fete des colons a son propre toil: il designe le menestrel maison
 		protected override LordToil CreateGatheringToil(IntVec3 spot, Pawn organizer, GatheringDef gatheringDef)
 		{
 			return new LordToil_ColonistFeast(spot, gatheringDef);
 		}
 
-		// vanilla annule la fete des que l'organisateur la quitte. pour une fete spontanee
-		// c'est logique, pour un banquet paye et deja servi c'est absurde: il suffit qu'un
-		// mod de besoins (hygiene) l'envoie se soulager pour tout faire tomber. ici le
-		// banquet appartient a la colonie, pas a son hote
+		// vanilla annule la fete si l'organisateur part, un mod d'hygiene suffit a tout faire tomber
 		public override StateGraph CreateGraph()
 		{
 			var graph = new StateGraph();
@@ -56,11 +51,9 @@ namespace RimFeast.AI
 			return graph;
 		}
 
-		// plus de dependance a l'organisateur: seules les conditions de la carte comptent
 		protected override bool ShouldBeCalledOff() =>
 			!GatheringsUtility.AcceptableGameConditionsToContinueGathering(Map);
 
-		// meme souvenir que vanilla, module par le temps reellement passe a table
 		private void ApplyFeastOutcome(LordToil toil)
 		{
 			LordToilData_Gathering data = ((LordToil_Gathering)toil).Data;
@@ -80,7 +73,6 @@ namespace RimFeast.AI
 			}
 		}
 
-		// pas d'enfants ni de non-violents a une table qu'on a prevu de finir au couteau
 		public override float VoluntaryJoinPriorityFor(Pawn p)
 		{
 			if (trap && !FitForTrap(p)) return 0f;

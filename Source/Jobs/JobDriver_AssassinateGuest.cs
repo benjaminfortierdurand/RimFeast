@@ -5,9 +5,6 @@ using Verse.AI;
 
 namespace RimFeast.Jobs
 {
-	// la version banquet de l'execution: on rattrape le convive et on tranche au contact.
-	// tout est garde contre le job nettoye en cours de route: la cible peut mourir
-	// ou sortir de la carte pendant qu'on marche vers elle
 	public class JobDriver_AssassinateGuest : JobDriver
 	{
 		private Pawn Victim => job?.GetTarget(TargetIndex.A).Thing as Pawn;
@@ -17,8 +14,6 @@ namespace RimFeast.Jobs
 			return pawn.Reserve(job.GetTarget(TargetIndex.A), job, 1, -1, null, errorOnFailed);
 		}
 
-		// la premiere gorge est le signal: on laisse la chanson monter avant de trancher.
-		// les suivantes sont une chasse, pas une mise en scene
 		private const int SignalPauseTicks = 300;
 
 		private static bool OpeningKill =>
@@ -54,7 +49,6 @@ namespace RimFeast.Jobs
 					EndJobWith(JobCondition.Incompletable);
 					return;
 				}
-				// la cible a repris de la distance entre deux toils: on la rechasse
 				if (!pawn.Position.AdjacentTo8WayOrInside(v))
 				{
 					JumpToToil(chase);

@@ -13,9 +13,7 @@ namespace RimFeast.Planet
 		}
 	}
 
-	// greffe sur les colonies vanilla, ajoutee par Patches/. WorldObject.GetFloatMenuOptions
-	// parcourt les comps et Settlement appelle bien base en premier, donc l'option apparait
-	// dans le menu de la caravane sans toucher a une seule ligne de vanilla
+	// Settlement appelle base en premier: l'option s'ajoute sans patch
 	public class WorldObjectComp_FeastInvite : WorldObjectComp
 	{
 		public Settlement Seat => parent as Settlement;
@@ -31,8 +29,6 @@ namespace RimFeast.Planet
 				yield return o;
 		}
 
-		// la carte du monde n'a plus de marqueur a nous: c'est ici que le joueur lit qu'une
-		// table l'attend, et combien de temps elle l'attend encore
 		public override string CompInspectStringExtra()
 		{
 			if (!Open) return null;

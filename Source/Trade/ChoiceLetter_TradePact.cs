@@ -4,8 +4,7 @@ using Verse;
 
 namespace RimFeast
 {
-	// la caravane est deja programmee quand cette lettre part: choisir ne fait que fixer
-	// le marchand. ignorer la lettre ne coute donc rien, la maison enverra qui elle veut
+	// la caravane est deja programmee, la lettre ne fait que fixer le marchand
 	public class ChoiceLetter_TradePact : ChoiceLetter
 	{
 		public int pactId;
@@ -25,8 +24,7 @@ namespace RimFeast
 						TraderKindDef k = kind;
 						yield return new DiaOption("RimFeast_PactPick".Translate(k.label))
 						{
-							// resolveTree ne ferme que le dialogue: sans RemoveLetter la lettre
-							// reste sur la pile et on peut rechoisir a l'infini
+							// resolveTree ne ferme que le dialogue: sans RemoveLetter on rechoisit a l'infini
 							action = delegate
 							{
 								comp.SetPactKind(pactId, k);
@@ -39,7 +37,6 @@ namespace RimFeast
 					yield break;
 				}
 
-				// deja arrivee, ou l'accord n'existe plus
 				yield return Option_Close;
 			}
 		}

@@ -4,8 +4,7 @@ using Verse.AI;
 
 namespace RimFeast.AI
 {
-	// le JobGiver vanilla exige un trone assigne (def Royalty, et l'assignation vise les colons).
-	// le driver lui gere la cible cellule: TargetThingA null = pas de trone, branches alternatives
+	// le JobGiver vanilla exige un trone assigne. TargetThingA null = pas de trone
 	public class JobGiver_GiveToast : ThinkNode_JobGiver
 	{
 		protected override Job TryGiveJob(Pawn pawn)
@@ -19,7 +18,7 @@ namespace RimFeast.AI
 
 			Job job = JobMaker.MakeJob(JobDefOf.GiveSpeech, cell);
 
-			// il tourne vers B. sa propre case ne ferait rien tourner du tout
+			// il tourne vers B, sa propre case ne ferait rien tourner
 			IntVec3 face = cell + IntVec3.North;
 			job.SetTarget(TargetIndex.B, face.InBounds(pawn.Map) ? face : cell);
 

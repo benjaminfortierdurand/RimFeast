@@ -5,8 +5,7 @@ using Verse.AI;
 
 namespace RimFeast.AI
 {
-	// les instruments sont du contenu Royalty/Ideology. sans DLC, Building_MusicalInstrument
-	// et son driver crachent une Log.ErrorOnce: on ne cree simplement pas le job
+	// sans DLC l'instrument crache une Log.ErrorOnce: pas de job
 	public class JobGiver_PlayAtFeast : ThinkNode_JobGiver
 	{
 		protected override Job TryGiveJob(Pawn pawn)

@@ -5,26 +5,26 @@ namespace RimFeast
 {
 	public class RimFeastSettings : ModSettings
 	{
-		public int inviteCost = 200;      // presents du messager, x1.5 par banquet memorise
-		public int giftSilver = 400;      // bourse laissee apres un banquet de legende
-		public int feastHours = 8;        // duree du festin une fois a table
-		public int corteges = 6;          // taille type du cortege, +/-2 selon l'estime
+		public int inviteCost = 200;
+		public int giftSilver = 400;
+		public int feastHours = 8;
+		public int corteges = 6;
 
-		public bool summonColonists = true; // on lache la pelle quand le duc s'assied
-		public bool leaderEnabled = true;   // le chef de maison peut venir en personne
+		public bool summonColonists = true;
+		public bool leaderEnabled = true;
 		public bool marriageEnabled = true;
 		public float proposalChance = 0.02f;
 		public bool tradePactEnabled = true;
-		public bool requestsEnabled = true;   // le seigneur demande une faveur a table
-		public float requestChance = 0.35f;   // tire une seule fois, a mi-banquet
+		public bool requestsEnabled = true;
+		public float requestChance = 0.35f;
 
-		public bool awayFeastsEnabled = true; // les maisons rendent l'invitation
-		public int awayFeastDays = 20;        // delai moyen entre deux invitations recues
-		public int awayInviteWindowDays = 12; // plancher du delai, allonge selon la distance
-		public int awayMaxTravelDays = 30;    // au-dela, la maison est trop loin pour inviter
-		public float awayRiskFactor = 1f;     // multiplie le risque a leur table. 0 = jamais
+		public bool awayFeastsEnabled = true;
+		public int awayFeastDays = 20;
+		public int awayInviteWindowDays = 12;
+		public int awayMaxTravelDays = 30;
+		public float awayRiskFactor = 1f;
 
-		// vanilla: 0.25 = eméché, 0.4 = ivre. au-dela on ramasse les convives a la petite cuiller
+		// vanilla: 0.25 = eméché, 0.4 = ivre
 		public float drinkLimit = 0.35f;
 		public float brawlChance = 0.03f;
 
@@ -32,9 +32,9 @@ namespace RimFeast
 		public float treacheryChance = 0.35f;
 		public int treacheryGoodwillMax = -10;
 
-		public int fadeDays = 20;         // au bout de ca, la maison oublie un banquet
-		public int redWeddingDays = 60;   // duree du blacklist apres des noces pourpres
-		public bool censoredMusic;        // autre morceau pour les noces pourpres
+		public int fadeDays = 20;
+		public int redWeddingDays = 60;
+		public bool censoredMusic;
 
 		public override void ExposeData()
 		{
@@ -70,15 +70,11 @@ namespace RimFeast
 	{
 		private static RimFeastSettings settings;
 
-		// la page a doublé de longueur: sans vue défilante, Listing bascule en seconde
-		// colonne et pousse tout ce qui suit hors de la fenêtre, invisible et incliquable.
-		// la hauteur se mesure toute seule d'une frame sur l'autre, donc elle suivra les
-		// réglages qu'on ajoutera ensuite
+		// sans vue defilante, Listing bascule en seconde colonne et cache la suite
 		private static Vector2 scrollPos;
 		private static float viewHeight = 1200f;
 
-		// jamais null: si la classe Mod n'a pas ete instanciee (ou a echoue), tout le mod
-		// tomberait en NullRef au premier reglage lu
+		// jamais null, meme si le Mod n'a pas ete instancie
 		public static RimFeastSettings S
 		{
 			get
@@ -99,9 +95,7 @@ namespace RimFeast
 
 		public override void DoSettingsWindowContents(Rect inRect)
 		{
-			// on edite l'instance exacte que WriteSettings ecrira. sans ca, si S a ete lu
-			// avant la construction du Mod, on modifierait une copie jetable et la coche
-			// disparaitrait a la fermeture de la fenetre
+			// l'instance que WriteSettings ecrira, sinon la coche disparait a la fermeture
 			settings = GetSettings<RimFeastSettings>();
 
 			var l = new Listing_Standard();

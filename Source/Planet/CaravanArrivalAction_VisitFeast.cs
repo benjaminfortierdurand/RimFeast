@@ -5,8 +5,7 @@ using Verse;
 
 namespace RimFeast.Planet
 {
-	// calque de CaravanArrivalAction_VisitPeaceTalks, mais la destination est leur vrai
-	// chateau. on ne rentre pas dans leur carte: on resout la soiree et on repart
+	// calque de CaravanArrivalAction_VisitPeaceTalks
 	public class CaravanArrivalAction_VisitFeast : CaravanArrivalAction
 	{
 		private Settlement seat;

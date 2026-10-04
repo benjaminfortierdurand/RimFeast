@@ -4,7 +4,7 @@ using Verse.AI.Group;
 
 namespace RimFeast.AI
 {
-	// perte causee par la main du joueur. a ajouter avant la transition harmed
+	// a ajouter avant la transition harmed
 	public class Trigger_GuestLostToPlayer : Trigger
 	{
 		public override bool ActivateOn(Lord lord, TriggerSignal signal)
@@ -16,14 +16,13 @@ namespace RimFeast.AI
 
 			if (signal.condition == PawnLostCondition.MadePrisoner) return true;
 
-			// un massacre commande ne s'excuse ni par une bataille alentour ni par la victime
 			if (!Deliberate(signal))
 			{
 				if (lord.Map != null && GenHostility.AnyHostileActiveThreatToPlayer(lord.Map)) return false;
 				if (signal.Pawn?.MentalStateDef?.IsAggro == true) return false;
 			}
 
-			// tourelles et pieges engagent le joueur autant que ses pawns
+			// tourelles et pieges engagent le joueur
 			return signal.dinfo.Instigator?.Faction == Faction.OfPlayer;
 		}
 

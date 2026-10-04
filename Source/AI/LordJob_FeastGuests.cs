@@ -6,7 +6,6 @@ using Verse.AI.Group;
 
 namespace RimFeast.AI
 {
-	// cortege d'invites: arrive sous banniere, festoie, porte des toasts, repart
 	public class LordJob_FeastGuests : LordJob
 	{
 		public const string MemoEndFeast = "RimFeast_EndFeast";
@@ -27,10 +26,8 @@ namespace RimFeast.AI
 			this.speaker = speaker;
 		}
 
-		// la grande salle est forcement derriere des portes
 		public override bool CanOpenAnyDoor(Pawn p) => true;
 
-		// une rixe de taverne ne rompt pas l'hospitalite: l'assomme reste des notres.
 		// meme hook que LordJob_Ritual
 		public override bool ShouldRemovePawn(Pawn p, PawnLostCondition reason)
 		{
@@ -42,16 +39,13 @@ namespace RimFeast.AI
 
 		public override string GetReport(Pawn pawn) => "RimFeast_ReportFeasting".Translate();
 
-		// un orateur au tapis ne porte pas de toast, et le score ne doit pas en compter
 		private bool SpeakerReady() =>
 			speaker != null && speaker.Spawned && !speaker.Dead && !speaker.Downed && !speaker.InMentalState;
 
 		public override StateGraph CreateGraph()
 		{
 			var graph = new StateGraph();
-			// la route a deux toils: la marche, et la defense apres un premier coup. le coup
-			// arrive avant la mort, donc un convive tue en chemin tombe toujours depuis la
-			// defense. sans elle en source, l'egorger sur la route ne coutait rien
+			// le coup arrive avant la mort: un convive tue en chemin tombe depuis le toil de defense
 			StateGraph road = graph.AttachSubgraph(new LordJob_Travel(spot).CreateGraph());
 			LordToil travel = road.StartingToil;
 			graph.StartingToil = travel;
@@ -78,8 +72,7 @@ namespace RimFeast.AI
 			}));
 			graph.AddTransition(arrive);
 
-			// le graph garde la meme forme quoi qu'il arrive: le lord reapplique les
-			// TriggerData par index au chargement, une geometrie variable les decalerait
+			// le graph garde la meme forme: les TriggerData sont reappliques par index au chargement
 			var raise = new Transition(feast, toast);
 			raise.AddTrigger(new Trigger_TickCondition(
 				() => lord.ticksInToil >= GameComponent_FeastState.ToastIntervalTicks && SpeakerReady()
@@ -96,8 +89,7 @@ namespace RimFeast.AI
 			sitDown.AddPostAction(new TransitionAction_EndAllJobs());
 			graph.AddTransition(sitDown);
 
-			// toast doit etre source ici: sinon le compteur se remet a zero a chaque retour
-			// a la tablee et le banquet ne finit jamais
+			// toast source ici, sinon le compteur repart a zero et le banquet ne finit jamais
 			var done = new Transition(feast, exit);
 			done.AddSources(toast);
 			done.AddTrigger(new Trigger_TicksPassed(GameComponent_FeastState.FeastDurationTicks));
@@ -109,15 +101,13 @@ namespace RimFeast.AI
 			done.AddPostAction(new TransitionAction_WakeAll());
 			graph.AddTransition(done);
 
-			// en partant ils ramassent leurs blesses
 			var wounded = new Transition(exit, takeWounded);
 			wounded.AddTrigger(new Trigger_WoundedGuestPresent());
 			wounded.AddPreAction(new TransitionAction_Message(
 				"RimFeast_MessageTakingWounded".Translate(house?.Name), MessageTypeDefOf.NeutralEvent));
 			graph.AddTransition(wounded);
 
-			// le droit de l'hote court jusqu'a la derniere case. le toil flee n'est pas
-			// source: massacrer des empoisonneurs demasques reste gratuit
+			// flee n'est pas source: massacrer des empoisonneurs demasques reste gratuit
 			var betrayedLeaving = new Transition(exit, fightOut);
 			betrayedLeaving.AddSources(takeWounded);
 			betrayedLeaving.AddTrigger(new Trigger_GuestLostToPlayer());
@@ -129,7 +119,6 @@ namespace RimFeast.AI
 			betrayedLeaving.AddPostAction(new TransitionAction_EndAllJobs());
 			graph.AddTransition(betrayedLeaving);
 
-			// empoisonneurs demasques: le cortege detale sans demander son reste
 			var caught = new Transition(feast, flee);
 			caught.AddSources(toast);
 			caught.AddTrigger(new Trigger_Memo(MemoExposed));
@@ -137,8 +126,7 @@ namespace RimFeast.AI
 			caught.AddPostAction(new TransitionAction_EndAllJobs());
 			graph.AddTransition(caught);
 
-			// la main du joueur sur un convive: on degaine et on se bat vers la sortie.
-			// ajoutee avant harmed, le premier match dans le graph gagne
+			// avant harmed: le premier match gagne
 			var betrayed = new Transition(travel, fightOut);
 			betrayed.AddSources(feast, toast);
 			betrayed.AddSources(onRoad);
@@ -151,7 +139,6 @@ namespace RimFeast.AI
 			betrayed.AddPostAction(new TransitionAction_EndAllJobs());
 			graph.AddTransition(betrayed);
 
-			// du sang par une autre main. les exits comptent pas
 			var harmed = new Transition(travel, exit);
 			harmed.AddSources(feast, toast);
 			harmed.AddSources(onRoad);
@@ -177,8 +164,7 @@ namespace RimFeast.AI
 			weather.AddPostAction(new TransitionAction_EndAllJobs());
 			graph.AddTransition(weather);
 
-			// backstop pour ne jamais squatter la carte. le compteur court depuis l'arrivee,
-			// trajet compris, donc il doit suivre le reglage de duree et pas rester cable
+			// le compteur court depuis l'arrivee, il suit la duree reglee
 			var stale = new Transition(travel, exit);
 			stale.AddSources(feast, toast);
 			stale.AddSources(onRoad);
@@ -202,8 +188,6 @@ namespace RimFeast.AI
 		}
 	}
 
-	// trahis a table: ils gagnent la sortie en rendant les coups. le composant bascule la
-	// faction invitee en hostile le temps du combat, sinon le ciblage ignore des neutres
 	public class LordToil_FightOut : LordToil
 	{
 		public override bool AllowSatisfyLongNeeds => false;

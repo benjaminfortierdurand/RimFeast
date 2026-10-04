@@ -129,7 +129,6 @@ namespace RimFeast.Debug
 			GameComponent_FeastState.Get()?.DebugAwayInviteNow();
 		}
 
-		// joue l'issue sur la premiere caravane du joueur, ou qu'elle soit
 		[DebugAction("RimFeast", "Force an away feast outcome: pick one",
 			allowedGameStates = AllowedGameStates.PlayingOnMap)]
 		private static void AwayOutcomeNow()
@@ -178,7 +177,6 @@ namespace RimFeast.Debug
 			comp?.DebugRushCaravans();
 		}
 
-		// a coller dans un rapport de bug quand des colons refusent de venir a table
 		[DebugAction("RimFeast", "Log why colonists are not at the table",
 			allowedGameStates = AllowedGameStates.PlayingOnMap)]
 		private static void LogColonists()
