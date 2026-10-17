@@ -9,8 +9,10 @@ namespace RimFeast
 		public int giftSilver = 400;
 		public int feastHours = 8;
 		public int corteges = 6;
+		public int colonyFeastDays = 7;
 
 		public bool summonColonists = true;
+		public bool seatMeals = true;
 		public bool leaderEnabled = true;
 		public bool marriageEnabled = true;
 		public float proposalChance = 0.02f;
@@ -43,7 +45,9 @@ namespace RimFeast
 			Scribe_Values.Look(ref giftSilver, "giftSilver", 400);
 			Scribe_Values.Look(ref feastHours, "feastHours", 8);
 			Scribe_Values.Look(ref corteges, "corteges", 6);
+			Scribe_Values.Look(ref colonyFeastDays, "colonyFeastDays", 7);
 			Scribe_Values.Look(ref summonColonists, "summonColonists", true);
+			Scribe_Values.Look(ref seatMeals, "seatMeals", true);
 			Scribe_Values.Look(ref leaderEnabled, "leaderEnabled", true);
 			Scribe_Values.Look(ref marriageEnabled, "marriageEnabled", true);
 			Scribe_Values.Look(ref proposalChance, "proposalChance", 0.02f);
@@ -110,12 +114,16 @@ namespace RimFeast
 			S.giftSilver = Mathf.RoundToInt(l.Slider(S.giftSilver, 0f, 2000f) / 50f) * 50;
 			l.Label("RimFeast_SetHours".Translate(S.feastHours));
 			S.feastHours = Mathf.RoundToInt(l.Slider(S.feastHours, 2f, 24f));
+			l.Label("RimFeast_SetColonyDays".Translate(S.colonyFeastDays));
+			S.colonyFeastDays = Mathf.RoundToInt(l.Slider(S.colonyFeastDays, 1f, 30f));
 			l.Label("RimFeast_SetCortege".Translate(S.corteges, Mathf.Max(2, S.corteges - 3), S.corteges + 3));
 			S.corteges = Mathf.RoundToInt(l.Slider(S.corteges, 3f, 16f));
 
 			l.GapLine();
 			l.CheckboxLabeled("RimFeast_SetSummon".Translate(), ref S.summonColonists,
 				"RimFeast_SetSummonTip".Translate());
+			l.CheckboxLabeled("RimFeast_SetSeatMeals".Translate(), ref S.seatMeals,
+				"RimFeast_SetSeatMealsTip".Translate());
 			l.CheckboxLabeled("RimFeast_SetLeader".Translate(), ref S.leaderEnabled,
 				"RimFeast_SetLeaderTip".Translate());
 			l.CheckboxLabeled("RimFeast_SetTradePact".Translate(), ref S.tradePactEnabled,

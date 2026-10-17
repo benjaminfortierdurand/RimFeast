@@ -5,6 +5,15 @@
 	<RimFeast_InviteGizmoLabel>invite a house</RimFeast_InviteGizmoLabel>
 	<RimFeast_InviteGizmoDesc>Send a messenger with gifts to invite a noble house to a feast at this spot. Costs {0} silver for a house that has never dined with you. A house that has feasted here recently asks for richer gifts, and is harder to impress a second time. Let a season pass and the novelty returns.</RimFeast_InviteGizmoDesc>
 	<RimFeast_InviteDisabledBusy>a feast is already planned or underway</RimFeast_InviteDisabledBusy>
+	<RimFeast_ColonyGizmoLabel>feast for the colony</RimFeast_ColonyGizmoLabel>
+	<RimFeast_ColonyGizmoDesc>Hold a feast for your own people, no guests. Your colonists gather in the feast area to eat, drink and listen to music. How good they feel afterwards depends on the hall, the table and the drink. Once every {0} days.</RimFeast_ColonyGizmoDesc>
+	<RimFeast_ColonyDisabledCooldown>your people feasted recently, again in {0} days</RimFeast_ColonyDisabledCooldown>
+	<RimFeast_ColonyDisabledDanger>not with danger on the map</RimFeast_ColonyDisabledDanger>
+	<RimFeast_ColonyDisabledGathering>a party, ceremony or caravan is already gathering your people</RimFeast_ColonyDisabledGathering>
+	<RimFeast_ColonyDisabledNobody>Nobody is free to preside over a feast right now.</RimFeast_ColonyDisabledNobody>
+	<RimFeast_ColonyFeastBegins>{0} calls the colony to the feast.</RimFeast_ColonyFeastBegins>
+	<RimFeast_ColonyToast>{0} raises a toast. The hall falls quiet to listen.</RimFeast_ColonyToast>
+	<RimFeast_ColonyFeastOver>The colony feast is over. {0}</RimFeast_ColonyFeastOver>
 	<RimFeast_InviteDisabledNoHouses>No noble house will treat with you.</RimFeast_InviteDisabledNoHouses>
 	<RimFeast_InviteOption>Invite {0} (goodwill {1}, {2} silver)</RimFeast_InviteOption>
 	<RimFeast_InviteOptionAgain>Invite {0} (goodwill {1}, {2} silver, has feasted here {3}x)</RimFeast_InviteOptionAgain>
@@ -70,9 +79,12 @@
 	<RimFeast_SetInviteCost>Invitation cost: {0} silver</RimFeast_SetInviteCost>
 	<RimFeast_SetGift>Gift after a legendary feast: {0} silver</RimFeast_SetGift>
 	<RimFeast_SetHours>Feast length: {0} hours</RimFeast_SetHours>
+	<RimFeast_SetColonyDays>Days between colony feasts: {0}</RimFeast_SetColonyDays>
 	<RimFeast_SetCortege>Cortege size: about {0} guests (houses send {1} to {2} depending on how they see you)</RimFeast_SetCortege>
 	<RimFeast_SetSummon>Colonists drop their work for the feast</RimFeast_SetSummon>
 	<RimFeast_SetSummonTip>When the guests sit down, colonists set aside whatever they were doing and head for the hall. Surgery, tending and other jobs that cannot be dropped are left alone. Turn this off and they will drift in one by one as their work ends, the way vanilla parties fill up.</RimFeast_SetSummonTip>
+	<RimFeast_SetSeatMeals>Colonists eat at their own seat</RimFeast_SetSeatMeals>
+	<RimFeast_SetSeatMealsTip>Chairs inside a feast area can be given to a colonist, like a bed. With this on, they go eat there whenever the seat is free and at a table. Turn it off and seats only count at feasts.</RimFeast_SetSeatMealsTip>
 	<RimFeast_SetLeader>Heads of house may attend in person</RimFeast_SetLeader>
 	<RimFeast_SetLeaderTip>With high goodwill and a feast already to your name, the head of the house may ride with the cortege. Hosting them is worth more, and losing them costs more.</RimFeast_SetLeaderTip>
 	<RimFeast_SetTradePact>Trade agreements</RimFeast_SetTradePact>
@@ -80,7 +92,7 @@
 	<RimFeast_SetMarriage>Marriage proposals</RimFeast_SetMarriage>
 	<RimFeast_SetMarriageTip>A noble may ask for the hand of one of your colonists. Accepting means losing them to the house for good.</RimFeast_SetMarriageTip>
 	<RimFeast_SetProposalChance>Proposal chance: {0}% per check</RimFeast_SetProposalChance>
-	<RimFeast_SetDrinkLimit>Guests stop drinking at: {0}% ({1})</RimFeast_SetDrinkLimit>
+	<RimFeast_SetDrinkLimit>At feasts, most people stop drinking at: {0}% ({1}). A few always overdo it</RimFeast_SetDrinkLimit>
 	<RimFeast_DrunkStageWarm>merry</RimFeast_DrunkStageWarm>
 	<RimFeast_DrunkStageTipsy>tipsy</RimFeast_DrunkStageTipsy>
 	<RimFeast_DrunkStageDrunk>falling-down drunk</RimFeast_DrunkStageDrunk>
@@ -145,16 +157,20 @@
 	<RimFeast_ReportFeasting>attending the feast</RimFeast_ReportFeasting>
 	<RimFeast_ShowMarkerLabel>Show marker</RimFeast_ShowMarkerLabel>
 	<RimFeast_ShowMarkerDesc>Show or hide the marker. The feast keeps working either way.</RimFeast_ShowMarkerDesc>
-	<RimFeast_AreaPlus>Radius {0} +</RimFeast_AreaPlus>
-	<RimFeast_AreaMinus>Radius {0} -</RimFeast_AreaMinus>
-	<RimFeast_AreaDesc>How far the feast reaches from the spot. Only food, drink, chairs and instruments inside it count, and the guests stay inside it. Select the spot to see it on the floor.</RimFeast_AreaDesc>
-	<RimFeast_AreaAuto>Auto</RimFeast_AreaAuto>
-	<RimFeast_AreaAutoDesc>Stretch the feast to the walls of the room the spot stands in, however big it is.</RimFeast_AreaAutoDesc>
-	<RimFeast_AreaNotEnclosed>The spot isnt in an enclosed room. Use the radius instead.</RimFeast_AreaNotEnclosed>
-	<RimFeast_AreaFitted>The feast now fills the hall: {0} cells.</RimFeast_AreaFitted>
+	<RimFeast_AreaPaint>Paint feast area</RimFeast_AreaPaint>
+	<RimFeast_AreaPaintDesc>Drag to add cells to the feast, like a stockpile zone. Once you paint, your shape replaces the circle. Only food, drink, chairs and instruments inside count, and the guests stay inside.</RimFeast_AreaPaintDesc>
+	<RimFeast_AreaErase>Erase feast area</RimFeast_AreaErase>
+	<RimFeast_AreaEraseDesc>Drag to take cells out of the feast. The spot always stays inside.</RimFeast_AreaEraseDesc>
+	<RimFeast_AreaKeep>The feast spot has to stay inside its area.</RimFeast_AreaKeep>
+	<RimFeast_AreaTooFar>Too far, the feast reaches {0} cells at most from its spot.</RimFeast_AreaTooFar>
+	<RimFeast_SpotAreaPainted>The feast covers {0} painted cells.</RimFeast_SpotAreaPainted>
 	<RimFeast_SpotAreaRoom>The feast fills the whole hall, {0} cells.</RimFeast_SpotAreaRoom>
 	<RimFeast_SpotAreaRadius>The feast reaches {0} cells around the spot, within this room.</RimFeast_SpotAreaRadius>
 	<RimFeast_MarkerHidden>Marker hidden.</RimFeast_MarkerHidden>
+	<RimFeast_SeatAssign>Assign feast seat</RimFeast_SeatAssign>
+	<RimFeast_SeatDesc>Give this seat to one of your colonists, like a bed. They sit here at feasts, and for their meals too if the setting is on.</RimFeast_SeatDesc>
+	<RimFeast_SeatOf>Seat of {0}.</RimFeast_SeatOf>
+	<RimFeast_SpotColonyFeast>The colony is feasting.</RimFeast_SpotColonyFeast>
 	<RimFeast_SpotIdle>No feast planned.</RimFeast_SpotIdle>
 	<RimFeast_LabelRequest>A request at the table</RimFeast_LabelRequest>
 	<RimFeast_TextRequestWeapon>{0} of {1} rises at the head of the table, cup in hand, and speaks at length of the steel your smiths turn out. Then he comes to the point: he would carry one of your blades home. Your {2}.\n\nThe hall has gone quiet. His knights are watching.</RimFeast_TextRequestWeapon>

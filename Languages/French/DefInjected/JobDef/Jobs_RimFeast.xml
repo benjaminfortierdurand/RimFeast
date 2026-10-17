@@ -3,5 +3,6 @@
 
 	<RimFeast_AssassinateJob.reportString>assassine TargetA.</RimFeast_AssassinateJob.reportString>
 	<RimFeast_SitAtFeastJob.reportString>festoie à table.</RimFeast_SitAtFeastJob.reportString>
+	<RimFeast_EatAtSeatJob.reportString>mange TargetA.</RimFeast_EatAtSeatJob.reportString>
 
 </LanguageData>

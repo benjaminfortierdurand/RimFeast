@@ -14,7 +14,7 @@ namespace RimFeast.AI
 			if (duty == null) return null;
 			if (pawn.DevelopmentalStage.Juvenile()) return null;
 			if (pawn.IsTeetotaler()) return null;
-			if (FeastUtility.DrunkennessOf(pawn) > RimFeastMod.S.drinkLimit) return null;
+			if (FeastUtility.DrunkennessOf(pawn) >= FeastUtility.DrinkLimitFor(pawn)) return null;
 
 			Thing drink = FindDrink(pawn, duty.focus.Cell);
 			if (drink == null) return null;
@@ -30,6 +30,7 @@ namespace RimFeast.AI
 			{
 				if (!x.IngestibleNow || !x.def.IsDrug) return false;
 				if (x.def.ingestible == null || x.def.ingestible.drugCategory != DrugCategory.Social) return false;
+				if (!FeastUtility.CanDrink(pawn, x)) return false;
 				if (x.IsForbidden(pawn)) return false;
 				if (!area.Contains(x.Position)) return false;
 				return pawn.CanReserve(x);

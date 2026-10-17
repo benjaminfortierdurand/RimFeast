@@ -255,6 +255,8 @@ namespace RimFeast
 		private int redWeddingTick = -1;
 		private int nextAwayInviteTick = -1;
 		private LovinScene lovin;
+		private FeastCase colony;
+		private int lastColonyFeastTick = -1;
 
 		private Faction awayHouse;
 		private int awayExpireTick = -1;
@@ -309,9 +311,11 @@ namespace RimFeast
 
 		public static GameComponent_FeastState Get() => Current.Game?.GetComponent<GameComponent_FeastState>();
 
-		public bool Busy => current != null;
+		public bool Busy => current != null || colony != null;
 
 		public FeastCase CurrentCase => current;
+
+		public FeastCase ColonyCase => colony;
 
 		public bool SlaughterUnderway => current != null && current.slaughterOrdered;
 
@@ -605,7 +609,11 @@ namespace RimFeast
 
 		public void DebugRush()
 		{
-			if (current == null) return;
+			if (current == null)
+			{
+				colony?.colonistLord?.ReceiveMemo(LordJob_FeastColonists.MemoEnd);
+				return;
+			}
 			if (current.state == FeastCase.Invited)
 				current.eventTick = Find.TickManager.TicksGame;
 			else if (current.state == FeastCase.Feasting)
@@ -652,7 +660,7 @@ namespace RimFeast
 
 		public void StartInvite(Map map, Faction house, Thing spot, bool planned = false)
 		{
-			if (current != null || map == null || house == null || spot == null) return;
+			if (Busy || map == null || house == null || spot == null) return;
 			planned = planned || debugForcePlanned;
 			debugForcePlanned = false;
 			current = new FeastCase
@@ -712,6 +720,7 @@ namespace RimFeast
 			if (wards.Count > 0) TickWards();
 			if (lovin != null) TickLovin();
 			TickAwayInvites();
+			if (colony != null) TickColony();
 
 			if (current == null) return;
 
@@ -1816,6 +1825,116 @@ namespace RimFeast
 			}
 		}
 
+		public int ColonyFeastDaysLeft()
+		{
+			if (lastColonyFeastTick < 0) return 0;
+			int ready = lastColonyFeastTick + RimFeastMod.S.colonyFeastDays * GenDate.TicksPerDay;
+			return Mathf.Max(0, Mathf.CeilToInt((ready - Find.TickManager.TicksGame) / (float)GenDate.TicksPerDay));
+		}
+
+		// pas les heures ni le nombre de colons des fetes vanilla: c'est le joueur qui lance
+		public string ColonyFeastBlocked(Map map)
+		{
+			if (Busy) return "RimFeast_InviteDisabledBusy".Translate();
+			int days = ColonyFeastDaysLeft();
+			if (days > 0) return "RimFeast_ColonyDisabledCooldown".Translate(days);
+			if (map == null) return "";
+			// le seuil ou vanilla interrompt une fete: une bete hostile au fond de la carte suffit a sortir de None
+			if (map.dangerWatcher.DangerRating == StoryDanger.High) return "RimFeast_ColonyDisabledDanger".Translate();
+			if (GatheringsUtility.AnyLordJobPreventsNewGatherings(map)) return "RimFeast_ColonyDisabledGathering".Translate();
+			return null;
+		}
+
+		public void StartColonyFeast(Thing spot)
+		{
+			Map map = spot?.Map;
+			if (map == null || ColonyFeastBlocked(map) != null) return;
+			GatheringDef def = RimFeastDefOf.RimFeast_Feast;
+			Pawn organizer = GatheringsUtility.FindRandomGatheringOrganizer(Faction.OfPlayer, map, def);
+			if (organizer == null)
+			{
+				Messages.Message("RimFeast_ColonyDisabledNobody".Translate(), spot,
+					MessageTypeDefOf.RejectInput, historical: false);
+				return;
+			}
+			var c = new FeastCase
+			{
+				id = nextId++,
+				map = map,
+				spotCell = spot.Position,
+				spotThing = spot,
+				state = FeastCase.Feasting,
+				arrivedTick = Find.TickManager.TicksGame,
+				guestCount = Mathf.Max(1, map.mapPawns.FreeColonistsSpawned.Count(p => !p.DevelopmentalStage.Baby())),
+			};
+			var job = new LordJob_FeastColonists(spot.Position, organizer, def, trap: false, colony: true);
+			c.colonistLord = LordMaker.MakeNewLord(Faction.OfPlayer, job, map,
+				job.OrganizerIsStartingPawn ? new List<Pawn> { organizer } : null);
+			c.lord = c.colonistLord;
+			colony = c;
+			lastColonyFeastTick = Find.TickManager.TicksGame;
+			SummonColonists(c);
+			Messages.Message("RimFeast_ColonyFeastBegins".Translate(organizer.LabelShort),
+				new TargetInfo(spot.Position, map), MessageTypeDefOf.PositiveEvent);
+		}
+
+		private void TickColony()
+		{
+			FeastCase c = colony;
+			if (c.map == null || !Find.Maps.Contains(c.map) || c.colonistLord == null
+				|| !c.map.lordManager.lords.Contains(c.colonistLord))
+			{
+				colony = null;
+				return;
+			}
+			if (Find.TickManager.TicksGame - c.lastSummonTick >= ResummonTicks) SummonColonists(c);
+			Sample(c);
+		}
+
+		public void Notify_ColonyToast(Pawn speaker)
+		{
+			FeastCase c = colony;
+			if (c == null) return;
+			c.toastsGiven++;
+			if (speaker != null)
+				Messages.Message("RimFeast_ColonyToast".Translate(speaker.LabelShort), new TargetInfo(c.spotCell, c.map),
+					MessageTypeDefOf.PositiveEvent, historical: false);
+		}
+
+		// le bareme des invites, l'organisateur porte les toasts
+		public int ColonyFeastStage(out string report)
+		{
+			report = null;
+			FeastCase c = colony;
+			if (c == null) return 0;
+			float hall = Mathf.Clamp01(c.maxImpressiveness / ImpressivenessCap);
+			float drink = Mathf.Min((float)c.maxDrinkUnits / Mathf.Max(1, c.guestCount), 1f);
+			float score = hall * 20f + c.maxTableScore + Mathf.Min(c.maxVariety, 5) * 3f + drink * 10f;
+			if (c.drankAny) score += 5f;
+			List<Pawn> pawns = c.colonistLord?.ownedPawns;
+			if (pawns != null && pawns.Count > 0)
+				score += (float)pawns.Count(p => p.needs?.food != null && p.needs.food.CurLevelPercentage > 0.6f)
+					/ pawns.Count * 15f;
+			bool music = FeastUtility.MusicPossible;
+			float toasts = Mathf.Min(c.toastsGiven / (float)ToastsForFull, 1f);
+			score += toasts * (music ? 10f : 15f);
+			if (music)
+				score += Mathf.Min((c.samples > 0 ? (float)c.musicSamples / c.samples : 0f) / 0.5f, 1f) * 5f;
+			float ent = c.samples > 0 && c.musicSamples > 0 ? Mathf.Max(toasts, 0.7f) : toasts;
+			report = Qual(hall, "RimFeast_QualHall") + " " + Qual(Mathf.Clamp01(c.maxTableScore / 20f), "RimFeast_QualTable")
+				+ " " + Qual(drink, "RimFeast_QualDrink") + " " + Qual(ent, "RimFeast_QualEnt");
+			return score >= TriumphScore ? 3 : score >= GoodScore ? 2 : score >= DecentScore ? 1 : 0;
+		}
+
+		public void Notify_ColonyFeastEnded(string report)
+		{
+			FeastCase c = colony;
+			colony = null;
+			if (c?.map == null || report.NullOrEmpty()) return;
+			Messages.Message("RimFeast_ColonyFeastOver".Translate(report), new TargetInfo(c.spotCell, c.map),
+				MessageTypeDefOf.PositiveEvent);
+		}
+
 		private void Sample(FeastCase c)
 		{
 			Map map = c.map;
@@ -2661,6 +2780,8 @@ namespace RimFeast
 			Scribe_References.Look(ref awayHouse, "awayHouse");
 			Scribe_Values.Look(ref awayExpireTick, "awayExpireTick", -1);
 			Scribe_Deep.Look(ref lovin, "lovin");
+			Scribe_Deep.Look(ref colony, "colony");
+			Scribe_Values.Look(ref lastColonyFeastTick, "lastColonyFeastTick", -1);
 			if (Scribe.mode == LoadSaveMode.PostLoadInit)
 			{
 				if (memories == null) memories = new List<HouseFeastMemory>();

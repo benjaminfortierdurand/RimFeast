@@ -4,6 +4,15 @@
 	<RimFeast_AttendedFeast.stages.0.label>a participé à un banquet</RimFeast_AttendedFeast.stages.0.label>
 	<RimFeast_AttendedFeast.stages.0.description>Un vrai banquet, comme dans les contes. La salle, la viande, l'hydromel, la compagnie.</RimFeast_AttendedFeast.stages.0.description>
 
+	<RimFeast_ColonyFeast.stages.0.label>un maigre banquet entre nous</RimFeast_ColonyFeast.stages.0.label>
+	<RimFeast_ColonyFeast.stages.0.description>On s'est au moins mis à table ensemble. La table aurait pu être meilleure.</RimFeast_ColonyFeast.stages.0.description>
+	<RimFeast_ColonyFeast.stages.1.label>un modeste banquet entre nous</RimFeast_ColonyFeast.stages.1.label>
+	<RimFeast_ColonyFeast.stages.1.description>De la bonne nourriture, de la bonne compagnie et une soirée de repos.</RimFeast_ColonyFeast.stages.1.description>
+	<RimFeast_ColonyFeast.stages.2.label>un beau banquet entre nous</RimFeast_ColonyFeast.stages.2.label>
+	<RimFeast_ColonyFeast.stages.2.description>Un vrai banquet dans notre propre salle. On en avait besoin.</RimFeast_ColonyFeast.stages.2.description>
+	<RimFeast_ColonyFeast.stages.3.label>un banquet entre nous inoubliable</RimFeast_ColonyFeast.stages.3.label>
+	<RimFeast_ColonyFeast.stages.3.description>La salle, la viande, la boisson, la musique. Personne n'oubliera cette nuit-là.</RimFeast_ColonyFeast.stages.3.description>
+
 	<RimFeast_NightWithNoble.stages.0.label>une nuit avec un noble</RimFeast_NightWithNoble.stages.0.label>
 	<RimFeast_NightWithNoble.stages.0.description>De la soie, un vrai lit, et pour une fois quelqu'un aux mains propres et aux belles manières. On dira ce qu'on voudra de la noblesse.</RimFeast_NightWithNoble.stages.0.description>
 

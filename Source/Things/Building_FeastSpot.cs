@@ -32,7 +32,7 @@ namespace RimFeast
 			{
 				defaultLabel = "RimFeast_ShowMarkerLabel".Translate(),
 				defaultDesc = "RimFeast_ShowMarkerDesc".Translate(),
-				icon = RimFeastTex.ShowMarker,
+				icon = TexCommand.GatherSpotActive,
 				isActive = () => !hideMarker,
 				toggleAction = delegate
 				{
@@ -61,6 +61,17 @@ namespace RimFeast
 			};
 			if (comp != null && comp.Busy) trap.Disable("RimFeast_InviteDisabledBusy".Translate());
 			yield return trap;
+
+			var party = new Command_Action
+			{
+				defaultLabel = "RimFeast_ColonyGizmoLabel".Translate(),
+				defaultDesc = "RimFeast_ColonyGizmoDesc".Translate(RimFeastMod.S.colonyFeastDays),
+				icon = RimFeastTex.ColonyFeast,
+				action = () => GameComponent_FeastState.Get()?.StartColonyFeast(this),
+			};
+			string blocked = comp?.ColonyFeastBlocked(Map);
+			if (blocked != null) party.Disable(blocked);
+			yield return party;
 
 			FeastCase cur = comp?.CurrentCase;
 
@@ -151,8 +162,11 @@ namespace RimFeast
 			FeastCase c = GameComponent_FeastState.Get()?.CurrentCase;
 			string line;
 			if (hideMarker) s = (s.NullOrEmpty() ? "" : s + "\n") + "RimFeast_MarkerHidden".Translate();
+			FeastCase colonyCase = GameComponent_FeastState.Get()?.ColonyCase;
 			if (c == null || c.spotThing != this)
-				line = "RimFeast_SpotIdle".Translate();
+				line = colonyCase != null && colonyCase.spotThing == this
+					? "RimFeast_SpotColonyFeast".Translate()
+					: "RimFeast_SpotIdle".Translate();
 			else if (c.state == FeastCase.Invited)
 			{
 				line = "RimFeast_SpotInvited".Translate(c.house?.Name);

@@ -5,6 +5,15 @@
 	<RimFeast_InviteGizmoLabel>inviter une maison</RimFeast_InviteGizmoLabel>
 	<RimFeast_InviteGizmoDesc>Envoyer un messager porteur de présents pour inviter une maison noble à banqueter ici. Coûte {0} pièces d'argent pour une maison qui n'a jamais dîné chez vous. Une maison qui a festoyé ici récemment exige de plus riches présents, et se laisse moins impressionner une deuxième fois. Laissez passer une saison et la nouveauté revient.</RimFeast_InviteGizmoDesc>
 	<RimFeast_InviteDisabledBusy>un banquet est déjà prévu ou en cours</RimFeast_InviteDisabledBusy>
+	<RimFeast_ColonyGizmoLabel>banquet de la colonie</RimFeast_ColonyGizmoLabel>
+	<RimFeast_ColonyGizmoDesc>Organisez un banquet pour vos propres gens, sans invités. Vos colons se réunissent dans la zone du banquet pour manger, boire et écouter de la musique. Leur humeur ensuite dépend de la salle, de la table et de la boisson. Une fois tous les {0} jours.</RimFeast_ColonyGizmoDesc>
+	<RimFeast_ColonyDisabledCooldown>vos gens ont festoyé récemment, prochain banquet dans {0} jours</RimFeast_ColonyDisabledCooldown>
+	<RimFeast_ColonyDisabledDanger>pas avec un danger sur la carte</RimFeast_ColonyDisabledDanger>
+	<RimFeast_ColonyDisabledGathering>une fête, une cérémonie ou une caravane rassemble déjà vos gens</RimFeast_ColonyDisabledGathering>
+	<RimFeast_ColonyDisabledNobody>Personne n'est disponible pour présider un banquet pour l'instant.</RimFeast_ColonyDisabledNobody>
+	<RimFeast_ColonyFeastBegins>{0} appelle la colonie au banquet.</RimFeast_ColonyFeastBegins>
+	<RimFeast_ColonyToast>{0} lève son verre. La salle se tait pour l'écouter.</RimFeast_ColonyToast>
+	<RimFeast_ColonyFeastOver>Le banquet de la colonie est terminé. {0}</RimFeast_ColonyFeastOver>
 	<RimFeast_InviteDisabledNoHouses>Aucune maison noble ne veut traiter avec vous.</RimFeast_InviteDisabledNoHouses>
 	<RimFeast_InviteOption>Inviter {0} (relations {1}, {2} argent)</RimFeast_InviteOption>
 	<RimFeast_InviteOptionAgain>Inviter {0} (relations {1}, {2} argent, a déjà festoyé ici {3}x)</RimFeast_InviteOptionAgain>
@@ -70,9 +79,12 @@
 	<RimFeast_SetInviteCost>Coût de l'invitation : {0} pièces d'argent</RimFeast_SetInviteCost>
 	<RimFeast_SetGift>Bourse après un banquet de légende : {0} pièces d'argent</RimFeast_SetGift>
 	<RimFeast_SetHours>Durée du festin : {0} heures</RimFeast_SetHours>
+	<RimFeast_SetColonyDays>Jours entre deux banquets de la colonie : {0}</RimFeast_SetColonyDays>
 	<RimFeast_SetCortege>Taille du cortège : environ {0} convives (les maisons envoient de {1} à {2} selon l'estime qu'elles vous portent)</RimFeast_SetCortege>
 	<RimFeast_SetSummon>Les colons lâchent leur travail pour le banquet</RimFeast_SetSummon>
 	<RimFeast_SetSummonTip>Quand les convives s'attablent, les colons posent ce qu'ils font et gagnent la salle. La chirurgie, les soins et les autres tâches qu'on ne lâche pas sont épargnés. Désactivez et ils arriveront un par un à mesure que leur travail se termine, comme les fêtes vanilla.</RimFeast_SetSummonTip>
+	<RimFeast_SetSeatMeals>Les colons mangent à leur place</RimFeast_SetSeatMeals>
+	<RimFeast_SetSeatMealsTip>Les chaises dans la zone d'un banquet peuvent être attribuées à un colon, comme un lit. Avec ce réglage, il va y manger dès que sa place est libre et devant une table. Sans lui, les places ne servent qu'aux banquets.</RimFeast_SetSeatMealsTip>
 	<RimFeast_SetLeader>Les chefs de maison peuvent venir en personne</RimFeast_SetLeader>
 	<RimFeast_SetLeaderTip>Avec de bonnes relations et un banquet déjà à votre actif, le chef de la maison peut chevaucher avec le cortège. Le recevoir vaut davantage, le perdre coûte davantage.</RimFeast_SetLeaderTip>
 	<RimFeast_SetTradePact>Accords commerciaux</RimFeast_SetTradePact>
@@ -80,7 +92,7 @@
 	<RimFeast_SetMarriage>Demandes en mariage</RimFeast_SetMarriage>
 	<RimFeast_SetMarriageTip>Un noble peut demander la main d'un de vos colons. Accepter, c'est le perdre définitivement au profit de la maison.</RimFeast_SetMarriageTip>
 	<RimFeast_SetProposalChance>Chance de demande : {0}% par vérification</RimFeast_SetProposalChance>
-	<RimFeast_SetDrinkLimit>Les convives arrêtent de boire à : {0}% ({1})</RimFeast_SetDrinkLimit>
+	<RimFeast_SetDrinkLimit>Aux banquets, la plupart des convives arrêtent de boire à : {0}% ({1}). Quelques-uns en abusent toujours</RimFeast_SetDrinkLimit>
 	<RimFeast_DrunkStageWarm>gais</RimFeast_DrunkStageWarm>
 	<RimFeast_DrunkStageTipsy>éméchés</RimFeast_DrunkStageTipsy>
 	<RimFeast_DrunkStageDrunk>ivres morts</RimFeast_DrunkStageDrunk>
@@ -145,16 +157,20 @@
 	<RimFeast_ReportFeasting>participe au banquet</RimFeast_ReportFeasting>
 	<RimFeast_ShowMarkerLabel>Afficher le marqueur</RimFeast_ShowMarkerLabel>
 	<RimFeast_ShowMarkerDesc>Afficher ou masquer le marqueur. Le banquet fonctionne dans les deux cas.</RimFeast_ShowMarkerDesc>
-	<RimFeast_AreaPlus>Rayon {0} +</RimFeast_AreaPlus>
-	<RimFeast_AreaMinus>Rayon {0} -</RimFeast_AreaMinus>
-	<RimFeast_AreaDesc>Jusqu'où s'étend le banquet autour du marqueur. Seuls les plats, la boisson, les chaises et les instruments à l'intérieur comptent, et les convives y restent. Sélectionnez le marqueur pour la voir au sol.</RimFeast_AreaDesc>
-	<RimFeast_AreaAuto>Auto</RimFeast_AreaAuto>
-	<RimFeast_AreaAutoDesc>Étendre le banquet jusqu'aux murs de la pièce où se trouve le marqueur, quelle que soit sa taille.</RimFeast_AreaAutoDesc>
-	<RimFeast_AreaNotEnclosed>Le marqueur n'est pas dans une pièce fermée. Utilisez le rayon.</RimFeast_AreaNotEnclosed>
-	<RimFeast_AreaFitted>Le banquet occupe maintenant toute la salle : {0} cases.</RimFeast_AreaFitted>
+	<RimFeast_AreaPaint>Peindre la zone du banquet</RimFeast_AreaPaint>
+	<RimFeast_AreaPaintDesc>Faites glisser pour ajouter des cases au banquet, comme une zone de stockage. Dès que vous peignez, votre forme remplace le cercle. Seuls les plats, la boisson, les chaises et les instruments à l'intérieur comptent, et les convives y restent.</RimFeast_AreaPaintDesc>
+	<RimFeast_AreaErase>Effacer la zone du banquet</RimFeast_AreaErase>
+	<RimFeast_AreaEraseDesc>Faites glisser pour retirer des cases du banquet. Le marqueur reste toujours dedans.</RimFeast_AreaEraseDesc>
+	<RimFeast_AreaKeep>Le marqueur doit rester dans la zone du banquet.</RimFeast_AreaKeep>
+	<RimFeast_AreaTooFar>Trop loin, le banquet s'étend au plus à {0} cases de son marqueur.</RimFeast_AreaTooFar>
+	<RimFeast_SpotAreaPainted>Le banquet couvre {0} cases peintes.</RimFeast_SpotAreaPainted>
 	<RimFeast_SpotAreaRoom>Le banquet occupe toute la salle, {0} cases.</RimFeast_SpotAreaRoom>
 	<RimFeast_SpotAreaRadius>Le banquet s'étend à {0} cases autour du marqueur, dans cette pièce.</RimFeast_SpotAreaRadius>
 	<RimFeast_MarkerHidden>Marqueur masqué.</RimFeast_MarkerHidden>
+	<RimFeast_SeatAssign>Attribuer la place</RimFeast_SeatAssign>
+	<RimFeast_SeatDesc>Attribuez cette place à un de vos colons, comme un lit. Il s'y assoit pendant les banquets, et pour ses repas aussi si le réglage est actif.</RimFeast_SeatDesc>
+	<RimFeast_SeatOf>Place de {0}.</RimFeast_SeatOf>
+	<RimFeast_SpotColonyFeast>La colonie festoie.</RimFeast_SpotColonyFeast>
 	<RimFeast_SpotIdle>Aucun banquet prévu.</RimFeast_SpotIdle>
 	<RimFeast_LabelRequest>Une requête à table</RimFeast_LabelRequest>
 	<RimFeast_TextRequestWeapon>{0}, de la {1}, se lève au haut bout de la table, coupe en main, et vante longuement l'acier qui sort de vos forges. Puis il en vient au fait : il aimerait emporter une de vos lames. Votre {2}.\n\nLa salle s'est tue. Ses chevaliers regardent.</RimFeast_TextRequestWeapon>

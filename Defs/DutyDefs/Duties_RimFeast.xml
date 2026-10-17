@@ -9,6 +9,8 @@
 			<subNodes>
 				<li Class="RimFeast.AI.ThinkNode_ConditionalInFeastArea">
 					<subNodes>
+						<li Class="RimFeast.AI.JobGiver_EatAtFeastHungry" />
+
 						<li Class="ThinkNode_ConditionalRandom">
 							<chance>0.08</chance>
 							<subNodes>
@@ -61,6 +63,8 @@
 			<subNodes>
 				<li Class="RimFeast.AI.ThinkNode_ConditionalInFeastArea">
 					<subNodes>
+						<li Class="RimFeast.AI.JobGiver_EatAtFeastHungry" />
+
 						<li Class="ThinkNode_ConditionalRandom">
 							<chance>0.08</chance>
 							<subNodes>
@@ -94,7 +98,7 @@
 						<li Class="ThinkNode_ConditionalRandom">
 							<chance>0.1</chance>
 							<subNodes>
-								<li Class="JobGiver_GetJoyInGatheringArea" />
+								<li Class="RimFeast.AI.JobGiver_GetJoyInFeastArea" />
 							</subNodes>
 						</li>
 

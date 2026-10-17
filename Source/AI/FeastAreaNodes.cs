@@ -17,11 +17,13 @@ namespace RimFeast.AI
 
 	public class JobGiver_EatAtFeast : ThinkNode_JobGiver
 	{
+		protected virtual float MaxFood => 0.9f;
+
 		protected override Job TryGiveJob(Pawn pawn)
 		{
 			PawnDuty duty = pawn.mindState.duty;
 			if (duty == null || pawn.needs?.food == null) return null;
-			if (pawn.needs.food.CurLevelPercentage > 0.9f) return null;
+			if (pawn.needs.food.CurLevelPercentage > MaxFood) return null;
 
 			FeastUtility.FeastArea area = FeastUtility.FeastArea.For(duty.focus.Cell, pawn.Map);
 			Predicate<Thing> validator = x =>
@@ -35,10 +37,35 @@ namespace RimFeast.AI
 				TraverseParms.For(TraverseMode.NoPassClosedDoors), 14f, validator, null, 0, 12);
 			if (food == null) return null;
 
+			if (FeastSeats.Carriable(food, food.def) && FeastSeats.CanEatAtTable(pawn)
+				&& FeastSeats.TryGetSeat(pawn, out IntVec3 seat, area))
+				return FeastSeats.EatJob(pawn, food, food.def, seat);
+
 			Job job = JobMaker.MakeJob(JobDefOf.Ingest, food);
 			job.count = FoodUtility.WillIngestStackCountOf(pawn, food.def, FoodUtility.NutritionForEater(pawn, food));
 			return job;
 		}
+	}
+
+	// sans tirage au sort: on est a un banquet, on mange d'abord
+	public class JobGiver_EatAtFeastHungry : JobGiver_EatAtFeast
+	{
+		protected override float MaxFood => 0.7f;
+	}
+
+	// les loisirs vanilla boivent pour le plaisir sans regarder la limite du banquet
+	public class JobGiver_GetJoyInFeastArea : JobGiver_GetJoyInGatheringArea
+	{
+		protected override Job TryGiveJobFromJoyGiverDefDirect(JoyGiverDef def, Pawn pawn)
+		{
+			Job job = base.TryGiveJobFromJoyGiverDefDirect(def, pawn);
+			if (job == null) return null;
+			if (TooMuch(pawn, job.targetA) || TooMuch(pawn, job.targetC)) return null;
+			return job;
+		}
+
+		private static bool TooMuch(Pawn pawn, LocalTargetInfo t) =>
+			t.HasThing && t.Thing.def.IsDrug && !FeastUtility.CanDrink(pawn, t.Thing);
 	}
 
 	public class JobGiver_WanderInFeastArea : JobGiver_Wander

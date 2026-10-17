@@ -16,6 +16,34 @@
 	</ThoughtDef>
 
 	<ThoughtDef>
+		<defName>RimFeast_ColonyFeast</defName>
+		<thoughtClass>Thought_Memory</thoughtClass>
+		<durationDays>2</durationDays>
+		<stackLimit>1</stackLimit>
+		<stages>
+			<li>
+				<label>a thin colony feast</label>
+				<description>We sat down together, at least. The table could have been better.</description>
+				<baseMoodEffect>2</baseMoodEffect>
+			</li>
+			<li>
+				<label>a modest colony feast</label>
+				<description>Good food, good company and a night off.</description>
+				<baseMoodEffect>4</baseMoodEffect>
+			</li>
+			<li>
+				<label>a fine colony feast</label>
+				<description>A proper feast in our own hall. We needed that.</description>
+				<baseMoodEffect>6</baseMoodEffect>
+			</li>
+			<li>
+				<label>a colony feast to remember</label>
+				<description>The hall, the meat, the drink, the music. Nobody will forget that night.</description>
+				<baseMoodEffect>8</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+	<ThoughtDef>
 		<defName>RimFeast_NightWithNoble</defName>
 		<thoughtClass>Thought_Memory</thoughtClass>
 		<durationDays>5</durationDays>

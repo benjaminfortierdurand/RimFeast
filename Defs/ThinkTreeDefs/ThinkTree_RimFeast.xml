@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+	<!-- manger a sa place, avant le tri des besoins de vanilla -->
+	<ThinkTreeDef>
+		<defName>RimFeast_EatAtSeat</defName>
+		<insertTag>Humanlike_PreMain</insertTag>
+		<insertPriority>50</insertPriority>
+		<thinkRoot Class="ThinkNode_Tagger">
+			<tagToGive>SatisfyingNeeds</tagToGive>
+			<subNodes>
+				<li Class="RimFeast.AI.JobGiver_EatAtSeat" />
+			</subNodes>
+		</thinkRoot>
+	</ThinkTreeDef>
+
+</Defs>

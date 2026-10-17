@@ -17,14 +17,16 @@ namespace RimFeast.AI
 			if (focus == null) return null;
 
 			FeastUtility.FeastArea area = FeastUtility.FeastArea.For(spot, pawn.Map);
-			Thing chair = FindChair(pawn, spot, area);
-			if (chair == null) return null;
-
-			if (!Toils_Ingest.TryFindFreeSittingSpotOnThing(chair, pawn, out IntVec3 seat))
-				seat = chair.Position;
+			if (!FeastSeats.TryGetSeat(pawn, out IntVec3 seat, area))
+			{
+				Thing chair = FindChair(pawn, spot, area);
+				if (chair == null) return null;
+				if (!Toils_Ingest.TryFindFreeSittingSpotOnThing(chair, pawn, out seat))
+					seat = chair.Position;
+			}
 
 			Job job = JobMaker.MakeJob(RimFeastDefOf.RimFeast_SitAtFeastJob, focus, seat);
-			Thing drink = FindDrink(pawn, area);
+			Thing drink = Rand.Chance(0.4f) ? FindDrink(pawn, area) : null;
 			if (drink != null)
 			{
 				job.targetC = drink;
@@ -36,6 +38,7 @@ namespace RimFeast.AI
 		private static Thing FindChair(Pawn pawn, IntVec3 spot, FeastUtility.FeastArea area)
 		{
 			Thing loose = null;
+			Thing claimed = null;
 			int cells = GenRadial.NumCellsInRadius(area.Reach());
 			for (int i = 0; i < cells; i++)
 			{
@@ -48,11 +51,16 @@ namespace RimFeast.AI
 				if (edifice.IsForbidden(pawn)) continue;
 				if (!Toils_Ingest.TryFindFreeSittingSpotOnThing(edifice, pawn, out IntVec3 sitCell)) continue;
 				if (!pawn.CanReserveSittableOrSpot(sitCell)) continue;
+				if (FeastSeats.ClaimedByOther(edifice, pawn))
+				{
+					if (claimed == null) claimed = edifice;
+					continue;
+				}
 
 				if (BesideTable(edifice)) return edifice;
 				if (loose == null) loose = edifice;
 			}
-			return loose;
+			return loose ?? claimed;
 		}
 
 		private static bool BesideTable(Building chair)
@@ -70,12 +78,13 @@ namespace RimFeast.AI
 		{
 			if (pawn.DevelopmentalStage.Juvenile()) return null;
 			if (pawn.IsTeetotaler()) return null;
-			if (FeastUtility.DrunkennessOf(pawn) > RimFeastMod.S.drinkLimit) return null;
+			if (FeastUtility.DrunkennessOf(pawn) >= FeastUtility.DrinkLimitFor(pawn)) return null;
 			return GenClosest.ClosestThingReachable(pawn.Position, pawn.Map,
 				ThingRequest.ForGroup(ThingRequestGroup.Drug), PathEndMode.OnCell,
 				TraverseParms.For(pawn), 14f,
 				x => x.IngestibleNow && x.def.IsDrug
 					&& x.def.ingestible != null && x.def.ingestible.drugCategory == DrugCategory.Social
+					&& FeastUtility.CanDrink(pawn, x)
 					&& !x.IsForbidden(pawn) && area.Contains(x.Position) && pawn.CanReserve(x));
 		}
 	}

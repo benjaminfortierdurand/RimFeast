@@ -15,7 +15,9 @@ namespace RimFeast.AI
 		public LordToil_FeastParty(IntVec3 spot, GatheringDef gatheringDef)
 			: base(spot, gatheringDef) { }
 
-		public override void LordToilTick()
+		public override void LordToilTick() => TickPresence();
+
+		public void TickPresence()
 		{
 			int now = Find.TickManager.TicksGame;
 			if (areaTick < 0 || now - areaTick >= 250)
@@ -55,6 +57,20 @@ namespace RimFeast.AI
 			if (minstrel != null)
 				minstrel.mindState.duty = new PawnDuty(RimFeastDefOf.RimFeast_MinstrelDuty, spot);
 		}
+	}
+
+	// pendant le toast la presence continue de compter, sinon le souvenir perdrait un quart
+	public class LordToil_ColonyToast : LordToil_Toast
+	{
+		private readonly LordToil_FeastParty party;
+
+		public LordToil_ColonyToast(IntVec3 spot, Pawn speaker, LordToil_FeastParty party)
+			: base(spot, speaker)
+		{
+			this.party = party;
+		}
+
+		public override void LordToilTick() => party.TickPresence();
 	}
 
 	public class LordToil_Toast : LordToil

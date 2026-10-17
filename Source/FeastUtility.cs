@@ -158,6 +158,7 @@ namespace RimFeast
 			private IntVec3 spot;
 			private bool wholeRoom;
 			private float radius;
+			private HashSet<IntVec3> region;
 
 			public static FeastArea For(IntVec3 spot, Map map)
 			{
@@ -166,6 +167,7 @@ namespace RimFeast
 				a.room = spot.GetRoom(map);
 				CompFeastArea comp = spot.GetFirstThing<Building_FeastSpot>(map)?.GetComp<CompFeastArea>();
 				if (comp != null) a.radius = comp.Radius;
+				a.region = comp?.Region;
 				a.wholeRoom = comp != null && comp.WholeRoom && a.room != null && !a.room.PsychologicallyOutdoors;
 				return a;
 			}
@@ -174,6 +176,7 @@ namespace RimFeast
 
 			public bool Contains(IntVec3 cell)
 			{
+				if (region != null) return region.Contains(cell);
 				if (room == null) return false;
 				if (!wholeRoom && !cell.InHorDistOf(spot, radius)) return false;
 				return cell.GetRoom(map) == room;
@@ -181,7 +184,7 @@ namespace RimFeast
 
 			public float Reach()
 			{
-				if (!wholeRoom || room == null) return radius;
+				if (region != null || !wholeRoom || room == null) return radius;
 				float far = 0f;
 				foreach (IntVec3 c in room.Cells)
 				{
@@ -193,6 +196,7 @@ namespace RimFeast
 
 			public List<IntVec3> Cells()
 			{
+				if (region != null) return new List<IntVec3>(region);
 				var list = new List<IntVec3>();
 				if (room == null) return list;
 				if (wholeRoom)
@@ -219,6 +223,35 @@ namespace RimFeast
 				map.listerBuildings.AllBuildingsColonistOfClass<Building_MusicalInstrument>())
 				if (area.Contains(b.InteractionCell)) return true;
 			return false;
+		}
+
+		// la limite compte le verre lui-meme: un vin MO monte de 0.22 d'un coup
+		public static bool CanDrink(Pawn p, Thing drink) =>
+			DrunkennessOf(p) + AlcoholIn(drink?.def) <= DrinkLimitFor(p) + 0.001f;
+
+		// la plupart s'arretent a la limite, quelques-uns se mettent minables. tire une fois par fete et par convive
+		public static float DrinkLimitFor(Pawn p)
+		{
+			float limit = RimFeastMod.S.drinkLimit;
+			Lord lord = p?.GetLord();
+			if (limit <= 0f || lord == null) return limit;
+			float roll = Rand.ValueSeeded(p.thingIDNumber ^ (lord.loadID * 7919));
+			roll -= (p.story?.traits?.DegreeOfTrait(TraitDefOf.DrugDesire) ?? 0) * 0.25f;
+			float personal = roll < 0.06f ? 1f : roll < 0.22f ? 0.8f : limit;
+			// un invite ivre mort tombe, et le banquet le compterait comme blesse sous ton toit
+			if (p.Faction != Faction.OfPlayer) personal = Mathf.Min(personal, 0.85f);
+			return Mathf.Max(limit, personal);
+		}
+
+		public static float AlcoholIn(ThingDef def)
+		{
+			List<IngestionOutcomeDoer> doers = def?.ingestible?.outcomeDoers;
+			if (doers == null || AlcoholHigh == null) return 0f;
+			float total = 0f;
+			for (int i = 0; i < doers.Count; i++)
+				if (doers[i] is IngestionOutcomeDoer_GiveHediff give && give.hediffDef == AlcoholHigh && give.severity > 0f)
+					total += give.severity;
+			return total;
 		}
 
 		public static float DrunkennessOf(Pawn p)
