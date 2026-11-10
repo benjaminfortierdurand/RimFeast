@@ -73,6 +73,15 @@ namespace RimFeast
 		public int taintTick = -1;
 		public bool exposed;
 		public int sickBaseline;
+		// noces: la maison revient marier les fiances
+		public bool wedding;
+		public bool wed;
+		public int wedTick = -1;
+		public bool firstDanceDone;
+		public int ballUntilTick = -1;
+		public int minstrelTick = -1;
+		public List<Pawn> hosts;
+		public int lastScore = -1;
 
 		public void ExposeData()
 		{
@@ -122,6 +131,12 @@ namespace RimFeast
 			Scribe_Values.Look(ref taintTick, "taintTick", -1);
 			Scribe_Values.Look(ref exposed, "exposed");
 			Scribe_Values.Look(ref sickBaseline, "sickBaseline");
+			Scribe_Values.Look(ref wedding, "wedding");
+			Scribe_Values.Look(ref wed, "wed");
+			Scribe_Values.Look(ref wedTick, "wedTick", -1);
+			Scribe_Values.Look(ref firstDanceDone, "firstDanceDone");
+			Scribe_Values.Look(ref ballUntilTick, "ballUntilTick", -1);
+			Scribe_Collections.Look(ref hosts, "hosts", LookMode.Reference);
 			if (Scribe.mode == LoadSaveMode.PostLoadInit && guests == null)
 				guests = new List<Pawn>();
 		}
@@ -214,6 +229,25 @@ namespace RimFeast
 		}
 	}
 
+	// des fiancailles en attente de noces. le noble est epingle comme une pupille: entre les deux banquets il n'est sur aucune carte
+	public class PendingWedding : IExposable
+	{
+		public Faction house;
+		public Pawn noble;
+		public Pawn colonist;
+		public Thing spot;
+		public int fireTick;
+
+		public void ExposeData()
+		{
+			Scribe_References.Look(ref house, "house");
+			Scribe_References.Look(ref noble, "noble");
+			Scribe_References.Look(ref colonist, "colonist");
+			Scribe_References.Look(ref spot, "spot");
+			Scribe_Values.Look(ref fireTick, "fireTick");
+		}
+	}
+
 	// hors du dossier du banquet: le cortege peut partir avant la fin, les lits doivent etre rendus
 	public class LovinScene : IExposable
 	{
@@ -257,6 +291,9 @@ namespace RimFeast
 		private LovinScene lovin;
 		private FeastCase colony;
 		private int lastColonyFeastTick = -1;
+		private List<PendingWedding> weddings = new List<PendingWedding>();
+		private List<ChronicleEntry> chronicle = new List<ChronicleEntry>();
+		private const int MaxChronicle = 80;
 
 		private Faction awayHouse;
 		private int awayExpireTick = -1;
@@ -316,6 +353,13 @@ namespace RimFeast
 		public FeastCase CurrentCase => current;
 
 		public FeastCase ColonyCase => colony;
+
+		public int FeastStartTick(IntVec3 spot)
+		{
+			if (current != null && current.state == FeastCase.Feasting && current.spotCell == spot) return current.arrivedTick;
+			if (colony != null && colony.spotCell == spot) return colony.arrivedTick;
+			return -1;
+		}
 
 		public bool SlaughterUnderway => current != null && current.slaughterOrdered;
 
@@ -696,6 +740,12 @@ namespace RimFeast
 				if (w?.ward != null && !w.ward.Dead)
 					Find.WorldPawns.ForcefullyKeptPawns.Add(w.ward);
 
+			foreach (PendingWedding w in weddings)
+				if (w?.noble != null && !w.noble.Dead)
+					Find.WorldPawns.ForcefullyKeptPawns.Add(w.noble);
+			if (current != null && current.wedding && current.state == FeastCase.Invited && current.betrothedNoble != null)
+				Find.WorldPawns.ForcefullyKeptPawns.Add(current.betrothedNoble);
+
 			if (current != null && current.state == FeastCase.Fleeing) return;
 			Faction guests = Find.FactionManager.FirstFactionOfDef(RimFeastDefOf.RimFeast_Guests);
 			if (guests != null)
@@ -721,6 +771,7 @@ namespace RimFeast
 			if (lovin != null) TickLovin();
 			TickAwayInvites();
 			if (colony != null) TickColony();
+			if (weddings.Count > 0) TickWeddings();
 
 			if (current == null) return;
 
@@ -744,6 +795,7 @@ namespace RimFeast
 					TryBrawl(c);
 					BreakUpBrawl(c);
 					TryProposal(c);
+					TryFirstDance(c);
 					TryRequest(c);
 					TryPoison(c);
 					CheckPoisonSymptoms(c);
@@ -773,6 +825,7 @@ namespace RimFeast
 			}
 			if (c.state == FeastCase.Fleeing)
 				SetMutualRelation(FeastUtility.GuestFaction(), Faction.OfPlayer, FactionRelationKind.Neutral);
+			WeddingUndone(c, false);
 			current = null;
 		}
 
@@ -796,6 +849,7 @@ namespace RimFeast
 			{
 				Messages.Message("RimFeast_MessageSpotDestroyed".Translate(c.house?.Name),
 					MessageTypeDefOf.NegativeEvent);
+				WeddingUndone(c, true);
 				current = null;
 				return;
 			}
@@ -804,6 +858,7 @@ namespace RimFeast
 			{
 				Messages.Message("RimFeast_MessageInviteVoid".Translate(c.house?.Name ?? "?"),
 					MessageTypeDefOf.NegativeEvent);
+				WeddingUndone(c, true);
 				current = null;
 				return;
 			}
@@ -830,17 +885,32 @@ namespace RimFeast
 			int size = RimFeastMod.S.corteges
 				+ Mathf.RoundToInt(Mathf.Clamp(c.house.PlayerGoodwill, -100f, 100f) / 50f)
 				+ Rand.RangeInclusive(-1, 1);
+			if (c.wedding) size += 2;
 			size = Mathf.Max(size, 2);
 			PawnKindDef filler = crew ?? knight ?? lord;
 			while (kinds.Count < size && filler != null)
 				kinds.Add(kinds.Count % 2 == 0 ? (knight ?? filler) : filler);
 			if (kinds.Count == 0) { current = null; return; }
 
+			// le fiance fait le voyage: il doit etre libre dans le monde, comme le chef
+			Pawn groom = null;
+			if (c.wedding)
+			{
+				if (WeddingStillOn(c.betrothedNoble, c.betrothedColonist, c.house)) groom = TakeFromWorld(c.betrothedNoble);
+				if (groom == null)
+				{
+					WeddingUndone(c, true);
+					current = null;
+					return;
+				}
+				Find.WorldPawns.ForcefullyKeptPawns.Remove(groom);
+			}
+
 			// le vrai chef garde sa vraie faction, pas une copie
 			Pawn leader = null;
-			if (debugForceLeader
+			if ((groom == null || groom != c.house.leader) && (debugForceLeader
 				|| (RimFeastMod.S.leaderEnabled && c.house.PlayerGoodwill >= 40
-					&& FeastsRemembered(c.house) >= 1 && Rand.Chance(0.4f)))
+					&& FeastsRemembered(c.house) >= 1 && Rand.Chance(0.4f))))
 				leader = TakeLeader(c.house);
 			debugForceLeader = false;
 			if (leader != null) kinds.Remove(lord);
@@ -865,6 +935,14 @@ namespace RimFeast
 				guests.Add(leader);
 			}
 
+			if (groom != null)
+			{
+				if (groom.needs?.food != null) groom.needs.food.CurLevel = 0.35f * groom.needs.food.MaxLevel;
+				if (groom.needs?.rest != null) groom.needs.rest.CurLevel = Mathf.Max(groom.needs.rest.CurLevel, 0.8f);
+				GenSpawn.Spawn(groom, CellFinder.RandomClosewalkCellNear(entry, map, 6), map);
+				guests.Add(groom);
+			}
+
 			Pawn speaker = leader ?? guests.FirstOrDefault(p => p.kindDef == lord) ?? guests[0];
 
 			if (c.treacherous)
@@ -875,20 +953,25 @@ namespace RimFeast
 				new LordJob_FeastGuests(c.id, c.house, c.spotCell, speaker), map, guests);
 			c.guests = guests;
 			c.guestCount = guests.Count;
-			c.leaderCame = leader != null;
+			c.leaderCame = leader != null || (groom != null && groom == c.house.leader);
 			c.state = FeastCase.Traveling;
 
-			TaggedString arriveText = "RimFeast_TextGuestsArrive".Translate(c.house.Name, guests.Count);
+			TaggedString arriveText = groom != null
+				? "RimFeast_TextWeddingArrive".Translate(c.house.Name, guests.Count, groom.LabelShortCap,
+					c.betrothedColonist.LabelShortCap)
+				: "RimFeast_TextGuestsArrive".Translate(c.house.Name, guests.Count);
 			if (leader != null)
 				arriveText += "\n\n" + "RimFeast_TextLeaderRides".Translate(leader.LabelShortCap, c.house.Name);
-			Find.LetterStack.ReceiveLetter("RimFeast_LabelGuestsArrive".Translate(), arriveText,
+			Find.LetterStack.ReceiveLetter(
+				(groom != null ? "RimFeast_LabelWeddingArrive" : "RimFeast_LabelGuestsArrive").Translate(), arriveText,
 				LetterDefOf.PositiveEvent, guests[0], c.house);
 		}
 
 		// doit etre libre dans le monde: kidnappe, en quete ou en transporteur, GenSpawn planterait ou le doublerait
-		private static Pawn TakeLeader(Faction house)
+		private static Pawn TakeLeader(Faction house) => TakeFromWorld(house?.leader);
+
+		private static Pawn TakeFromWorld(Pawn l)
 		{
-			Pawn l = house?.leader;
 			if (l == null || l.Dead || l.Spawned || l.IsPrisoner || !l.RaceProps.Humanlike) return null;
 			if (!Find.WorldPawns.Contains(l)) return null;
 			if (l.ParentHolder != null && !(l.ParentHolder is WorldPawns)) return null;
@@ -914,7 +997,8 @@ namespace RimFeast
 		{
 			if (c.house == null || c.lord == null || c.map == null) return;
 			int esteem = c.house.PlayerGoodwill;
-			if (esteem < 20 || !Rand.Chance(Mathf.InverseLerp(0f, 100f, esteem))) return;
+			// aux noces la maison ne vient jamais les mains vides
+			if (!c.wedding && (esteem < 20 || !Rand.Chance(Mathf.InverseLerp(0f, 100f, esteem)))) return;
 
 			var parms = default(ThingSetMakerParams);
 			parms.techLevel = c.house.def.techLevel;
@@ -937,6 +1021,7 @@ namespace RimFeast
 				"RimFeast_TextCortegeGift".Translate(c.house.Name, giver.LabelShortCap,
 					gifts.Where(g => g.Spawned).Select(g => g.LabelCap).ToLineList("   -")),
 				LetterDefOf.PositiveEvent, look, c.house);
+			Get()?.Note(c, ChronicleLine.Gift);
 		}
 
 		public void Notify_ToastGiven(int id)
@@ -944,8 +1029,20 @@ namespace RimFeast
 			FeastCase c = current;
 			if (c == null || c.id != id || c.state != FeastCase.Feasting) return;
 			c.toastsGiven++;
-			Messages.Message("RimFeast_MessageToast".Translate(c.house?.Name),
+			bool vows = c.wedding && !c.wed && c.betrothedNoble != null && c.betrothedColonist != null;
+			Messages.Message(vows
+					? "RimFeast_MessageWeddingToast".Translate(c.betrothedNoble.LabelShortCap,
+						c.betrothedColonist.LabelShortCap)
+					: "RimFeast_MessageToast".Translate(c.house?.Name),
 				new TargetInfo(c.spotCell, c.map), MessageTypeDefOf.PositiveEvent, historical: false);
+		}
+
+		// la fin du toast: aux noces, c'est le moment des voeux
+		public void Notify_ToastOver(int id)
+		{
+			FeastCase c = current;
+			if (c == null || c.id != id || c.state != FeastCase.Feasting) return;
+			TryWed(c, false);
 		}
 
 		public void Notify_FeastEnded(int id)
@@ -957,6 +1054,7 @@ namespace RimFeast
 			{
 				Messages.Message("RimFeast_MessageGuestsLeftNoFeast".Translate(c.house?.Name),
 					MessageTypeDefOf.NegativeEvent);
+				WeddingUndone(c, true);
 				current = null;
 				return;
 			}
@@ -968,6 +1066,8 @@ namespace RimFeast
 		private void CloseFeast(FeastCase c)
 		{
 			Sample(c);
+			// dernier moment pour les voeux, meme si le fiance n'est pas dans la salle
+			TryWed(c, true);
 			ApplyOutcome(c);
 
 			if (c.tainted && !c.exposed)
@@ -1046,6 +1146,9 @@ namespace RimFeast
 				&& c.state != FeastCase.Leaving) return;
 			c.state = FeastCase.Fleeing;
 			c.fleeStartTick = Find.TickManager.TicksGame;
+			// pour la chronique: qui tenait la salle quand les lames sont sorties
+			c.hosts = c.map.mapPawns.FreeColonistsSpawned.ToList();
+			WeddingUndone(c, false);
 
 			StartRedWeddingMusic(c);
 			FlashRed(c);
@@ -1172,6 +1275,8 @@ namespace RimFeast
 			c.lord?.ReceiveMemo(LordJob_FeastGuests.MemoExposed);
 			c.house?.TryAffectGoodwillWith(Faction.OfPlayer, harmDone ? -75 : -30,
 				canSendMessage: true, canSendHostilityLetter: true);
+			Note(c, harmDone ? ChronicleLine.Poisoned : ChronicleLine.Poisoner, Who(c.poisoner));
+			EntryFor(c).goodwill += harmDone ? -75 : -30;
 			Find.LetterStack.ReceiveLetter(
 				(harmDone ? "RimFeast_LabelPoisonSymptoms" : "RimFeast_LabelPoisonerCaught").Translate(),
 				(harmDone ? "RimFeast_TextPoisonSymptoms" : "RimFeast_TextPoisonerCaught")
@@ -1308,6 +1413,21 @@ namespace RimFeast
 			foreach (Pawn g in c.guests)
 				if (g == null || g.Dead || g.Downed || g.IsPrisonerOfColony) slain++;
 
+			ChronicleEntry entry = EntryFor(c);
+			entry.red = true;
+			Stamp(entry, c);
+			int nameless = 0;
+			foreach (Pawn g in c.guests)
+			{
+				if (g == null) nameless++;
+				else if (g.Dead) entry.Add(ChronicleLine.Slain, Who(g));
+				else if (g.Downed || g.IsPrisonerOfColony) entry.Add(ChronicleLine.Fallen, Who(g));
+			}
+			if (nameless > 0) entry.Add(ChronicleLine.Nameless, null, null, nameless);
+			if (c.hosts != null)
+				foreach (Pawn h in c.hosts)
+					if (h != null && h.Dead) entry.Add(ChronicleLine.Lost, Who(h));
+
 			HouseFeastMemory m = MemoryFor(c.house, true);
 			if (total > 0 && slain * 2 >= total)
 			{
@@ -1334,12 +1454,15 @@ namespace RimFeast
 				foreach (Pawn col in c.map.mapPawns.FreeColonistsSpawned)
 					col.needs?.mood?.thoughts?.memories?.TryGainMemory(RimFeastDefOf.RimFeast_GuestRightBroken);
 
+				entry.Add(ChronicleLine.War, c.house?.Name);
 				Find.LetterStack.ReceiveLetter("RimFeast_LabelRedWedding".Translate(),
 					"RimFeast_TextRedWedding".Translate(c.house?.Name, slain),
 					LetterDefOf.ThreatBig, new TargetInfo(c.spotCell, c.map), c.house);
 			}
 			else
 			{
+				entry.Add(ChronicleLine.Blood);
+				entry.goodwill -= 40;
 				c.house?.TryAffectGoodwillWith(Faction.OfPlayer, -40, canSendMessage: true,
 					canSendHostilityLetter: false);
 				Find.LetterStack.ReceiveLetter("RimFeast_LabelGuestsHarmed".Translate(),
@@ -1575,6 +1698,7 @@ namespace RimFeast
 			List<Pawn> guests = caravan.PawnsListForReading
 				.Where(p => p.RaceProps.Humanlike && !p.Dead).ToList();
 			if (guests.Count == 0) { AwayOutcome_Slight(caravan, house); return; }
+			Get()?.NoteAway(caravan, house, AwayKnives);
 
 			var dead = new List<string>();
 			var hurt = new List<string>();
@@ -1642,6 +1766,7 @@ namespace RimFeast
 		private static void AwayOutcome_Ambush(Caravan caravan, Faction house)
 		{
 			if (!MoveCaravanToOpenGround(caravan)) { AwayOutcome_Knives(caravan, house); return; }
+			Get()?.NoteAway(caravan, house, AwayAmbush);
 
 			LongEventHandler.QueueLongEvent(delegate
 			{
@@ -1672,6 +1797,7 @@ namespace RimFeast
 
 		private static void AwayOutcome_Slight(Caravan caravan, Faction house)
 		{
+			Get()?.NoteAway(caravan, house, AwaySlight);
 			house.TryAffectGoodwillWith(Faction.OfPlayer, -10, canSendMessage: false,
 				canSendHostilityLetter: false);
 			Find.LetterStack.ReceiveLetter("RimFeast_LabelAwaySlight".Translate(),
@@ -1680,12 +1806,14 @@ namespace RimFeast
 
 		private static void AwayOutcome_Dull(Caravan caravan, Faction house)
 		{
+			Get()?.NoteAway(caravan, house, AwayDull);
 			Find.LetterStack.ReceiveLetter("RimFeast_LabelAwayDull".Translate(),
 				"RimFeast_TextAwayDull".Translate(house.Name), LetterDefOf.NeutralEvent, caravan, house);
 		}
 
 		private static void AwayOutcome_Fine(Caravan caravan, Faction house)
 		{
+			Get()?.NoteAway(caravan, house, AwayFine);
 			int gain = Rand.RangeInclusive(12, 20);
 			house.TryAffectGoodwillWith(Faction.OfPlayer, gain, canSendMessage: false,
 				canSendHostilityLetter: false);
@@ -1695,6 +1823,7 @@ namespace RimFeast
 
 		private static void AwayOutcome_Songs(Caravan caravan, Faction house)
 		{
+			Get()?.NoteAway(caravan, house, AwaySongs);
 			int gain = Rand.RangeInclusive(25, 35);
 			house.TryAffectGoodwillWith(Faction.OfPlayer, gain, canSendMessage: false,
 				canSendHostilityLetter: false);
@@ -1740,6 +1869,7 @@ namespace RimFeast
 
 			if (c.brawled && ((c.brawlerA?.Dead ?? false) || (c.brawlerB?.Dead ?? false)))
 			{
+				Note(c, ChronicleLine.BrawlDeath);
 				Find.LetterStack.ReceiveLetter("RimFeast_LabelBrawlDeath".Translate(),
 					"RimFeast_TextBrawlDeath".Translate(c.house?.Name),
 					LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map), c.house);
@@ -1761,6 +1891,8 @@ namespace RimFeast
 				return;
 			}
 
+			Note(c, ChronicleLine.Blood);
+			EntryFor(c).goodwill -= 15;
 			c.house?.TryAffectGoodwillWith(Faction.OfPlayer, -15, canSendMessage: true,
 				canSendHostilityLetter: false);
 			Find.LetterStack.ReceiveLetter("RimFeast_LabelGuestsHarmed".Translate(),
@@ -1770,8 +1902,9 @@ namespace RimFeast
 		}
 
 		// encore sous notre toit: lacher le dossier ici rendait gratuit le massacre en chemin
-		private static void LeaveUnderOurRoof(FeastCase c)
+		private void LeaveUnderOurRoof(FeastCase c)
 		{
+			WeddingUndone(c, true);
 			c.state = FeastCase.Leaving;
 			c.fleeStartTick = Find.TickManager.TicksGame;
 		}
@@ -1923,12 +2056,20 @@ namespace RimFeast
 			float ent = c.samples > 0 && c.musicSamples > 0 ? Mathf.Max(toasts, 0.7f) : toasts;
 			report = Qual(hall, "RimFeast_QualHall") + " " + Qual(Mathf.Clamp01(c.maxTableScore / 20f), "RimFeast_QualTable")
 				+ " " + Qual(drink, "RimFeast_QualDrink") + " " + Qual(ent, "RimFeast_QualEnt");
+			c.lastScore = Mathf.Clamp(Mathf.RoundToInt(score), 0, 100);
 			return score >= TriumphScore ? 3 : score >= GoodScore ? 2 : score >= DecentScore ? 1 : 0;
 		}
 
 		public void Notify_ColonyFeastEnded(string report)
 		{
 			FeastCase c = colony;
+			if (c?.map != null && !report.NullOrEmpty() && c.lastScore >= 0)
+			{
+				ChronicleEntry entry = EntryFor(c);
+				entry.score = c.lastScore;
+				entry.tier = TierOf(c.lastScore);
+				Stamp(entry, c);
+			}
 			colony = null;
 			if (c?.map == null || report.NullOrEmpty()) return;
 			Messages.Message("RimFeast_ColonyFeastOver".Translate(report), new TargetInfo(c.spotCell, c.map),
@@ -2042,6 +2183,7 @@ namespace RimFeast
 				if (other == null) continue;
 
 				drunk.interactions.StartSocialFight(other, "RimFeast_MessageBrawl");
+				Note(c, ChronicleLine.Brawl, Who(drunk), Who(other));
 				c.brawled = true;
 				c.brawlTick = Find.TickManager.TicksGame;
 				c.brawlerA = drunk;
@@ -2097,9 +2239,123 @@ namespace RimFeast
 			Pawn noble = c.betrothedNoble;
 			Pawn colonist = c.betrothedColonist;
 
-			// Married attend un lien fiance a retirer
+			// le oui ne marie plus sur-le-champ: fiancailles, et la maison revient quelques jours plus tard pour les noces
 			colonist.relations.AddDirectRelation(PawnRelationDefOf.Fiance, noble);
+			// epingle avant qu'il quitte la carte
+			Find.WorldPawns.ForcefullyKeptPawns.Add(noble);
+			weddings.Add(new PendingWedding
+			{
+				house = c.house, noble = noble, colonist = colonist, spot = c.spotThing,
+				fireTick = Find.TickManager.TicksGame + Rand.RangeInclusive(2, 4) * GenDate.TicksPerDay,
+			});
+
+			c.house?.TryAffectGoodwillWith(Faction.OfPlayer, 10, canSendMessage: true,
+				canSendHostilityLetter: false);
+			Note(c, ChronicleLine.Betrothed, Who(noble), Who(colonist));
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelBetrothed".Translate(),
+				"RimFeast_TextBetrothed".Translate(colonist.LabelShortCap, noble.LabelShortCap, c.house?.Name),
+				LetterDefOf.PositiveEvent, colonist, c.house);
+		}
+
+		private static bool WeddingStillOn(Pawn noble, Pawn colonist, Faction house) =>
+			noble != null && !noble.Dead && !noble.Discarded
+			&& colonist != null && !colonist.Dead && colonist.Faction == Faction.OfPlayer
+			&& house != null && !house.defeated && !house.HostileTo(Faction.OfPlayer)
+			&& colonist.relations != null && colonist.relations.DirectRelationExists(PawnRelationDefOf.Fiance, noble);
+
+		private static void CallOffWedding(Pawn noble, Pawn colonist, Faction house, bool letter)
+		{
+			if (noble != null) Find.WorldPawns.ForcefullyKeptPawns.Remove(noble);
+			if (noble != null && colonist?.relations != null)
+				colonist.relations.TryRemoveDirectRelation(PawnRelationDefOf.Fiance, noble);
+			if (!letter) return;
+			LookTargets look = colonist != null && colonist.Spawned ? new LookTargets(colonist) : null;
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelWeddingOff".Translate(),
+				"RimFeast_TextWeddingOff".Translate(colonist?.LabelShortCap ?? "?", noble?.LabelShortCap ?? "?",
+					house?.Name ?? "?"),
+				LetterDefOf.NeutralEvent, look, house);
+		}
+
+		// le cortege repart, ou ne viendra pas, sans que les voeux aient ete prononces
+		private void WeddingUndone(FeastCase c, bool letter)
+		{
+			if (!c.wedding || c.wed || c.betrothedNoble == null) return;
+			Note(c, ChronicleLine.Unwed, Who(c.betrothedColonist), Who(c.betrothedNoble));
+			CallOffWedding(c.betrothedNoble, c.betrothedColonist, c.house, letter);
+			c.betrothedNoble = null;
+		}
+
+		private void TickWeddings()
+		{
+			int now = Find.TickManager.TicksGame;
+			for (int i = weddings.Count - 1; i >= 0; i--)
+			{
+				PendingWedding w = weddings[i];
+				// quinze jours sans pouvoir se tenir (colon en voyage, plus de marqueur, noble retenu): on n'attend plus
+				if (!WeddingStillOn(w.noble, w.colonist, w.house) || now > w.fireTick + 15 * GenDate.TicksPerDay)
+				{
+					weddings.RemoveAt(i);
+					CallOffWedding(w.noble, w.colonist, w.house, true);
+					continue;
+				}
+				if (now < w.fireTick || Busy) continue;
+				if (w.noble.Spawned || !Find.WorldPawns.Contains(w.noble)) continue;
+				Map map = w.colonist.Spawned ? w.colonist.Map : null;
+				if (map == null || !map.IsPlayerHome) continue;
+				Thing spot = w.spot != null && w.spot.Spawned && w.spot.Map == map ? w.spot
+					: map.listerBuildings.AllBuildingsColonistOfDef(RimFeastDefOf.RimFeast_FeastSpot).FirstOrDefault();
+				if (spot == null) continue;
+				weddings.RemoveAt(i);
+				StartWedding(w, map, spot);
+				return;
+			}
+		}
+
+		// un dossier comme les autres, sans messager ni empoisonneur, et sans nouvelle demande a table
+		private void StartWedding(PendingWedding w, Map map, Thing spot)
+		{
+			current = new FeastCase
+			{
+				id = nextId++,
+				map = map,
+				house = w.house,
+				spotCell = spot.Position,
+				spotThing = spot,
+				state = FeastCase.Invited,
+				eventTick = ArrivalTick(map, Rand.Range(45000, 75000)),
+				wedding = true,
+				proposalDone = true,
+				requestRolled = true,
+				betrothedNoble = w.noble,
+				betrothedColonist = w.colonist,
+			};
+			TaggedString body = "RimFeast_TextWeddingComing".Translate(w.house.Name, w.noble.LabelShortCap,
+				w.colonist.LabelShortCap);
+			string eta = ArrivalEta(current);
+			if (!eta.NullOrEmpty()) body += "\n\n" + eta;
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelWeddingComing".Translate(), body,
+				LetterDefOf.PositiveEvent, new TargetInfo(spot.Position, map), w.house);
+		}
+
+		// les voeux se prononcent a la fin du premier toast ou les deux fiances sont dans la salle
+		private void TryWed(FeastCase c, bool anywhere)
+		{
+			if (!c.wedding || c.wed || c.lord == null) return;
+			Pawn noble = c.betrothedNoble;
+			Pawn colonist = c.betrothedColonist;
+			if (noble == null || noble.Dead || !noble.Spawned || !c.lord.ownedPawns.Contains(noble)) return;
+			if (colonist == null || colonist.Dead || !colonist.Spawned || colonist.Map != c.map
+				|| colonist.Faction != Faction.OfPlayer || colonist.Downed || colonist.InMentalState) return;
+			if (!colonist.relations.DirectRelationExists(PawnRelationDefOf.Fiance, noble)) return;
+			if (!anywhere && !FeastUtility.FeastArea.For(c.spotCell, c.map).Contains(colonist.Position)) return;
+
+			c.wed = true;
+			c.wedTick = Find.TickManager.TicksGame;
 			MarriageCeremonyUtility.Married(colonist, noble);
+			if (c.colonistLord != null)
+				foreach (Pawn col in c.colonistLord.ownedPawns)
+					if (col != colonist)
+						col.needs?.mood?.thoughts?.memories?.TryGainMemory(ThoughtDefOf.AttendedWedding);
 
 			// sortir du lord avant le changement de faction
 			if (colonist.Drafted) colonist.drafter.Drafted = false;
@@ -2111,11 +2367,120 @@ namespace RimFeast
 			c.guests.Add(colonist);
 			c.guestCount++;
 
-			c.house?.TryAffectGoodwillWith(Faction.OfPlayer, 25, canSendMessage: true,
+			c.house?.TryAffectGoodwillWith(Faction.OfPlayer, 15, canSendMessage: true,
 				canSendHostilityLetter: false);
-			Find.LetterStack.ReceiveLetter("RimFeast_LabelBetrothed".Translate(),
-				"RimFeast_TextBetrothed".Translate(colonist.LabelShortCap, noble.LabelShortCap, c.house?.Name),
+			Note(c, ChronicleLine.Wed, Who(colonist), Who(noble));
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelWed".Translate(),
+				"RimFeast_TextWed".Translate(colonist.LabelShortCap, noble.LabelShortCap, c.house?.Name),
 				LetterDefOf.PositiveEvent, colonist, c.house);
+		}
+
+		// la premiere danse attend qu'un instrument joue, et doit finir avant le toast suivant. sans instrument, pas de danse
+		private void TryFirstDance(FeastCase c)
+		{
+			if (!c.wed || c.firstDanceDone) return;
+			int now = Find.TickManager.TicksGame;
+			Pawn a = c.betrothedColonist;
+			Pawn b = c.betrothedNoble;
+			if (a == null || b == null || now - c.wedTick > 4000 || !FeastUtility.AnyInstrumentIn(c.spotCell, c.map))
+			{
+				c.firstDanceDone = true;
+				return;
+			}
+			if (!FeastUtility.MusicPlayingIn(c.spotCell, c.map))
+			{
+				CallMinstrel(c);
+				return;
+			}
+			if (!JobGiver_DanceAtFeast.StartDance(a, b, c.spotCell)) return;
+			c.firstDanceDone = true;
+			c.ballUntilTick = now + 5000;
+			Note(c, ChronicleLine.FirstDance, Who(a), Who(b));
+			Messages.Message("RimFeast_MessageFirstDance".Translate(a.LabelShortCap, b.LabelShortCap), a,
+				MessageTypeDefOf.PositiveEvent, historical: false);
+		}
+
+		// le meilleur artiste encore a table va jouer, comme le menestrel du banquet
+		private static void CallMinstrel(FeastCase c)
+		{
+			int now = Find.TickManager.TicksGame;
+			if (now - c.minstrelTick < 750 || c.colonistLord == null) return;
+			c.minstrelTick = now;
+			foreach (Pawn p in c.colonistLord.ownedPawns
+				.OrderByDescending(x => x.skills?.GetSkill(SkillDefOf.Artistic)?.Level ?? -1).ToList())
+			{
+				if (!p.Spawned || p.Downed || p.InMentalState || p.Drafted || !p.Awake()) continue;
+				if (p.CurJob != null && (p.CurJob.playerForced || !p.CurJob.def.casualInterruptible)) continue;
+				Building_MusicalInstrument inst = HallInstruments(c)
+					.FirstOrDefault(i => i.Spawned && GatheringWorker_Concert.InstrumentAccessible(i, p));
+				if (inst == null) continue;
+				p.jobs.TryTakeOrderedJob(FeastUtility.PlayJob(inst), JobTag.Misc);
+				return;
+			}
+		}
+
+		public bool BallOpen(IntVec3 spot) =>
+			current != null && current.spotCell == spot && current.ballUntilTick > Find.TickManager.TicksGame;
+
+		public string WeddingsInspect()
+		{
+			if (weddings.Count == 0) return null;
+			var sb = new StringBuilder();
+			foreach (PendingWedding w in weddings)
+			{
+				if (w?.noble == null || w.colonist == null) continue;
+				if (sb.Length > 0) sb.AppendLine();
+				int days = Mathf.Max(1, Mathf.CeilToInt((w.fireTick - Find.TickManager.TicksGame) / 60000f));
+				sb.Append("RimFeast_WeddingPendingLine".Translate(w.colonist.LabelShortCap, w.noble.LabelShortCap,
+					w.house?.Name ?? "?", days));
+			}
+			return sb.Length == 0 ? null : sb.ToString();
+		}
+
+		public string DebugMusicReport()
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine("RimFeast music diagnostic:");
+			sb.AppendLine("  music possible (Royalty or Ideology, and an instrument def): " + FeastUtility.MusicPossible);
+			FeastCase c = current ?? colony;
+			if (c?.map == null) { sb.AppendLine("  NO FEAST RUNNING"); return sb.ToString(); }
+			sb.AppendLine("  feast: " + (c == colony ? "colony" : c.wedding ? "wedding" : "guests") + ", state=" + c.state
+				+ ", spot=" + c.spotCell);
+			FeastUtility.FeastArea area = FeastUtility.FeastArea.For(c.spotCell, c.map);
+			var all = c.map.listerBuildings.AllBuildingsColonistOfClass<Building_MusicalInstrument>().ToList();
+			sb.AppendLine("  instruments owned on this map: " + all.Count);
+			foreach (Building_MusicalInstrument b in all)
+				sb.AppendLine("   - " + b.LabelShort + " at " + b.Position + ": play cell " + b.InteractionCell
+					+ " in feast area=" + area.Contains(b.InteractionCell) + ", being played=" + b.IsBeingPlayed);
+			bool alive = c.colonistLord != null && c.map.lordManager.lords.Contains(c.colonistLord);
+			sb.AppendLine("  colonist lord: " + (c.colonistLord == null ? "NEVER CREATED" : alive
+				? c.colonistLord.ownedPawns.Count + " pawns, toil=" + c.colonistLord.CurLordToil?.GetType().Name
+				: "ENDED"));
+			if (!alive) return sb.ToString();
+			foreach (Pawn p in c.colonistLord.ownedPawns)
+			{
+				Building_MusicalInstrument free = all.FirstOrDefault(i => area.Contains(i.InteractionCell)
+					&& GatheringWorker_Concert.InstrumentAccessible(i, p));
+				sb.AppendLine("   " + p.LabelShort.PadRight(14)
+					+ " duty=" + (p.mindState.duty?.def?.defName ?? "none")
+					+ " job=" + (p.CurJobDef?.defName ?? "none")
+					+ " artistic=" + (p.skills?.GetSkill(SkillDefOf.Artistic)?.Level ?? -1)
+					+ " joy=" + (p.needs?.joy?.CurLevel.ToString("0.00") ?? "n/a")
+					+ " food=" + (p.needs?.food?.CurLevelPercentage.ToString("0.00") ?? "n/a")
+					+ " schedule=" + (p.timetable?.CurrentAssignment?.defName ?? "n/a")
+					+ " can take an instrument=" + (free != null));
+			}
+			return sb.ToString();
+		}
+
+		public void DebugRushWeddings()
+		{
+			if (weddings.Count == 0)
+			{
+				Messages.Message("RimFeast: no wedding pending.", MessageTypeDefOf.RejectInput, historical: false);
+				return;
+			}
+			foreach (PendingWedding w in weddings) w.fireTick = Find.TickManager.TicksGame;
 		}
 
 		public const int ReqNone = 0;
@@ -2387,6 +2752,7 @@ namespace RimFeast
 				goodwill = Mathf.Clamp(Mathf.RoundToInt(c.requestThing.MarketValue / 50f), 8, 20);
 				c.requestThing.Destroy();
 				done = "RimFeast_MessageRequestWeaponDone".Translate(label, c.house?.Name);
+				Note(c, ChronicleLine.Gave, label);
 			}
 			else if (c.requestKind == ReqArt)
 			{
@@ -2394,6 +2760,7 @@ namespace RimFeast
 				goodwill = Mathf.Clamp(Mathf.RoundToInt(c.requestThing.MarketValue / 50f), 10, 22);
 				c.requestThing.Destroy();
 				done = "RimFeast_MessageRequestArtDone".Translate(label, c.house?.Name);
+				Note(c, ChronicleLine.Gave, label);
 			}
 			else if (c.requestKind == ReqWard)
 			{
@@ -2418,6 +2785,7 @@ namespace RimFeast
 
 				goodwill = 25;
 				done = "RimFeast_MessageRequestWardDone".Translate(label, c.house?.Name, years);
+				Note(c, ChronicleLine.Ward, label);
 			}
 			else if (c.requestKind == ReqBed)
 			{
@@ -2432,6 +2800,7 @@ namespace RimFeast
 					canSendHostilityLetter: true);
 				goodwill = 15;
 				done = "RimFeast_MessageRequestRivalDone".Translate(rival.Name, c.house?.Name);
+				Note(c, ChronicleLine.Rival, rival.Name);
 			}
 
 			c.requestKind = ReqNone;
@@ -2585,12 +2954,14 @@ namespace RimFeast
 					canSendHostilityLetter: false);
 				Messages.Message("RimFeast_MessageBedRefused".Translate(her.LabelShortCap, c.house?.Name),
 					her, MessageTypeDefOf.NegativeEvent, historical: false);
+				Note(c, ChronicleLine.BedNo, Who(her), Who(him));
 				return;
 			}
 
 			her.needs?.mood?.thoughts?.memories?.TryGainMemory(RimFeastDefOf.RimFeast_NightWithNoble);
 			partner?.needs?.mood?.thoughts?.memories?.TryGainMemory(ThoughtDefOf.CheatedOnMe, her);
 			lovin = new LovinScene { caseId = c.id, her = her, him = him };
+			Note(c, ChronicleLine.BedYes, Who(her), Who(him));
 
 			c.house?.TryAffectGoodwillWith(Faction.OfPlayer, 18, canSendMessage: true,
 				canSendHostilityLetter: false);
@@ -2602,6 +2973,7 @@ namespace RimFeast
 		{
 			FeastCase c = current;
 			if (c == null || c.id != id) return;
+			Note(c, ChronicleLine.Refused);
 			c.requestKind = ReqNone;
 			c.house?.TryAffectGoodwillWith(Faction.OfPlayer, -8, canSendMessage: true,
 				canSendHostilityLetter: false);
@@ -2613,6 +2985,7 @@ namespace RimFeast
 		{
 			FeastCase c = current;
 			if (c == null || c.id != id) return;
+			Note(c, ChronicleLine.Declined, Who(c.betrothedNoble), Who(c.betrothedColonist));
 			Messages.Message("RimFeast_MessageProposalDeclined".Translate(c.house?.Name),
 				new TargetInfo(c.spotCell, c.map), MessageTypeDefOf.NeutralEvent, historical: false);
 		}
@@ -2638,6 +3011,7 @@ namespace RimFeast
 				text = "RimFeast_TextFeastTriumph".Translate(c.house?.Name, GiftSilver);
 				goodwill = 25;
 				DropGift(c);
+				Note(c, ChronicleLine.Silver, null, null, GiftSilver);
 			}
 			else if (score >= GoodScore)
 			{
@@ -2661,7 +3035,7 @@ namespace RimFeast
 
 			// calcule avant d'enregistrer ce banquet, sinon il se penalise lui-meme
 			int remembered = FeastsRemembered(c.house);
-			if (goodwill > 0 && remembered > 0)
+			if (!c.wedding && goodwill > 0 && remembered > 0)
 			{
 				goodwill = Mathf.Max(1, Mathf.RoundToInt(goodwill * GoodwillFactorFor(c.house)));
 				text += "\n\n" + "RimFeast_TextJaded".Translate(c.house?.Name, remembered);
@@ -2684,8 +3058,15 @@ namespace RimFeast
 				c.house?.TryAffectGoodwillWith(Faction.OfPlayer, goodwill, canSendMessage: true,
 					canSendHostilityLetter: goodwill < 0);
 
+			ChronicleEntry entry = EntryFor(c);
+			entry.score = score;
+			entry.tier = TierOf(score);
+			entry.goodwill += goodwill;
+			Stamp(entry, c);
+
+			// des noces ne lassent pas la maison: c'est elle qui les a voulues
 			HouseFeastMemory m = MemoryFor(c.house, true);
-			if (m != null)
+			if (m != null && !c.wedding)
 			{
 				m.timesFeasted = remembered + 1;
 				m.lastFeastTick = Find.TickManager.TicksGame;
@@ -2700,6 +3081,7 @@ namespace RimFeast
 			if (!RimFeastMod.S.tradePactEnabled) return;
 			if (c.house?.def?.caravanTraderKinds == null || c.house.def.caravanTraderKinds.Count == 0) return;
 			PendingCaravan p = ScheduleCaravan(c.house, c.map);
+			Note(c, ChronicleLine.Caravan);
 			int delayTicks = p.fireTick - Find.TickManager.TicksGame;
 
 			if (!playerPicks)
@@ -2766,6 +3148,146 @@ namespace RimFeast
 			}
 		}
 
+		public List<ChronicleEntry> Chronicle => chronicle;
+
+		private static string Who(Pawn p) => p?.LabelShortCap ?? "?";
+
+		private static int TierOf(int score) =>
+			score >= TriumphScore ? 3 : score >= GoodScore ? 2 : score >= DecentScore ? 1 : 0;
+
+		// la fiche de la soiree s'ouvre a la premiere chose a noter, le verdict s'y ajoute a la fin
+		private ChronicleEntry EntryFor(FeastCase c)
+		{
+			ChronicleEntry entry = chronicle.FirstOrDefault(x => x.caseId == c.id);
+			if (entry != null) return entry;
+			entry = new ChronicleEntry
+			{
+				caseId = c.id,
+				kind = c == colony ? ChronicleEntry.Colony : c.wedding ? ChronicleEntry.Wedding : ChronicleEntry.Feast,
+				absTick = Find.TickManager.TicksAbs,
+				place = c.map != null ? Find.WorldGrid.LongLatOf(c.map.Tile) : Vector2.zero,
+				house = c.house,
+				houseName = c.house?.Name,
+				guests = c.guestCount,
+			};
+			Pawn head = c.leaderCame ? c.house?.leader : null;
+			if (head != null) entry.Add(ChronicleLine.Leader, Who(head));
+			chronicle.Add(entry);
+			if (chronicle.Count > MaxChronicle) chronicle.RemoveAt(0);
+			return entry;
+		}
+
+		private void Note(FeastCase c, int kind, string a = null, string b = null, int n = 0)
+		{
+			if (c != null) EntryFor(c).Add(kind, a, b, n);
+		}
+
+		private static void Stamp(ChronicleEntry entry, FeastCase c)
+		{
+			entry.guests = c.guestCount;
+			entry.toasts = c.toastsGiven;
+			entry.hall = Mathf.Clamp01(c.maxImpressiveness / ImpressivenessCap);
+			entry.table = Mathf.Clamp01(c.maxTableScore / 20f);
+			entry.drink = c.guestCount > 0 ? Mathf.Min((float)c.maxDrinkUnits / c.guestCount, 1f) : 0f;
+			entry.ent = Mathf.Min(c.toastsGiven / (float)ToastsForFull, 1f);
+			if (c.samples > 0 && c.musicSamples > 0) entry.ent = Mathf.Max(entry.ent, 0.7f);
+		}
+
+		private void NoteAway(Caravan caravan, Faction house, int outcome)
+		{
+			chronicle.Add(new ChronicleEntry
+			{
+				kind = ChronicleEntry.Away,
+				absTick = Find.TickManager.TicksAbs,
+				place = caravan != null ? Find.WorldGrid.LongLatOf(caravan.Tile) : Vector2.zero,
+				house = house,
+				houseName = house?.Name,
+				tier = outcome,
+			});
+			if (chronicle.Count > MaxChronicle) chronicle.RemoveAt(0);
+		}
+
+		private FeastCase CaseAt(Pawn p)
+		{
+			if (p?.Map == null) return null;
+			if (current != null && current.map == p.Map && current.state == FeastCase.Feasting) return current;
+			return colony != null && colony.map == p.Map ? colony : null;
+		}
+
+		public void Notify_Danced(Pawn a, Pawn b) => Note(CaseAt(a), ChronicleLine.Dance, Who(a), Who(b));
+
+		public void Notify_Conga(Pawn leader, int size) => Note(CaseAt(leader), ChronicleLine.Conga, Who(leader), null, size);
+
+		public void Notify_Round(Pawn leader, int size) => Note(CaseAt(leader), ChronicleLine.Round, Who(leader), null, size);
+
+		public void DebugChronicleSamples()
+		{
+			Map map = Find.CurrentMap;
+			Vector2 place = map != null ? Find.WorldGrid.LongLatOf(map.Tile) : Vector2.zero;
+			Faction house = FeastUtility.InvitableHouses().FirstOrDefault();
+			List<Pawn> cols = map?.mapPawns.FreeColonistsSpawned.ToList() ?? new List<Pawn>();
+			string Col(int i) => cols.Count > 0 ? Who(cols[i % cols.Count]) : "Colonist " + (i + 1);
+			int now = Find.TickManager.TicksAbs;
+
+			var feast = new ChronicleEntry
+			{
+				kind = ChronicleEntry.Feast, absTick = now - 9 * GenDate.TicksPerDay, place = place, house = house,
+				houseName = house?.Name, score = 88, tier = 3, goodwill = 25, guests = 7, toasts = 3,
+				hall = 0.9f, table = 0.85f, drink = 1f, ent = 1f,
+			};
+			feast.Add(ChronicleLine.Leader, "Lord Aldric");
+			feast.Add(ChronicleLine.Gift);
+			feast.Add(ChronicleLine.Dance, Col(1), "Ser Rowan");
+			feast.Add(ChronicleLine.Conga, Col(2), null, 6);
+			feast.Add(ChronicleLine.Round, Col(3), null, 5);
+			feast.Add(ChronicleLine.Betrothed, "Ser Rowan", Col(0));
+			feast.Add(ChronicleLine.Silver, null, null, GiftSilver);
+			feast.Add(ChronicleLine.Caravan);
+			chronicle.Add(feast);
+
+			var wedding = new ChronicleEntry
+			{
+				kind = ChronicleEntry.Wedding, absTick = now - 5 * GenDate.TicksPerDay, place = place, house = house,
+				houseName = house?.Name, score = 71, tier = 2, goodwill = 15, guests = 9, toasts = 3,
+				hall = 0.8f, table = 0.6f, drink = 0.7f, ent = 1f,
+			};
+			wedding.Add(ChronicleLine.Gift);
+			wedding.Add(ChronicleLine.Wed, Col(0), "Ser Rowan");
+			wedding.Add(ChronicleLine.FirstDance, Col(0), "Ser Rowan");
+			wedding.Add(ChronicleLine.Dance, Col(1), Col(2));
+			wedding.Add(ChronicleLine.Brawl, "Knight Osric", "Knight Hale");
+			chronicle.Add(wedding);
+
+			var colonyFeast = new ChronicleEntry
+			{
+				kind = ChronicleEntry.Colony, absTick = now - 3 * GenDate.TicksPerDay, place = place,
+				score = 52, tier = 1, guests = Mathf.Max(3, cols.Count), toasts = 2,
+				hall = 0.7f, table = 0.4f, drink = 0.5f, ent = 0.7f,
+			};
+			colonyFeast.Add(ChronicleLine.Dance, Col(1), Col(3));
+			chronicle.Add(colonyFeast);
+
+			var red = new ChronicleEntry
+			{
+				kind = ChronicleEntry.Feast, absTick = now, place = place, house = house, houseName = house?.Name,
+				guests = 6, toasts = 1, hall = 0.9f, table = 0.5f, drink = 0.8f, ent = 0.4f, red = true,
+			};
+			red.Add(ChronicleLine.Slain, "Lord Aldric");
+			red.Add(ChronicleLine.Slain, "Knight Osric");
+			red.Add(ChronicleLine.Slain, "Knight Hale");
+			red.Add(ChronicleLine.Fallen, "Dame Ysolde");
+			red.Add(ChronicleLine.Lost, Col(2));
+			red.Add(ChronicleLine.War, house?.Name ?? "House Amboise");
+			chronicle.Add(red);
+
+			chronicle.Add(new ChronicleEntry
+			{
+				kind = ChronicleEntry.Away, absTick = now - 14 * GenDate.TicksPerDay, place = place, house = house,
+				houseName = house?.Name, tier = AwayFine,
+			});
+			chronicle.SortBy(x => x.absTick);
+		}
+
 		public override void ExposeData()
 		{
 			Scribe_Deep.Look(ref current, "current");
@@ -2782,6 +3304,8 @@ namespace RimFeast
 			Scribe_Deep.Look(ref lovin, "lovin");
 			Scribe_Deep.Look(ref colony, "colony");
 			Scribe_Values.Look(ref lastColonyFeastTick, "lastColonyFeastTick", -1);
+			Scribe_Collections.Look(ref weddings, "weddings", LookMode.Deep);
+			Scribe_Collections.Look(ref chronicle, "chronicle", LookMode.Deep);
 			if (Scribe.mode == LoadSaveMode.PostLoadInit)
 			{
 				if (memories == null) memories = new List<HouseFeastMemory>();
@@ -2794,6 +3318,10 @@ namespace RimFeast
 				reveals.RemoveAll(x => x == null || x.house == null);
 				if (wards == null) wards = new List<PendingWard>();
 				wards.RemoveAll(x => x == null || x.ward == null);
+				if (weddings == null) weddings = new List<PendingWedding>();
+				weddings.RemoveAll(x => x == null);
+				if (chronicle == null) chronicle = new List<ChronicleEntry>();
+				chronicle.RemoveAll(x => x == null);
 			}
 		}
 	}

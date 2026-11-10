@@ -26,6 +26,27 @@
 						</li>
 
 						<li Class="ThinkNode_ConditionalRandom">
+							<chance>0.15</chance>
+							<subNodes>
+								<li Class="RimFeast.AI.JobGiver_DanceAtFeast" />
+							</subNodes>
+						</li>
+
+						<li Class="ThinkNode_ConditionalRandom">
+							<chance>0.05</chance>
+							<subNodes>
+								<li Class="RimFeast.AI.JobGiver_CongaAtFeast" />
+							</subNodes>
+						</li>
+
+						<li Class="ThinkNode_ConditionalRandom">
+							<chance>0.06</chance>
+							<subNodes>
+								<li Class="RimFeast.AI.JobGiver_RoundAtFeast" />
+							</subNodes>
+						</li>
+
+						<li Class="ThinkNode_ConditionalRandom">
 							<chance>0.7</chance>
 							<subNodes>
 								<li Class="RimFeast.AI.JobGiver_SitAtFeast" />
@@ -76,6 +97,27 @@
 							<chance>0.08</chance>
 							<subNodes>
 								<li Class="RimFeast.AI.JobGiver_DrinkAtFeast" />
+							</subNodes>
+						</li>
+
+						<li Class="ThinkNode_ConditionalRandom">
+							<chance>0.15</chance>
+							<subNodes>
+								<li Class="RimFeast.AI.JobGiver_DanceAtFeast" />
+							</subNodes>
+						</li>
+
+						<li Class="ThinkNode_ConditionalRandom">
+							<chance>0.05</chance>
+							<subNodes>
+								<li Class="RimFeast.AI.JobGiver_CongaAtFeast" />
+							</subNodes>
+						</li>
+
+						<li Class="ThinkNode_ConditionalRandom">
+							<chance>0.06</chance>
+							<subNodes>
+								<li Class="RimFeast.AI.JobGiver_RoundAtFeast" />
 							</subNodes>
 						</li>
 
@@ -143,6 +185,8 @@
 		<hook>HighPriority</hook>
 		<thinkNode Class="ThinkNode_Priority">
 			<subNodes>
+				<li Class="RimFeast.AI.JobGiver_EatAtFeastHungry" />
+
 				<li Class="RimFeast.AI.JobGiver_PlayAtFeast" />
 
 				<li Class="RimFeast.AI.ThinkNode_ConditionalInFeastArea">

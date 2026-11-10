@@ -29,6 +29,9 @@
 		<comps>
 			<li Class="RimFeast.CompProperties_FeastArea" />
 		</comps>
+		<inspectorTabs>
+			<li>RimFeast.ITab_FeastChronicle</li>
+		</inspectorTabs>
 	</ThingDef>
 
 </Defs>

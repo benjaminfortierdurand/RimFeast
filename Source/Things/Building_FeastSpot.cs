@@ -75,7 +75,7 @@ namespace RimFeast
 
 			FeastCase cur = comp?.CurrentCase;
 
-			if (cur != null && cur.state == FeastCase.Invited && cur.spotThing == this)
+			if (cur != null && cur.state == FeastCase.Invited && cur.spotThing == this && !cur.wedding)
 				yield return new Command_Action
 				{
 					defaultLabel = "RimFeast_CancelInviteLabel".Translate(),
@@ -169,7 +169,7 @@ namespace RimFeast
 					: "RimFeast_SpotIdle".Translate();
 			else if (c.state == FeastCase.Invited)
 			{
-				line = "RimFeast_SpotInvited".Translate(c.house?.Name);
+				line = (c.wedding ? "RimFeast_SpotWeddingInvited" : "RimFeast_SpotInvited").Translate(c.house?.Name);
 				string eta = GameComponent_FeastState.ArrivalEta(c);
 				if (!eta.NullOrEmpty()) line += "\n" + eta;
 				if (Find.TickManager.TicksGame - cachedPreviewTick > 250)
@@ -199,6 +199,8 @@ namespace RimFeast
 
 			string wardsLine = GameComponent_FeastState.Get()?.WardsInspect();
 			if (!wardsLine.NullOrEmpty()) line += "\n" + wardsLine;
+			string weddingLine = GameComponent_FeastState.Get()?.WeddingsInspect();
+			if (!weddingLine.NullOrEmpty()) line += "\n" + weddingLine;
 			return s.NullOrEmpty() ? line : s + "\n" + line;
 		}
 	}

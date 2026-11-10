@@ -34,6 +34,48 @@ namespace RimFeast.Debug
 			CortegeNow();
 		}
 
+		[DebugAction("RimFeast", "Dance now (click a feaster)",
+			actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void DanceNow(Pawn p)
+		{
+			Verse.AI.Job job = AI.JobGiver_DanceAtFeast.TryDance(p, true, out string why);
+			if (job == null)
+			{
+				Messages.Message("RimFeast: no dance for " + p.LabelShort + ": " + why, p,
+					MessageTypeDefOf.RejectInput, historical: false);
+				return;
+			}
+			p.jobs.TryTakeOrderedJob(job, Verse.AI.JobTag.Misc);
+		}
+
+		[DebugAction("RimFeast", "Conga now (click a feaster)",
+			actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void CongaNow(Pawn p)
+		{
+			Verse.AI.Job job = AI.JobGiver_CongaAtFeast.TryConga(p, true, out string why);
+			if (job == null)
+			{
+				Messages.Message("RimFeast: no conga for " + p.LabelShort + ": " + why, p,
+					MessageTypeDefOf.RejectInput, historical: false);
+				return;
+			}
+			p.jobs.TryTakeOrderedJob(job, Verse.AI.JobTag.Misc);
+		}
+
+		[DebugAction("RimFeast", "Circle dance now (click a feaster)",
+			actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void RoundNow(Pawn p)
+		{
+			Verse.AI.Job job = AI.JobGiver_RoundAtFeast.TryRound(p, true, out string why);
+			if (job == null)
+			{
+				Messages.Message("RimFeast: no circle dance for " + p.LabelShort + ": " + why, p,
+					MessageTypeDefOf.RejectInput, historical: false);
+				return;
+			}
+			p.jobs.TryTakeOrderedJob(job, Verse.AI.JobTag.Misc);
+		}
+
 		[DebugAction("RimFeast", "Cortege now: pick a house",
 			allowedGameStates = AllowedGameStates.PlayingOnMap)]
 		private static void CortegeNow()
@@ -91,6 +133,28 @@ namespace RimFeast.Debug
 				return;
 			}
 			comp.DebugRush();
+		}
+
+		[DebugAction("RimFeast", "Log why nobody plays music",
+			allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void LogMusic()
+		{
+			GameComponent_FeastState comp = GameComponent_FeastState.Get();
+			if (comp != null) Log.Message(comp.DebugMusicReport());
+		}
+
+		[DebugAction("RimFeast", "Rush pending weddings",
+			allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void RushWeddings()
+		{
+			GameComponent_FeastState.Get()?.DebugRushWeddings();
+		}
+
+		[DebugAction("RimFeast", "Chronicle: add sample evenings",
+			allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void ChronicleSamples()
+		{
+			GameComponent_FeastState.Get()?.DebugChronicleSamples();
 		}
 
 		[DebugAction("RimFeast", "Force marriage proposal",

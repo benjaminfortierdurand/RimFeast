@@ -12,6 +12,9 @@
 	<RimFeast_ColonyDisabledGathering>a party, ceremony or caravan is already gathering your people</RimFeast_ColonyDisabledGathering>
 	<RimFeast_ColonyDisabledNobody>Nobody is free to preside over a feast right now.</RimFeast_ColonyDisabledNobody>
 	<RimFeast_ColonyFeastBegins>{0} calls the colony to the feast.</RimFeast_ColonyFeastBegins>
+	<RimFeast_CongaStarts>{0} starts a conga line.</RimFeast_CongaStarts>
+	<RimFeast_DanceInvite>{0} asks {1} to dance.</RimFeast_DanceInvite>
+	<RimFeast_RoundStarts>{0} gets a circle dance going.</RimFeast_RoundStarts>
 	<RimFeast_ColonyToast>{0} raises a toast. The hall falls quiet to listen.</RimFeast_ColonyToast>
 	<RimFeast_ColonyFeastOver>The colony feast is over. {0}</RimFeast_ColonyFeastOver>
 	<RimFeast_InviteDisabledNoHouses>No noble house will treat with you.</RimFeast_InviteDisabledNoHouses>
@@ -127,12 +130,24 @@
 	<RimFeast_TextPoisonRevealed>In the days after the feast, your colonists fall sick one after another, and the truth surfaces: the cortege of {0} poisoned your table and smiled while you toasted their health.\n\nBurn whatever remains of that feast.</RimFeast_TextPoisonRevealed>
 
 	<RimFeast_LabelProposal>A proposal of marriage</RimFeast_LabelProposal>
-	<RimFeast_TextProposal>{0} of {1} has been struck by your colonist {2} across the feast table, and asks for their hand in marriage.\n\nAccept and {2} weds into the house and rides home with the cortege, sealing a bond of kin between you. You will not see them again, but the house will call you family.\n\nDecline and no harm is done: such things are asked at every great feast.</RimFeast_TextProposal>
-	<RimFeast_ProposalAccept>Give your blessing (they wed into the house and leave with the cortege)</RimFeast_ProposalAccept>
+	<RimFeast_TextProposal>{0} of {1} has been struck by your colonist {2} across the feast table, and asks for their hand in marriage.\n\nAccept and they are betrothed. The house rides back in a few days to hold the wedding in your hall, and when that feast is over {2} leaves with them for good. You will not see them again, but the house will call you family.\n\nDecline and no harm is done: such things are asked at every great feast.</RimFeast_TextProposal>
+	<RimFeast_ProposalAccept>Give your blessing (betrothal now, the wedding feast in a few days)</RimFeast_ProposalAccept>
 	<RimFeast_ProposalDecline>Decline the match</RimFeast_ProposalDecline>
-	<RimFeast_LabelBetrothed>Wed into the house</RimFeast_LabelBetrothed>
-	<RimFeast_TextBetrothed>{0} and {1} are married. As the feast ends, {0} gathers their things and rides out with the cortege of {2}, a noble of the house now. Your halls are quieter, but you have kin among the nobility.</RimFeast_TextBetrothed>
+	<RimFeast_LabelBetrothed>Betrothed</RimFeast_LabelBetrothed>
+	<RimFeast_TextBetrothed>{0} and {1} are betrothed. {2} will ride back in a few days to hold the wedding in your hall. Set a table worth the day: when the feast is over, {0} leaves with the cortege, a noble of the house from then on.</RimFeast_TextBetrothed>
 	<RimFeast_MessageProposalDeclined>You decline the match. The suitor of {0} takes it in good grace.</RimFeast_MessageProposalDeclined>
+	<RimFeast_LabelWeddingComing>The wedding cortege sets out</RimFeast_LabelWeddingComing>
+	<RimFeast_TextWeddingComing>{0} is on its way to marry {1} to {2}. The wedding feast is held at your feast spot and judged like any other, so set the table.</RimFeast_TextWeddingComing>
+	<RimFeast_LabelWeddingArrive>Wedding cortege</RimFeast_LabelWeddingArrive>
+	<RimFeast_TextWeddingArrive>The wedding cortege of {0} has arrived: {1} guests, {2} among them, come to marry {3}. The vows are spoken at the first toast.</RimFeast_TextWeddingArrive>
+	<RimFeast_MessageWeddingToast>A toast is raised to {0} and {1}. The hall falls quiet for the vows.</RimFeast_MessageWeddingToast>
+	<RimFeast_LabelWed>Wed into the house</RimFeast_LabelWed>
+	<RimFeast_TextWed>{0} and {1} are married. When the feast ends, {0} rides out with the cortege of {2}, a noble of the house now. Your halls will be quieter, but you have kin among the nobility.</RimFeast_TextWed>
+	<RimFeast_MessageFirstDance>{0} and {1} open the ball.</RimFeast_MessageFirstDance>
+	<RimFeast_LabelWeddingOff>The wedding is off</RimFeast_LabelWeddingOff>
+	<RimFeast_TextWeddingOff>The wedding of {0} and {1} of {2} will not take place. The betrothal is broken.</RimFeast_TextWeddingOff>
+	<RimFeast_WeddingPendingLine>{0} is to wed {1} of {2}. Their cortege sets out within {3} days.</RimFeast_WeddingPendingLine>
+	<RimFeast_SpotWeddingInvited>The wedding cortege of {0} is on its way.</RimFeast_SpotWeddingInvited>
 	<RimFeast_LabelPactOffered>Trade agreement</RimFeast_LabelPactOffered>
 	<RimFeast_TextPactOffered>{0} left your hall well fed and well pleased. Their steward will send one of the house merchants your way within a few days, whichever of them can be spared.</RimFeast_TextPactOffered>
 	<RimFeast_LabelPactChoice>Trade agreement offered</RimFeast_LabelPactChoice>
@@ -239,5 +254,51 @@
 	<RimFeast_SpotTraveling>Cortege of {0} on its way.</RimFeast_SpotTraveling>
 	<RimFeast_SpotFeasting>Feast underway with {0}.</RimFeast_SpotFeasting>
 	<RimFeast_SpotLeaderLine>{0}, head of the house, is here in person. Goodwill from this evening counts half again.</RimFeast_SpotLeaderLine>
+	<RimFeast_TabChronicle>Chronicle</RimFeast_TabChronicle>
+	<RimFeast_ChronTitle>Chronicle of the feasts</RimFeast_ChronTitle>
+	<RimFeast_ChronSummary>Evenings on record: {0}. Best table: {1} out of 100.</RimFeast_ChronSummary>
+	<RimFeast_ChronSummaryPlain>Evenings on record: {0}.</RimFeast_ChronSummaryPlain>
+	<RimFeast_ChronEmpty>No feast has been held yet. Every evening gets written down here: the verdict, who danced with whom, and who did not leave the hall.</RimFeast_ChronEmpty>
+	<RimFeast_ChronKindFeast>Feast</RimFeast_ChronKindFeast>
+	<RimFeast_ChronKindWedding>Wedding feast</RimFeast_ChronKindWedding>
+	<RimFeast_ChronKindColony>Colony feast</RimFeast_ChronKindColony>
+	<RimFeast_ChronKindAway>At their table</RimFeast_ChronKindAway>
+	<RimFeast_ChronKindRed>Red feast</RimFeast_ChronKindRed>
+	<RimFeast_ChronGoodwill>{0} goodwill</RimFeast_ChronGoodwill>
+	<RimFeast_ChronMood>{0} mood</RimFeast_ChronMood>
+	<RimFeast_ChronHall>Hall</RimFeast_ChronHall>
+	<RimFeast_ChronTable>Table</RimFeast_ChronTable>
+	<RimFeast_ChronDrink>Drink</RimFeast_ChronDrink>
+	<RimFeast_ChronEnt>Toasts and music</RimFeast_ChronEnt>
+	<RimFeast_ChronStats>Guests: {0}   Toasts: {1}</RimFeast_ChronStats>
+	<RimFeast_ChronStatsColony>At the table: {0}   Toasts: {1}</RimFeast_ChronStatsColony>
+	<RimFeast_ChronLeader>{0}, head of the house, came in person.</RimFeast_ChronLeader>
+	<RimFeast_ChronGift>They brought a gift.</RimFeast_ChronGift>
+	<RimFeast_ChronDance>{0} danced with {1}.</RimFeast_ChronDance>
+	<RimFeast_ChronConga>{0} led a conga line of {2}.</RimFeast_ChronConga>
+	<RimFeast_ChronRound>{0} got a circle dance of {2} going.</RimFeast_ChronRound>
+	<RimFeast_ChronBrawl>{0} and {1} came to blows.</RimFeast_ChronBrawl>
+	<RimFeast_ChronBetrothed>{0} asked for the hand of {1}. You gave your blessing.</RimFeast_ChronBetrothed>
+	<RimFeast_ChronDeclined>{0} asked for the hand of {1}. You declined.</RimFeast_ChronDeclined>
+	<RimFeast_ChronWed>{0} and {1} were wed.</RimFeast_ChronWed>
+	<RimFeast_ChronFirstDance>{0} and {1} opened the ball.</RimFeast_ChronFirstDance>
+	<RimFeast_ChronGave>They asked for {0}, and left with it.</RimFeast_ChronGave>
+	<RimFeast_ChronRival>You swore off {0} in front of everyone.</RimFeast_ChronRival>
+	<RimFeast_ChronWard>{0} left with them, to be raised as a page.</RimFeast_ChronWard>
+	<RimFeast_ChronRefused>They asked for something. You said no.</RimFeast_ChronRefused>
+	<RimFeast_ChronBedYes>{0} spent the night with {1}.</RimFeast_ChronBedYes>
+	<RimFeast_ChronBedNo>{0} turned {1} down.</RimFeast_ChronBedNo>
+	<RimFeast_ChronPoisoner>{0} was caught poisoning the food.</RimFeast_ChronPoisoner>
+	<RimFeast_ChronPoisoned>{0} poisoned the food, and your people fell sick.</RimFeast_ChronPoisoned>
+	<RimFeast_ChronSlain>{0} died at the table.</RimFeast_ChronSlain>
+	<RimFeast_ChronFallen>{0} was struck down, and lives.</RimFeast_ChronFallen>
+	<RimFeast_ChronLost>You lost {0} in the fight.</RimFeast_ChronLost>
+	<RimFeast_ChronNameless>{2} more guests did not leave the hall.</RimFeast_ChronNameless>
+	<RimFeast_ChronWar>It means war with {0}.</RimFeast_ChronWar>
+	<RimFeast_ChronBlood>Blood was spilled under your roof.</RimFeast_ChronBlood>
+	<RimFeast_ChronBrawlDeath>A guest died in a drunken brawl.</RimFeast_ChronBrawlDeath>
+	<RimFeast_ChronUnwed>The wedding of {0} and {1} did not take place.</RimFeast_ChronUnwed>
+	<RimFeast_ChronCaravan>They promised a trade caravan.</RimFeast_ChronCaravan>
+	<RimFeast_ChronSilver>They left {2} silver on the table.</RimFeast_ChronSilver>
 
 </LanguageData>

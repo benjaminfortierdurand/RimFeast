@@ -44,6 +44,22 @@
 		</stages>
 	</ThoughtDef>
 	<ThoughtDef>
+		<defName>RimFeast_DancedWith</defName>
+		<thoughtClass>Thought_MemorySocial</thoughtClass>
+		<durationDays>10</durationDays>
+		<stackLimit>300</stackLimit>
+		<stackLimitForSameOtherPawn>3</stackLimitForSameOtherPawn>
+		<stackedEffectMultiplier>0.9</stackedEffectMultiplier>
+		<developmentalStageFilter>Child, Adult</developmentalStageFilter>
+		<socialTargetDevelopmentalStageFilter>Child, Adult</socialTargetDevelopmentalStageFilter>
+		<stages>
+			<li>
+				<label>danced with me</label>
+				<baseOpinionOffset>5</baseOpinionOffset>
+			</li>
+		</stages>
+	</ThoughtDef>
+	<ThoughtDef>
 		<defName>RimFeast_NightWithNoble</defName>
 		<thoughtClass>Thought_Memory</thoughtClass>
 		<durationDays>5</durationDays>

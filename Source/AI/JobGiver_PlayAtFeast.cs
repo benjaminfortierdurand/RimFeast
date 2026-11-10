@@ -24,7 +24,7 @@ namespace RimFeast.AI
 				.RandomElementWithFallback();
 			if (inst == null) return null;
 
-			return JobMaker.MakeJob(JobDefOf.Play_MusicalInstrument, inst, inst.InteractionCell);
+			return FeastUtility.PlayJob(inst);
 		}
 	}
 }

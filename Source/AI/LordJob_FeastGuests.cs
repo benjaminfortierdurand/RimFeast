@@ -87,6 +87,11 @@ namespace RimFeast.AI
 			var sitDown = new Transition(toast, feast);
 			sitDown.AddTrigger(new Trigger_TicksPassed(GameComponent_FeastState.ToastDurationTicks));
 			sitDown.AddPostAction(new TransitionAction_EndAllJobs());
+			// apres EndAllJobs: la premiere danse des maries part d'ici et ne doit pas etre coupee
+			sitDown.AddPostAction(new TransitionAction_Custom((System.Action)delegate
+			{
+				GameComponent_FeastState.Get()?.Notify_ToastOver(caseId);
+			}));
 			graph.AddTransition(sitDown);
 
 			// toast source ici, sinon le compteur repart a zero et le banquet ne finit jamais

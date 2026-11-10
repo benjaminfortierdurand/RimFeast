@@ -3,6 +3,7 @@ using System.Linq;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 using Verse.AI.Group;
 
 namespace RimFeast
@@ -223,6 +224,49 @@ namespace RimFeast
 				map.listerBuildings.AllBuildingsColonistOfClass<Building_MusicalInstrument>())
 				if (area.Contains(b.InteractionCell)) return true;
 			return false;
+		}
+
+		public static bool IsFeaster(Pawn p) =>
+			p.GetLord()?.LordJob is AI.LordJob_FeastGuests || p.GetLord()?.LordJob is AI.LordJob_FeastColonists;
+
+		public static bool CanDance(Pawn p) =>
+			p.RaceProps.Humanlike && !p.Downed && p.Awake() && !p.InMentalState && !p.DevelopmentalStage.Baby()
+			&& p.health.capacities.CapableOf(PawnCapacityDefOf.Moving);
+
+		public static bool MusicPlayingIn(IntVec3 spot, Map map)
+		{
+			if (!MusicPossible || map == null) return false;
+			FeastArea area = FeastArea.For(spot, map);
+			foreach (Building_MusicalInstrument b in
+				map.listerBuildings.AllBuildingsColonistOfClass<Building_MusicalInstrument>())
+				if (b.IsBeingPlayed && area.Contains(b.InteractionCell)) return true;
+			return false;
+		}
+
+		public const int MusicSetTicks = 2500;
+
+		// sans doUntilGatheringEnded, vanilla coupe le morceau des que la joie du musicien est pleine ou que son horaire
+		// interdit le loisir. a un banquet la joie est pleine tres vite: plus personne ne jouait.
+		// le morceau dure une heure, puis le menestrel peut manger avant de reprendre
+		public static Job PlayJob(Building_MusicalInstrument inst)
+		{
+			Job job = JobMaker.MakeJob(JobDefOf.Play_MusicalInstrument, inst, inst.InteractionCell);
+			job.doUntilGatheringEnded = true;
+			job.expiryInterval = MusicSetTicks;
+			return job;
+		}
+
+		// la salle danse une ou deux fois par soiree, et seulement quand un instrument joue
+		public static bool HallIsLively(IntVec3 spot, Map map)
+		{
+			GameComponent_FeastState comp = GameComponent_FeastState.Get();
+			int start = comp?.FeastStartTick(spot) ?? -1;
+			if (start < 0) return false;
+			float t = (Find.TickManager.TicksGame - start) / (float)GameComponent_FeastState.FeastDurationTicks;
+			bool second = Rand.ValueSeeded(start) < 0.5f;
+			// aux noces, la premiere danse des maries ouvre le bal quelle que soit l'heure
+			bool open = (t >= 0.35f && t < 0.5f) || (second && t >= 0.7f && t < 0.85f) || comp.BallOpen(spot);
+			return open && MusicPlayingIn(spot, map);
 		}
 
 		// la limite compte le verre lui-meme: un vin MO monte de 0.22 d'un coup

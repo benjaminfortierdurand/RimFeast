@@ -17,6 +17,24 @@
 	</JobDef>
 
 	<JobDef>
+		<defName>RimFeast_DanceJob</defName>
+		<driverClass>RimFeast.Jobs.JobDriver_DanceAtFeast</driverClass>
+		<reportString>dancing with TargetA.</reportString>
+	</JobDef>
+
+	<JobDef>
+		<defName>RimFeast_CongaJob</defName>
+		<driverClass>RimFeast.Jobs.JobDriver_Conga</driverClass>
+		<reportString>doing the conga.</reportString>
+	</JobDef>
+
+	<JobDef>
+		<defName>RimFeast_RoundJob</defName>
+		<driverClass>RimFeast.Jobs.JobDriver_Round</driverClass>
+		<reportString>dancing in a circle.</reportString>
+	</JobDef>
+
+	<JobDef>
 		<defName>RimFeast_AssassinateJob</defName>
 		<driverClass>RimFeast.Jobs.JobDriver_AssassinateGuest</driverClass>
 		<reportString>assassinating TargetA.</reportString>

@@ -12,6 +12,9 @@
 	<RimFeast_ColonyDisabledGathering>une fête, une cérémonie ou une caravane rassemble déjà vos gens</RimFeast_ColonyDisabledGathering>
 	<RimFeast_ColonyDisabledNobody>Personne n'est disponible pour présider un banquet pour l'instant.</RimFeast_ColonyDisabledNobody>
 	<RimFeast_ColonyFeastBegins>{0} appelle la colonie au banquet.</RimFeast_ColonyFeastBegins>
+	<RimFeast_CongaStarts>{0} lance une chenille.</RimFeast_CongaStarts>
+	<RimFeast_DanceInvite>{0} invite {1} à danser.</RimFeast_DanceInvite>
+	<RimFeast_RoundStarts>{0} lance une ronde.</RimFeast_RoundStarts>
 	<RimFeast_ColonyToast>{0} lève son verre. La salle se tait pour l'écouter.</RimFeast_ColonyToast>
 	<RimFeast_ColonyFeastOver>Le banquet de la colonie est terminé. {0}</RimFeast_ColonyFeastOver>
 	<RimFeast_InviteDisabledNoHouses>Aucune maison noble ne veut traiter avec vous.</RimFeast_InviteDisabledNoHouses>
@@ -127,12 +130,24 @@
 	<RimFeast_TextPoisonRevealed>Dans les jours qui suivent le banquet, vos colons tombent malades l'un après l'autre, et la vérité remonte : le cortège de {0} a empoisonné votre table en souriant pendant que vous buviez à leur santé.\n\nBrûlez ce qui reste de ce festin.</RimFeast_TextPoisonRevealed>
 
 	<RimFeast_LabelProposal>Une demande en mariage</RimFeast_LabelProposal>
-	<RimFeast_TextProposal>{0} de {1} a le cœur pris par votre colon {2} d'un bout à l'autre de la table, et demande sa main.\n\nSi vous acceptez, {2} entre dans la maison par les liens du mariage et repart avec le cortège, scellant une parenté entre vous. Vous ne reverrez plus {2}, mais la maison vous appellera famille.\n\nSi vous refusez, sans mal : de telles demandes se font à tout grand banquet.</RimFeast_TextProposal>
-	<RimFeast_ProposalAccept>Donner votre bénédiction (mariage dans la maison, départ avec le cortège)</RimFeast_ProposalAccept>
+	<RimFeast_TextProposal>{0} de {1} a le cœur pris par votre colon {2} d'un bout à l'autre de la table, et demande sa main.\n\nSi vous acceptez, ce sont des fiançailles. La maison reviendra dans quelques jours célébrer les noces dans votre salle, et à la fin de ce banquet {2} repartira avec elle pour de bon. Vous ne reverrez plus {2}, mais la maison vous appellera famille.\n\nSi vous refusez, sans mal : de telles demandes se font à tout grand banquet.</RimFeast_TextProposal>
+	<RimFeast_ProposalAccept>Donner votre bénédiction (fiançailles, puis banquet de noces dans quelques jours)</RimFeast_ProposalAccept>
 	<RimFeast_ProposalDecline>Refuser le parti</RimFeast_ProposalDecline>
-	<RimFeast_LabelBetrothed>Un mariage dans la maison</RimFeast_LabelBetrothed>
-	<RimFeast_TextBetrothed>{0} et {1} sont mariés. À la fin du banquet, {0} rassemble ses affaires et s'en va avec le cortège de {2}, noble de la maison désormais. Vos salles sont plus silencieuses, mais vous avez de la parenté dans la noblesse.</RimFeast_TextBetrothed>
+	<RimFeast_LabelBetrothed>Fiançailles</RimFeast_LabelBetrothed>
+	<RimFeast_TextBetrothed>{0} et {1} sont fiancés. {2} reviendra dans quelques jours célébrer les noces dans votre salle. Dressez une table à la hauteur : à la fin du banquet, {0} partira avec le cortège, noble de la maison désormais.</RimFeast_TextBetrothed>
 	<RimFeast_MessageProposalDeclined>Vous refusez le parti. La maison {0} le prend avec grâce.</RimFeast_MessageProposalDeclined>
+	<RimFeast_LabelWeddingComing>Le cortège de noces se met en route</RimFeast_LabelWeddingComing>
+	<RimFeast_TextWeddingComing>{0} est en route pour marier {1} et {2}. Le banquet de noces se tient à votre haut bout de table et sera jugé comme les autres : dressez la table.</RimFeast_TextWeddingComing>
+	<RimFeast_LabelWeddingArrive>Cortège de noces</RimFeast_LabelWeddingArrive>
+	<RimFeast_TextWeddingArrive>Le cortège de noces de {0} est arrivé : {1} convives, dont {2}, pour épouser {3}. Les vœux sont prononcés au premier toast.</RimFeast_TextWeddingArrive>
+	<RimFeast_MessageWeddingToast>On porte un toast à {0} et {1}. La salle se tait pour les vœux.</RimFeast_MessageWeddingToast>
+	<RimFeast_LabelWed>Un mariage dans la maison</RimFeast_LabelWed>
+	<RimFeast_TextWed>{0} et {1} sont mariés. À la fin du banquet, {0} s'en ira avec le cortège de {2}, noble de la maison désormais. Vos salles seront plus silencieuses, mais vous avez de la parenté dans la noblesse.</RimFeast_TextWed>
+	<RimFeast_MessageFirstDance>{0} et {1} ouvrent le bal.</RimFeast_MessageFirstDance>
+	<RimFeast_LabelWeddingOff>Le mariage est annulé</RimFeast_LabelWeddingOff>
+	<RimFeast_TextWeddingOff>Le mariage de {0} et {1}, de {2}, n'aura pas lieu. Les fiançailles sont rompues.</RimFeast_TextWeddingOff>
+	<RimFeast_WeddingPendingLine>{0} doit épouser {1}, de {2}. Leur cortège se met en route d'ici {3} jours.</RimFeast_WeddingPendingLine>
+	<RimFeast_SpotWeddingInvited>Le cortège de noces de {0} est en route.</RimFeast_SpotWeddingInvited>
 	<RimFeast_LabelPactOffered>Accord commercial</RimFeast_LabelPactOffered>
 	<RimFeast_TextPactOffered>{0} a quitté votre salle le ventre plein et le cœur content. Leur intendant vous enverra un marchand de la maison d'ici quelques jours, celui dont ils pourront se passer.</RimFeast_TextPactOffered>
 	<RimFeast_LabelPactChoice>Accord commercial proposé</RimFeast_LabelPactChoice>
@@ -239,5 +254,51 @@
 	<RimFeast_SpotTraveling>Cortège de {0} en route.</RimFeast_SpotTraveling>
 	<RimFeast_SpotFeasting>Banquet en cours avec {0}.</RimFeast_SpotFeasting>
 	<RimFeast_SpotLeaderLine>{0}, chef de la maison, est là en personne. L'estime gagnée ce soir compte moitié plus.</RimFeast_SpotLeaderLine>
+	<RimFeast_TabChronicle>Chronique</RimFeast_TabChronicle>
+	<RimFeast_ChronTitle>Chronique des banquets</RimFeast_ChronTitle>
+	<RimFeast_ChronSummary>Soirées consignées : {0}. Meilleure table : {1} sur 100.</RimFeast_ChronSummary>
+	<RimFeast_ChronSummaryPlain>Soirées consignées : {0}.</RimFeast_ChronSummaryPlain>
+	<RimFeast_ChronEmpty>Aucun banquet n'a encore eu lieu. Chaque soirée sera consignée ici : le verdict, qui a dansé avec qui, et qui n'est pas ressorti de la salle.</RimFeast_ChronEmpty>
+	<RimFeast_ChronKindFeast>Banquet</RimFeast_ChronKindFeast>
+	<RimFeast_ChronKindWedding>Banquet de noces</RimFeast_ChronKindWedding>
+	<RimFeast_ChronKindColony>Banquet de la colonie</RimFeast_ChronKindColony>
+	<RimFeast_ChronKindAway>À leur table</RimFeast_ChronKindAway>
+	<RimFeast_ChronKindRed>Banquet rouge</RimFeast_ChronKindRed>
+	<RimFeast_ChronGoodwill>{0} de bonne entente</RimFeast_ChronGoodwill>
+	<RimFeast_ChronMood>{0} d'humeur</RimFeast_ChronMood>
+	<RimFeast_ChronHall>Salle</RimFeast_ChronHall>
+	<RimFeast_ChronTable>Table</RimFeast_ChronTable>
+	<RimFeast_ChronDrink>Boisson</RimFeast_ChronDrink>
+	<RimFeast_ChronEnt>Toasts et musique</RimFeast_ChronEnt>
+	<RimFeast_ChronStats>Convives : {0}   Toasts : {1}</RimFeast_ChronStats>
+	<RimFeast_ChronStatsColony>À table : {0}   Toasts : {1}</RimFeast_ChronStatsColony>
+	<RimFeast_ChronLeader>{0}, à la tête de la maison, a fait le voyage en personne.</RimFeast_ChronLeader>
+	<RimFeast_ChronGift>Le cortège a apporté un présent.</RimFeast_ChronGift>
+	<RimFeast_ChronDance>{0} a dansé avec {1}.</RimFeast_ChronDance>
+	<RimFeast_ChronConga>{0} a mené une chenille à {2}.</RimFeast_ChronConga>
+	<RimFeast_ChronRound>{0} a lancé une ronde à {2}.</RimFeast_ChronRound>
+	<RimFeast_ChronBrawl>{0} et {1} en sont venus aux mains.</RimFeast_ChronBrawl>
+	<RimFeast_ChronBetrothed>{0} a demandé la main de {1}. Vous avez donné votre bénédiction.</RimFeast_ChronBetrothed>
+	<RimFeast_ChronDeclined>{0} a demandé la main de {1}. Vous avez refusé.</RimFeast_ChronDeclined>
+	<RimFeast_ChronWed>{0} et {1} se sont mariés.</RimFeast_ChronWed>
+	<RimFeast_ChronFirstDance>{0} et {1} ont ouvert le bal.</RimFeast_ChronFirstDance>
+	<RimFeast_ChronGave>Le cortège a demandé {0}, et l'a emporté.</RimFeast_ChronGave>
+	<RimFeast_ChronRival>Vous avez renié {0} devant tout le monde.</RimFeast_ChronRival>
+	<RimFeast_ChronWard>{0} a suivi le cortège pour devenir page.</RimFeast_ChronWard>
+	<RimFeast_ChronRefused>Le cortège a demandé quelque chose. Vous avez dit non.</RimFeast_ChronRefused>
+	<RimFeast_ChronBedYes>{0} a passé la nuit avec {1}.</RimFeast_ChronBedYes>
+	<RimFeast_ChronBedNo>{0} a éconduit {1}.</RimFeast_ChronBedNo>
+	<RimFeast_ChronPoisoner>On a surpris {0} à empoisonner les plats.</RimFeast_ChronPoisoner>
+	<RimFeast_ChronPoisoned>{0} a empoisonné les plats, et vos gens sont tombés malades.</RimFeast_ChronPoisoned>
+	<RimFeast_ChronSlain>{0} a trouvé la mort à table.</RimFeast_ChronSlain>
+	<RimFeast_ChronFallen>{0} est à terre, mais respire encore.</RimFeast_ChronFallen>
+	<RimFeast_ChronLost>Vous avez perdu {0} dans le combat.</RimFeast_ChronLost>
+	<RimFeast_ChronNameless>{2} autres convives ne sont pas ressortis de la salle.</RimFeast_ChronNameless>
+	<RimFeast_ChronWar>C'est la guerre avec {0}.</RimFeast_ChronWar>
+	<RimFeast_ChronBlood>Le sang a coulé sous votre toit.</RimFeast_ChronBlood>
+	<RimFeast_ChronBrawlDeath>Un convive est mort dans une rixe d'ivrognes.</RimFeast_ChronBrawlDeath>
+	<RimFeast_ChronUnwed>Le mariage de {0} et {1} n'a pas eu lieu.</RimFeast_ChronUnwed>
+	<RimFeast_ChronCaravan>Le cortège a promis une caravane marchande.</RimFeast_ChronCaravan>
+	<RimFeast_ChronSilver>Le cortège a laissé {2} pièces d'argent sur la table.</RimFeast_ChronSilver>
 
 </LanguageData>

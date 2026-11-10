@@ -4,5 +4,8 @@
 	<RimFeast_AssassinateJob.reportString>assassine TargetA.</RimFeast_AssassinateJob.reportString>
 	<RimFeast_SitAtFeastJob.reportString>festoie à table.</RimFeast_SitAtFeastJob.reportString>
 	<RimFeast_EatAtSeatJob.reportString>mange TargetA.</RimFeast_EatAtSeatJob.reportString>
+	<RimFeast_DanceJob.reportString>danse avec TargetA.</RimFeast_DanceJob.reportString>
+	<RimFeast_CongaJob.reportString>fait la chenille.</RimFeast_CongaJob.reportString>
+	<RimFeast_RoundJob.reportString>danse la ronde.</RimFeast_RoundJob.reportString>
 
 </LanguageData>
