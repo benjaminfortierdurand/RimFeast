@@ -143,6 +143,76 @@ namespace RimFeast.Debug
 			if (comp != null) Log.Message(comp.DebugMusicReport());
 		}
 
+		[DebugAction("RimFeast", "Grand Feast now",
+			allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void GrandNow()
+		{
+			Map map = Find.CurrentMap;
+			GameComponent_FeastState comp = GameComponent_FeastState.Get();
+			if (map == null || comp == null) return;
+			Thing spot = null;
+			foreach (Building b in map.listerBuildings.AllBuildingsColonistOfDef(RimFeastDefOf.RimFeast_FeastSpot))
+			{
+				spot = b;
+				break;
+			}
+			if (spot == null || comp.Busy)
+			{
+				Messages.Message("RimFeast: needs a feast spot and no feast planned or underway.",
+					MessageTypeDefOf.RejectInput, historical: false);
+				return;
+			}
+			comp.StartGrandInvite(map, spot, false, force: true);
+			if (comp.CurrentCase == null)
+				Messages.Message("RimFeast: fewer than two houses would come.", MessageTypeDefOf.RejectInput,
+					historical: false);
+			else comp.DebugRush();
+		}
+
+		[DebugAction("RimFeast", "Grand red feast now",
+			allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void GrandTrapNow()
+		{
+			GameComponent_FeastState comp = GameComponent_FeastState.Get();
+			if (comp != null) comp.debugForcePlanned = true;
+			GrandNow();
+		}
+
+		[DebugAction("RimFeast", "Cheer now",
+			allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void CheerNow()
+		{
+			GameComponent_FeastState.Get()?.DebugCheer();
+		}
+
+		[DebugAction("RimFeast", "Country dance now (click a feaster)",
+			actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void SetDanceNow(Pawn p)
+		{
+			Verse.AI.Job job = AI.JobGiver_SetDanceAtFeast.TrySetDance(p, true, out string why);
+			if (job == null)
+			{
+				Messages.Message("RimFeast: no country dance for " + p.LabelShort + ": " + why, p,
+					MessageTypeDefOf.RejectInput, historical: false);
+				return;
+			}
+			p.jobs.TryTakeOrderedJob(job, Verse.AI.JobTag.Misc);
+		}
+
+		[DebugAction("RimFeast", "Drinking contest now (click a feaster)",
+			actionType = DebugActionType.ToolMapForPawns, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void ContestNow(Pawn p)
+		{
+			Verse.AI.Job job = AI.JobGiver_ContestAtFeast.TryContest(p, true, out string why);
+			if (job == null)
+			{
+				Messages.Message("RimFeast: no drinking contest for " + p.LabelShort + ": " + why, p,
+					MessageTypeDefOf.RejectInput, historical: false);
+				return;
+			}
+			p.jobs.TryTakeOrderedJob(job, Verse.AI.JobTag.Misc);
+		}
+
 		[DebugAction("RimFeast", "Rush pending weddings",
 			allowedGameStates = AllowedGameStates.PlayingOnMap)]
 		private static void RushWeddings()

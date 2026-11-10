@@ -6,7 +6,7 @@
 	<RimFeast_InviteGizmoDesc>Envoyer un messager porteur de présents pour inviter une maison noble à banqueter ici. Coûte {0} pièces d'argent pour une maison qui n'a jamais dîné chez vous. Une maison qui a festoyé ici récemment exige de plus riches présents, et se laisse moins impressionner une deuxième fois. Laissez passer une saison et la nouveauté revient.</RimFeast_InviteGizmoDesc>
 	<RimFeast_InviteDisabledBusy>un banquet est déjà prévu ou en cours</RimFeast_InviteDisabledBusy>
 	<RimFeast_ColonyGizmoLabel>banquet de la colonie</RimFeast_ColonyGizmoLabel>
-	<RimFeast_ColonyGizmoDesc>Organisez un banquet pour vos propres gens, sans invités. Vos colons se réunissent dans la zone du banquet pour manger, boire et écouter de la musique. Leur humeur ensuite dépend de la salle, de la table et de la boisson. Une fois tous les {0} jours.</RimFeast_ColonyGizmoDesc>
+	<RimFeast_ColonyGizmoDesc>Organisez un banquet pour vos propres gens, sans invités. Vos colons se réunissent dans la zone du banquet pour manger, boire et écouter de la musique. Leur humeur ensuite dépend de la salle, de la table et de la boisson. Un banquet ordinaire tous les {0} jours. Une veillée, un banquet de victoire ou une fête des moissons peuvent s'y ajouter quand l'occasion se présente.</RimFeast_ColonyGizmoDesc>
 	<RimFeast_ColonyDisabledCooldown>vos gens ont festoyé récemment, prochain banquet dans {0} jours</RimFeast_ColonyDisabledCooldown>
 	<RimFeast_ColonyDisabledDanger>pas avec un danger sur la carte</RimFeast_ColonyDisabledDanger>
 	<RimFeast_ColonyDisabledGathering>une fête, une cérémonie ou une caravane rassemble déjà vos gens</RimFeast_ColonyDisabledGathering>
@@ -15,8 +15,55 @@
 	<RimFeast_CongaStarts>{0} lance une chenille.</RimFeast_CongaStarts>
 	<RimFeast_DanceInvite>{0} invite {1} à danser.</RimFeast_DanceInvite>
 	<RimFeast_RoundStarts>{0} lance une ronde.</RimFeast_RoundStarts>
+	<RimFeast_SetDanceStarts>{0} lance une contredanse.</RimFeast_SetDanceStarts>
+	<RimFeast_ContestStarts>{0} défie {1} à un concours de boisson.</RimFeast_ContestStarts>
+	<RimFeast_ContestWon>{0} fait rouler {1} sous la table après {2} chopes.</RimFeast_ContestWon>
+	<RimFeast_ContestDraw>{0} et {1} s'arrêtent à égalité après {2} chopes.</RimFeast_ContestDraw>
+	<RimFeast_GrandGuests>les maisons nobles</RimFeast_GrandGuests>
+	<RimFeast_GrandOption>Le Grand Banquet : toutes les maisons à la fois ({0} maisons, {1} argent)</RimFeast_GrandOption>
+	<RimFeast_GrandOptionBlocked>Le Grand Banquet ({0})</RimFeast_GrandOptionBlocked>
+	<RimFeast_GrandCooldown>une fois par an, de nouveau dans {0} jours</RimFeast_GrandCooldown>
+	<RimFeast_GrandNeedHouses>il faut au moins {0} maisons prêtes à venir</RimFeast_GrandNeedHouses>
+	<RimFeast_GrandConfirm>Envoyer un messager à chaque maison : {0}.\n\nElles arrivent toutes le même soir et partagent votre salle. Chaque maison juge le banquet pour elle-même. Il vous en coûte {1} pièces d'argent, et cela ne se fait qu'une fois par an.</RimFeast_GrandConfirm>
+	<RimFeast_GrandConfirmPlanned>Envoyer un messager à chaque maison : {0}.\n\nElles arrivent toutes le même soir, et aucune n'est censée repartir. Versez le sang de la moitié des convives et c'est la guerre avec chaque maison présente. Il vous en coûte {1} pièces d'argent, et cela ne se fait qu'une fois par an.</RimFeast_GrandConfirmPlanned>
+	<RimFeast_GrandFeuds>De vieilles querelles s'assiéront à la même table : {0}.</RimFeast_GrandFeuds>
+	<RimFeast_GrandFeudPair>{0} et {1}</RimFeast_GrandFeudPair>
+	<RimFeast_LabelGrandSent>Le Grand Banquet est annoncé</RimFeast_LabelGrandSent>
+	<RimFeast_TextGrandSent>Vos messagers partent vers {0} maisons : {1}. Elles arriveront toutes le même soir. Dressez une table pour une foule.</RimFeast_TextGrandSent>
+	<RimFeast_TextGrandSentPlanned>Vos messagers partent vers {0} maisons : {1}. Elles arriveront toutes le même soir, et vous comptez les enterrer ensemble.</RimFeast_TextGrandSentPlanned>
+	<RimFeast_LabelGrandArrive>Les maisons arrivent</RimFeast_LabelGrandArrive>
+	<RimFeast_TextGrandArrive>{0} cortèges arrivent de tous côtés, {1} convives sous leurs bannières : {2}. Ils se dirigent vers votre salle de banquet.</RimFeast_TextGrandArrive>
+	<RimFeast_GrandHead>{0}, à la tête de {1}, a fait le voyage en personne.</RimFeast_GrandHead>
+	<RimFeast_GrandFeudBrawl>La vieille querelle entre {0} et {1} ressort au-dessus des coupes.</RimFeast_GrandFeudBrawl>
+	<RimFeast_LabelGrandVerdict>Le Grand Banquet : le verdict</RimFeast_LabelGrandVerdict>
+	<RimFeast_TextGrandVerdict>Les maisons repartent, chacune avec son propre récit de la soirée.</RimFeast_TextGrandVerdict>
+	<RimFeast_GrandVerdictLine>{0} : {1} ({2})</RimFeast_GrandVerdictLine>
+	<RimFeast_GrandNoToast>Personne n'a levé sa coupe en son honneur.</RimFeast_GrandNoToast>
+	<RimFeast_GrandBrawled>Ses gens en sont venus aux mains.</RimFeast_GrandBrawled>
+	<RimFeast_GrandPeace>{0} et {1} ont enterré une vieille querelle à votre table. Les deux vous en savent gré.</RimFeast_GrandPeace>
+	<RimFeast_GrandSilver>Une nuit pareille se paie : {0} pièces d'argent sont laissées sur la table.</RimFeast_GrandSilver>
+	<RimFeast_TextRedGrand>Vous avez massacré la noblesse de la région sous votre propre toit : {0} convives gisent morts ou brisés, de {1} maisons. Chacune de ces maisons est désormais en guerre contre vous, et leurs cavaliers ne tarderont pas.</RimFeast_TextRedGrand>
 	<RimFeast_ColonyToast>{0} lève son verre. La salle se tait pour l'écouter.</RimFeast_ColonyToast>
 	<RimFeast_ColonyFeastOver>Le banquet de la colonie est terminé. {0}</RimFeast_ColonyFeastOver>
+	<RimFeast_OccasionPlain>Un banquet ordinaire</RimFeast_OccasionPlain>
+	<RimFeast_OccasionWake>Une veillée pour {0}</RimFeast_OccasionWake>
+	<RimFeast_OccasionWakeNone>Une veillée (personne à pleurer)</RimFeast_OccasionWakeNone>
+	<RimFeast_OccasionVictory>Un banquet de victoire</RimFeast_OccasionVictory>
+	<RimFeast_OccasionVictoryNone>Un banquet de victoire (aucune attaque repoussée depuis {0} jours)</RimFeast_OccasionVictoryNone>
+	<RimFeast_OccasionVictoryHeld>Un banquet de victoire (déjà tenu pour la dernière attaque)</RimFeast_OccasionVictoryHeld>
+	<RimFeast_OccasionHarvest>Une fête des moissons</RimFeast_OccasionHarvest>
+	<RimFeast_OccasionHarvestLow>Une fête des moissons (il faut {0} jours de vivres en réserve, il y en a {1})</RimFeast_OccasionHarvestLow>
+	<RimFeast_OccasionHarvestHeld>Une fête des moissons (une fois par an, de nouveau dans {0} jours)</RimFeast_OccasionHarvestHeld>
+	<RimFeast_WakeBegins>{0} appelle la colonie à la veillée de {1}.</RimFeast_WakeBegins>
+	<RimFeast_VictoryBegins>{0} appelle la colonie au banquet de victoire.</RimFeast_VictoryBegins>
+	<RimFeast_HarvestBegins>{0} appelle la colonie à la fête des moissons.</RimFeast_HarvestBegins>
+	<RimFeast_WakeToast>{0} lève sa coupe à la mémoire de {1}. La salle se tait.</RimFeast_WakeToast>
+	<RimFeast_VictoryToast>{0} porte un toast à la victoire. La salle rugit.</RimFeast_VictoryToast>
+	<RimFeast_HarvestToast>{0} porte un toast aux moissons et aux mains qui les ont rentrées.</RimFeast_HarvestToast>
+	<RimFeast_WakeOver>La veillée est terminée. Ceux qui y ont pris part portent le deuil de {0} un peu moins lourdement. {1}</RimFeast_WakeOver>
+	<RimFeast_SpotWake>La colonie tient la veillée de {0}.</RimFeast_SpotWake>
+	<RimFeast_SpotVictory>La colonie fête sa victoire.</RimFeast_SpotVictory>
+	<RimFeast_SpotHarvest>La colonie fête les moissons.</RimFeast_SpotHarvest>
 	<RimFeast_InviteDisabledNoHouses>Aucune maison noble ne veut traiter avec vous.</RimFeast_InviteDisabledNoHouses>
 	<RimFeast_InviteOption>Inviter {0} (relations {1}, {2} argent)</RimFeast_InviteOption>
 	<RimFeast_InviteOptionAgain>Inviter {0} (relations {1}, {2} argent, a déjà festoyé ici {3}x)</RimFeast_InviteOptionAgain>
@@ -106,6 +153,9 @@
 	<RimFeast_SetTreacheryGoodwill>Seuil de relations pour la traîtrise : {0}</RimFeast_SetTreacheryGoodwill>
 	<RimFeast_SetCensoredMusic>Utiliser l&apos;autre morceau du banquet rouge</RimFeast_SetCensoredMusic>
 	<RimFeast_SetCensoredMusicTip>Le banquet rouge joue une reprise d'un certain air d'une certaine série. Cochez pour utiliser un autre morceau à la place, même scène, même signal, sans souci de droits.</RimFeast_SetCensoredMusicTip>
+	<RimFeast_SetNeutral>Vocabulaire neutre</RimFeast_SetNeutral>
+	<RimFeast_SetNeutralTip>Pour les parties qui ne sont pas médiévales. Les textes disent faction, groupe et délégué là où ils disaient maison, cortège et noble, et plus personne ne chevauche. Prend effet à la fermeture de cette fenêtre.</RimFeast_SetNeutralTip>
+	<RimFeast_NeutralWords>maisons nobles=factions|maison noble=faction|une table noble=leur table|la bannière de leur maison=leurs couleurs|sous leurs bannières=sous leurs couleurs|noble de la maison=membre de la faction|maisons=factions|maison=faction|cortèges=groupes|cortège=groupe|la noblesse de la région=les dirigeants de la région|dans la noblesse=chez eux|noblesse=haute société|nobles=délégués|noble=délégué|seigneurs=chefs|seigneur=chef|chevaliers=gardes|chevalier=garde|bannières=couleurs|bannière=couleur|leurs cavaliers=leurs combattants|cavaliers=combattants|cavalier=messager|chevauchant sous=sous|chevauche en personne avec=voyage en personne avec|chevaucher=voyager|chevauche=voyage|part au galop=part|hydromel=alcool</RimFeast_NeutralWords>
 	<RimFeast_SetFadeDays>Une maison oublie un banquet tous les {0} jours</RimFeast_SetFadeDays>
 	<RimFeast_SetRedWeddingDays>La rumeur d'un banquet rouge court {0} jours</RimFeast_SetRedWeddingDays>
 
@@ -300,5 +350,16 @@
 	<RimFeast_ChronUnwed>Le mariage de {0} et {1} n'a pas eu lieu.</RimFeast_ChronUnwed>
 	<RimFeast_ChronCaravan>Le cortège a promis une caravane marchande.</RimFeast_ChronCaravan>
 	<RimFeast_ChronSilver>Le cortège a laissé {2} pièces d'argent sur la table.</RimFeast_ChronSilver>
+	<RimFeast_ChronKindWake>Veillée</RimFeast_ChronKindWake>
+	<RimFeast_ChronKindVictory>Banquet de victoire</RimFeast_ChronKindVictory>
+	<RimFeast_ChronKindHarvest>Fête des moissons</RimFeast_ChronKindHarvest>
+	<RimFeast_ChronInMemory>Tenu à la mémoire de {0}.</RimFeast_ChronInMemory>
+	<RimFeast_ChronSetDance>{0} a lancé une contredanse à {2}.</RimFeast_ChronSetDance>
+	<RimFeast_ChronContest>{0} a fait rouler {1} sous la table en {2} chopes.</RimFeast_ChronContest>
+	<RimFeast_ChronContestDraw>{0} et {1} ont bu jusqu'à l'égalité.</RimFeast_ChronContestDraw>
+	<RimFeast_ChronKindGrand>Grand Banquet</RimFeast_ChronKindGrand>
+	<RimFeast_ChronHouseVerdict>{0} : {1} ({2})</RimFeast_ChronHouseVerdict>
+	<RimFeast_ChronPeace>{0} et {1} ont enterré une vieille querelle à votre table.</RimFeast_ChronPeace>
+	<RimFeast_ChronFeudBrawl>La querelle entre {0} et {1} est ressortie au-dessus des coupes.</RimFeast_ChronFeudBrawl>
 
 </LanguageData>

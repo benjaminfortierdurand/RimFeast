@@ -27,6 +27,10 @@ namespace RimFeast
 		public static JobDef RimFeast_DanceJob;
 		public static JobDef RimFeast_CongaJob;
 		public static JobDef RimFeast_RoundJob;
+		public static JobDef RimFeast_SetDanceJob;
+		public static JobDef RimFeast_CheerJob;
+		public static JobDef RimFeast_ContestJob;
+		public static JobDef RimFeast_WatchContestJob;
 
 		public static SongDef RimFeast_RedWeddingSong;
 		public static SoundDef RimFeast_RedWeddingPerformance;
@@ -35,6 +39,10 @@ namespace RimFeast
 
 		public static ThoughtDef RimFeast_AttendedFeast;
 		public static ThoughtDef RimFeast_ColonyFeast;
+		public static ThoughtDef RimFeast_Wake;
+		public static ThoughtDef RimFeast_VictoryFeast;
+		public static ThoughtDef RimFeast_HarvestFeast;
+		public static ThoughtDef RimFeast_WonContest;
 		public static ThoughtDef RimFeast_DancedWith;
 		public static ThoughtDef RimFeast_NightWithNoble;
 		public static ThoughtDef RimFeast_GuestRightBroken;

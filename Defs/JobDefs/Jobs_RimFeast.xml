@@ -35,6 +35,30 @@
 	</JobDef>
 
 	<JobDef>
+		<defName>RimFeast_SetDanceJob</defName>
+		<driverClass>RimFeast.Jobs.JobDriver_SetDance</driverClass>
+		<reportString>dancing a country dance.</reportString>
+	</JobDef>
+
+	<JobDef>
+		<defName>RimFeast_CheerJob</defName>
+		<driverClass>RimFeast.Jobs.JobDriver_Cheer</driverClass>
+		<reportString>cheering.</reportString>
+	</JobDef>
+
+	<JobDef>
+		<defName>RimFeast_ContestJob</defName>
+		<driverClass>RimFeast.Jobs.JobDriver_DrinkContest</driverClass>
+		<reportString>in a drinking contest with TargetA.</reportString>
+	</JobDef>
+
+	<JobDef>
+		<defName>RimFeast_WatchContestJob</defName>
+		<driverClass>RimFeast.Jobs.JobDriver_WatchContest</driverClass>
+		<reportString>watching the drinking contest.</reportString>
+	</JobDef>
+
+	<JobDef>
 		<defName>RimFeast_AssassinateJob</defName>
 		<driverClass>RimFeast.Jobs.JobDriver_AssassinateGuest</driverClass>
 		<reportString>assassinating TargetA.</reportString>

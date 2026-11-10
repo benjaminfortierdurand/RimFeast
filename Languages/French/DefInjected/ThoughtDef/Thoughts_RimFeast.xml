@@ -13,6 +13,36 @@
 	<RimFeast_ColonyFeast.stages.3.label>un banquet entre nous inoubliable</RimFeast_ColonyFeast.stages.3.label>
 	<RimFeast_ColonyFeast.stages.3.description>La salle, la viande, la boisson, la musique. Personne n'oubliera cette nuit-là.</RimFeast_ColonyFeast.stages.3.description>
 
+	<RimFeast_Wake.stages.0.label>une veillée bien maigre</RimFeast_Wake.stages.0.label>
+	<RimFeast_Wake.stages.0.description>Nous avons levé le peu que nous avions à sa mémoire.</RimFeast_Wake.stages.0.description>
+	<RimFeast_Wake.stages.1.label>une veillée correcte</RimFeast_Wake.stages.1.label>
+	<RimFeast_Wake.stages.1.description>Nous nous sommes assis ensemble pour parler de nos morts. Cela a fait du bien.</RimFeast_Wake.stages.1.description>
+	<RimFeast_Wake.stages.2.label>une belle veillée</RimFeast_Wake.stages.2.label>
+	<RimFeast_Wake.stages.2.description>Une table garnie et des coupes pleines à la mémoire d'un des nôtres. Cela lui aurait plu.</RimFeast_Wake.stages.2.description>
+	<RimFeast_Wake.stages.3.label>une veillée à sa mesure</RimFeast_Wake.stages.3.label>
+	<RimFeast_Wake.stages.3.description>Toute la salle a bu à son nom. Personne ne quitte cette colonie sans un chant.</RimFeast_Wake.stages.3.description>
+
+	<RimFeast_VictoryFeast.stages.0.label>un maigre banquet de victoire</RimFeast_VictoryFeast.stages.0.label>
+	<RimFeast_VictoryFeast.stages.0.description>Nous avons gagné, et il n'y avait pas grand-chose pour le fêter.</RimFeast_VictoryFeast.stages.0.description>
+	<RimFeast_VictoryFeast.stages.1.label>un modeste banquet de victoire</RimFeast_VictoryFeast.stages.1.label>
+	<RimFeast_VictoryFeast.stages.1.description>Nous avons tenu les murs, et nous avons bu à cela.</RimFeast_VictoryFeast.stages.1.description>
+	<RimFeast_VictoryFeast.stages.2.label>un beau banquet de victoire</RimFeast_VictoryFeast.stages.2.label>
+	<RimFeast_VictoryFeast.stages.2.description>Ils sont venus pour nous, et c'est nous qui festoyons ce soir.</RimFeast_VictoryFeast.stages.2.description>
+	<RimFeast_VictoryFeast.stages.3.label>un banquet de victoire inoubliable</RimFeast_VictoryFeast.stages.3.label>
+	<RimFeast_VictoryFeast.stages.3.description>La salle a rugi. Qu'ils reviennent.</RimFeast_VictoryFeast.stages.3.description>
+
+	<RimFeast_HarvestFeast.stages.0.label>une maigre fête des moissons</RimFeast_HarvestFeast.stages.0.label>
+	<RimFeast_HarvestFeast.stages.0.description>Les réserves sont pleines, même si la table ne l'était pas.</RimFeast_HarvestFeast.stages.0.description>
+	<RimFeast_HarvestFeast.stages.1.label>une modeste fête des moissons</RimFeast_HarvestFeast.stages.1.label>
+	<RimFeast_HarvestFeast.stages.1.description>Une année de travail, et une soirée pour en profiter.</RimFeast_HarvestFeast.stages.1.description>
+	<RimFeast_HarvestFeast.stages.2.label>une belle fête des moissons</RimFeast_HarvestFeast.stages.2.label>
+	<RimFeast_HarvestFeast.stages.2.description>Le grenier est plein, et nous aussi.</RimFeast_HarvestFeast.stages.2.description>
+	<RimFeast_HarvestFeast.stages.3.label>une fête des moissons inoubliable</RimFeast_HarvestFeast.stages.3.label>
+	<RimFeast_HarvestFeast.stages.3.description>Quoi que l'hiver apporte, nous avons mangé comme des seigneurs ce soir.</RimFeast_HarvestFeast.stages.3.description>
+
+	<RimFeast_WonContest.stages.0.label>a gagné un concours de boisson</RimFeast_WonContest.stages.0.label>
+	<RimFeast_WonContest.stages.0.description>Je l'ai fait rouler sous la table, et toute la salle l'a vu.</RimFeast_WonContest.stages.0.description>
+
 	<RimFeast_DancedWith.stages.0.label>a dansé avec moi</RimFeast_DancedWith.stages.0.label>
 
 	<RimFeast_NightWithNoble.stages.0.label>une nuit avec un noble</RimFeast_NightWithNoble.stages.0.label>

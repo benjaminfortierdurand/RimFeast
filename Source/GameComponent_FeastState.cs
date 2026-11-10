@@ -82,6 +82,19 @@ namespace RimFeast
 		public int minstrelTick = -1;
 		public List<Pawn> hosts;
 		public int lastScore = -1;
+		// banquet de la colonie tenu pour une occasion. le mort d'une veillee est note par son numero: sa reference peut disparaitre
+		public int occasion;
+		public int honoredId = -1;
+		public string honoredName;
+		public int contests;
+		// grand banquet: plusieurs maisons dans le meme cortege. guestHouse suit guests rang pour rang
+		public bool grand;
+		public List<Faction> houses;
+		public List<Faction> guestHouse;
+		public List<Faction> toasted;
+		public List<Faction> leaderHouses;
+		public List<Faction> brawlHouses;
+		public bool feudBrawl;
 
 		public void ExposeData()
 		{
@@ -137,6 +150,26 @@ namespace RimFeast
 			Scribe_Values.Look(ref firstDanceDone, "firstDanceDone");
 			Scribe_Values.Look(ref ballUntilTick, "ballUntilTick", -1);
 			Scribe_Collections.Look(ref hosts, "hosts", LookMode.Reference);
+			Scribe_Values.Look(ref occasion, "occasion");
+			Scribe_Values.Look(ref honoredId, "honoredId", -1);
+			Scribe_Values.Look(ref honoredName, "honoredName");
+			Scribe_Values.Look(ref contests, "contests");
+			Scribe_Values.Look(ref grand, "grand");
+			Scribe_Collections.Look(ref houses, "houses", LookMode.Reference);
+			Scribe_Collections.Look(ref guestHouse, "guestHouse", LookMode.Reference);
+			Scribe_Collections.Look(ref toasted, "toasted", LookMode.Reference);
+			Scribe_Collections.Look(ref leaderHouses, "leaderHouses", LookMode.Reference);
+			Scribe_Collections.Look(ref brawlHouses, "brawlHouses", LookMode.Reference);
+			Scribe_Values.Look(ref feudBrawl, "feudBrawl");
+			if (Scribe.mode == LoadSaveMode.PostLoadInit && grand)
+			{
+				if (houses == null) houses = new List<Faction>();
+				if (guestHouse == null) guestHouse = new List<Faction>();
+				if (toasted == null) toasted = new List<Faction>();
+				if (leaderHouses == null) leaderHouses = new List<Faction>();
+				if (brawlHouses == null) brawlHouses = new List<Faction>();
+				houses.RemoveAll(h => h == null);
+			}
 			if (Scribe.mode == LoadSaveMode.PostLoadInit && guests == null)
 				guests = new List<Pawn>();
 		}
@@ -294,6 +327,12 @@ namespace RimFeast
 		private List<PendingWedding> weddings = new List<PendingWedding>();
 		private List<ChronicleEntry> chronicle = new List<ChronicleEntry>();
 		private const int MaxChronicle = 80;
+		private List<int> wakesHeld = new List<int>();
+		private int lastVictoryThreatTick = -1;
+		private int lastHarvestFeastTick = -1;
+		private int lastGrandFeastTick = -1;
+		// les querelles refermees a un grand banquet, une cle par paire de maisons
+		private List<int> peace = new List<int>();
 
 		private Faction awayHouse;
 		private int awayExpireTick = -1;
@@ -552,7 +591,7 @@ namespace RimFeast
 			float hall = room != null && !room.PsychologicallyOutdoors
 				? room.GetStat(RoomStatDefOf.Impressiveness) : 0f;
 
-			int expected = Mathf.Max(2, RimFeastMod.S.corteges
+			int expected = c.grand ? GrandExpected(c) : Mathf.Max(2, RimFeastMod.S.corteges
 				+ Mathf.RoundToInt(Mathf.Clamp(c.house.PlayerGoodwill, -100f, 100f) / 50f));
 
 			var tierNutrition = new float[TierValue.Length];
@@ -583,8 +622,10 @@ namespace RimFeast
 		{
 			FeastCase c = current;
 			if (c == null || c.state != FeastCase.Invited || c.spotThing != spot) return;
-			Messages.Message("RimFeast_MessageInviteCancelled".Translate(c.house?.Name),
+			Messages.Message("RimFeast_MessageInviteCancelled".Translate(GuestsName(c)),
 				new TargetInfo(c.spotCell, c.map), MessageTypeDefOf.NeutralEvent, historical: false);
+			// un grand banquet annule ne coute pas l'annee
+			if (c.grand) lastGrandFeastTick = -1;
 			current = null;
 		}
 
@@ -702,6 +743,431 @@ namespace RimFeast
 			return "RimFeast_EtaLine".Translate(when, band);
 		}
 
+		private const int GrandMinHouses = 2;
+		private const int GrandMaxHouses = 5;
+		private const int GrandMaxGuests = 28;
+
+		private static readonly string[] TierKeys =
+		{
+			"RimFeast_LabelFeastPoor", "RimFeast_LabelFeastDecent", "RimFeast_LabelFeastGood", "RimFeast_LabelFeastTriumph",
+		};
+
+		public static string TierLabel(int tier) => TierKeys[Mathf.Clamp(tier, 0, 3)].Translate();
+
+		// le nom a donner aux invites dans un message: une maison, ou "les maisons nobles" au grand banquet
+		public static string GuestsName(FeastCase c) =>
+			c == null ? null : c.grand ? (string)"RimFeast_GrandGuests".Translate() : c.house?.Name;
+
+		private static Faction HouseOfGuest(FeastCase c, Pawn p)
+		{
+			if (c.guestHouse != null)
+			{
+				int i = c.guests.IndexOf(p);
+				if (i >= 0 && i < c.guestHouse.Count && c.guestHouse[i] != null) return c.guestHouse[i];
+			}
+			return c.house;
+		}
+
+		private static int PairKey(Faction a, Faction b) =>
+			Gen.HashCombineInt(Mathf.Min(a.loadID, b.loadID), Mathf.Max(a.loadID, b.loadID));
+
+		// une vieille querelle entre deux maisons: tiree une fois pour toutes dans ce monde, jusqu'a ce qu'un grand banquet la referme
+		public bool Feud(Faction a, Faction b)
+		{
+			if (a == null || b == null || a == b) return false;
+			int key = PairKey(a, b);
+			if (peace.Contains(key)) return false;
+			return a.HostileTo(b) || Rand.ValueSeeded(key ^ Find.World.info.Seed) < 0.25f;
+		}
+
+		private List<Pair<Faction, Faction>> Feuds(List<Faction> houses)
+		{
+			var list = new List<Pair<Faction, Faction>>();
+			for (int i = 0; i < houses.Count; i++)
+				for (int j = i + 1; j < houses.Count; j++)
+					if (Feud(houses[i], houses[j])) list.Add(new Pair<Faction, Faction>(houses[i], houses[j]));
+			return list;
+		}
+
+		private string FeudsText(List<Faction> houses)
+		{
+			List<Pair<Faction, Faction>> feuds = Feuds(houses);
+			if (feuds.Count == 0) return null;
+			return "RimFeast_GrandFeuds".Translate(feuds
+				.Select(f => (string)"RimFeast_GrandFeudPair".Translate(f.First.Name, f.Second.Name))
+				.ToCommaList(useAnd: true));
+		}
+
+		private static int GrandSize(Faction h, int houseCount)
+		{
+			int cap = Mathf.Clamp(GrandMaxGuests / Mathf.Max(1, houseCount), 3, 6);
+			return Mathf.Clamp(3 + Mathf.RoundToInt(Mathf.Clamp(h.PlayerGoodwill, -100f, 100f) / 50f), 3, cap);
+		}
+
+		private static int GrandExpected(FeastCase c) =>
+			c.houses == null ? 0 : c.houses.Where(h => h != null).Sum(h => GrandSize(h, c.houses.Count));
+
+		// null si le grand banquet peut se tenir. les maisons sont rangees de celle qui vous estime le plus a celle qui vous estime le moins
+		public string GrandBlocked(Map map, out List<Faction> houses, out int cost)
+		{
+			houses = FeastUtility.InvitableHouses().Where(h => !HouseRefuses(h, out _))
+				.OrderByDescending(h => h.PlayerGoodwill).Take(GrandMaxHouses).ToList();
+			cost = houses.Sum(h => InviteCostFor(h));
+			if (Busy) return "RimFeast_InviteDisabledBusy".Translate();
+			int wait = lastGrandFeastTick < 0 ? 0
+				: lastGrandFeastTick + GenDate.TicksPerYear - Find.TickManager.TicksGame;
+			if (wait > 0) return "RimFeast_GrandCooldown".Translate(Mathf.CeilToInt(wait / (float)GenDate.TicksPerDay));
+			if (houses.Count < GrandMinHouses) return "RimFeast_GrandNeedHouses".Translate(GrandMinHouses);
+			return null;
+		}
+
+		public string GrandConfirmText(List<Faction> houses, int cost, bool planned)
+		{
+			TaggedString text = (planned ? "RimFeast_GrandConfirmPlanned" : "RimFeast_GrandConfirm").Translate(
+				houses.Select(h => h.Name).ToCommaList(useAnd: true), cost);
+			string feuds = FeudsText(houses);
+			if (feuds != null) text += "\n\n" + feuds;
+			return text;
+		}
+
+		// un dossier comme les autres, a plusieurs maisons. pas de demande en mariage ni de requete a table: trop de maisons a la fois
+		public void StartGrandInvite(Map map, Thing spot, bool planned, bool force = false)
+		{
+			if (map == null || spot == null || Busy) return;
+			string blocked = GrandBlocked(map, out List<Faction> houses, out _);
+			if ((blocked != null && !force) || houses.Count < 2) return;
+			planned = planned || debugForcePlanned;
+			debugForcePlanned = false;
+			current = new FeastCase
+			{
+				id = nextId++,
+				map = map,
+				house = houses[0],
+				spotCell = spot.Position,
+				spotThing = spot,
+				state = FeastCase.Invited,
+				eventTick = ArrivalTick(map, Rand.Range(45000, 75000)),
+				planned = planned,
+				grand = true,
+				houses = houses,
+				guestHouse = new List<Faction>(),
+				toasted = new List<Faction>(),
+				leaderHouses = new List<Faction>(),
+				brawlHouses = new List<Faction>(),
+				proposalDone = true,
+				requestRolled = true,
+			};
+			lastGrandFeastTick = Find.TickManager.TicksGame;
+
+			TaggedString body = (planned ? "RimFeast_TextGrandSentPlanned" : "RimFeast_TextGrandSent").Translate(
+				houses.Count, houses.Select(h => h.Name).ToCommaList(useAnd: true));
+			string eta = ArrivalEta(current);
+			if (!eta.NullOrEmpty()) body += "\n\n" + eta;
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelGrandSent".Translate(), body,
+				LetterDefOf.PositiveEvent, new TargetInfo(current.spotCell, map));
+		}
+
+		private static IntVec3 GrandEntry(Map map, int i)
+		{
+			if (CellFinder.TryFindRandomEdgeCellWith(
+				x => x.Standable(map) && !x.Fogged(map) && map.reachability.CanReachColony(x), map, new Rot4(i % 4),
+				CellFinder.EdgeRoadChance_Neutral, out IntVec3 cell))
+				return cell;
+			return RCellFinder.TryFindRandomPawnEntryCell(out cell, map, CellFinder.EdgeRoadChance_Neutral)
+				? cell : CellFinder.RandomEdgeCell(map);
+		}
+
+		private static void Welcome(Pawn p, Map map, IntVec3 entry)
+		{
+			if (p.needs?.food != null) p.needs.food.CurLevel = 0.35f * p.needs.food.MaxLevel;
+			if (p.needs?.rest != null) p.needs.rest.CurLevel = Mathf.Max(p.needs.rest.CurLevel, 0.8f);
+			GenSpawn.Spawn(p, CellFinder.RandomClosewalkCellNear(entry, map, 6), map);
+		}
+
+		// chaque maison entre par un bord different et toutes convergent vers la salle.
+		// un seul cortege et une seule faction cachee: tout le reste du banquet marche tel quel
+		private void SpawnGrandCortege(FeastCase c)
+		{
+			Map map = c.map;
+			Faction guestFaction = FeastUtility.GuestFaction();
+			c.houses.RemoveAll(h => h == null || h.defeated || h.HostileTo(Faction.OfPlayer));
+			if (guestFaction == null || c.houses.Count < 2)
+			{
+				Messages.Message("RimFeast_MessageInviteVoid".Translate(GuestsName(c)), MessageTypeDefOf.NegativeEvent);
+				current = null;
+				return;
+			}
+			c.house = c.houses[0];
+			guestFaction.Name = "RimFeast_GrandGuests".Translate();
+			SetMutualRelation(guestFaction, Faction.OfPlayer, FactionRelationKind.Neutral);
+
+			var guests = new List<Pawn>();
+			var heads = new List<string>();
+			c.guestHouse = new List<Faction>();
+			Pawn speaker = null;
+			for (int i = 0; i < c.houses.Count; i++)
+			{
+				Faction h = c.houses[i];
+				PawnKindDef crew = FeastUtility.CrewKindFor(h);
+				PawnKindDef lordKind = FeastUtility.HouseLordKind(h) ?? FeastUtility.HouseKnightKind(h)
+					?? FeastUtility.EliteKindFor(h) ?? crew;
+				PawnKindDef standard = FeastUtility.HouseStandardKind(h) ?? crew;
+				PawnKindDef knight = FeastUtility.HouseKnightKind(h) ?? FeastUtility.EliteKindFor(h) ?? crew;
+				if (lordKind == null) continue;
+				var kinds = new List<PawnKindDef> { lordKind };
+				if (standard != null) kinds.Add(standard);
+				PawnKindDef filler = crew ?? knight ?? lordKind;
+				int size = GrandSize(h, c.houses.Count);
+				while (kinds.Count < size) kinds.Add(kinds.Count % 2 == 0 ? (knight ?? filler) : filler);
+
+				// le vrai chef garde sa vraie faction, pas une copie
+				Pawn leader = RimFeastMod.S.leaderEnabled && h.PlayerGoodwill >= 40 && FeastsRemembered(h) >= 1
+					&& Rand.Chance(0.6f) ? TakeLeader(h) : null;
+				if (leader != null) kinds.Remove(lordKind);
+
+				IntVec3 entry = GrandEntry(map, i);
+				Pawn first = null;
+				foreach (PawnKindDef kind in kinds)
+				{
+					Pawn p = PawnGenerator.GeneratePawn(new PawnGenerationRequest(
+						kind, guestFaction, PawnGenerationContext.NonPlayer,
+						tile: map.Tile, forceGenerateNewPawn: true, canGeneratePawnRelations: false));
+					Welcome(p, map, entry);
+					guests.Add(p);
+					c.guestHouse.Add(h);
+					if (first == null) first = p;
+				}
+				if (leader != null)
+				{
+					Welcome(leader, map, entry);
+					guests.Add(leader);
+					c.guestHouse.Add(h);
+					c.leaderHouses.Add(h);
+					heads.Add("RimFeast_GrandHead".Translate(leader.LabelShortCap, h.Name));
+					first = leader;
+				}
+				if (speaker == null) speaker = first;
+			}
+			if (guests.Count == 0)
+			{
+				current = null;
+				return;
+			}
+
+			c.lord = LordMaker.MakeNewLord(guestFaction,
+				new LordJob_FeastGuests(c.id, c.house, c.spotCell, speaker ?? guests[0]), map, guests);
+			c.guests = guests;
+			c.guestCount = guests.Count;
+			c.leaderCame = c.leaderHouses.Count > 0;
+			c.state = FeastCase.Traveling;
+
+			TaggedString text = "RimFeast_TextGrandArrive".Translate(c.houses.Count, guests.Count,
+				c.houses.Select(h => h.Name).ToCommaList(useAnd: true));
+			if (heads.Count > 0) text += "\n\n" + string.Join("\n", heads);
+			string feuds = FeudsText(c.houses);
+			if (feuds != null) text += "\n\n" + feuds;
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelGrandArrive".Translate(), text,
+				LetterDefOf.PositiveEvent, guests[0]);
+		}
+
+		// au grand banquet les toasts tournent, la maison qui vous estime le plus d'abord. celles qu'on oublie s'en souviennent
+		private static string ToastedName(FeastCase c)
+		{
+			if (!c.grand || c.houses == null || c.houses.Count == 0) return c.house?.Name;
+			Faction h = c.houses[(Mathf.Max(1, c.toastsGiven) - 1) % c.houses.Count];
+			if (h != null && !c.toasted.Contains(h)) c.toasted.Add(h);
+			return h?.Name;
+		}
+
+		private static void Blame(FeastCase c, int goodwill)
+		{
+			if (c.grand && c.houses != null)
+				foreach (Faction h in c.houses)
+					h?.TryAffectGoodwillWith(Faction.OfPlayer, goodwill, canSendMessage: false, canSendHostilityLetter: false);
+			else
+				c.house?.TryAffectGoodwillWith(Faction.OfPlayer, goodwill, canSendMessage: true, canSendHostilityLetter: false);
+		}
+
+		private void GrandBrawl(FeastCase c, Pawn a, Pawn b)
+		{
+			Faction ha = HouseOfGuest(c, a);
+			Faction hb = HouseOfGuest(c, b);
+			if (ha != null && !c.brawlHouses.Contains(ha)) c.brawlHouses.Add(ha);
+			if (hb != null && !c.brawlHouses.Contains(hb)) c.brawlHouses.Add(hb);
+			if (!Feud(ha, hb)) return;
+			c.feudBrawl = true;
+			Note(c, ChronicleLine.FeudBrawl, ha.Name, hb.Name);
+			Messages.Message("RimFeast_GrandFeudBrawl".Translate(ha.Name, hb.Name), new TargetInfo(c.spotCell, c.map),
+				MessageTypeDefOf.NegativeEvent, historical: false);
+		}
+
+		// deux maisons en froid dans la meme salle: la rixe n'attend pas que quelqu'un soit ivre
+		private void TryFeudBrawl(FeastCase c)
+		{
+			if (!c.grand || c.brawled || c.lord == null) return;
+			if (Find.TickManager.TicksGame - c.arrivedTick < BrawlGraceTicks || !Rand.Chance(0.009f)) return;
+			FeastUtility.FeastArea hall = FeastUtility.FeastArea.For(c.spotCell, c.map);
+			foreach (Pawn a in c.lord.ownedPawns.InRandomOrder().ToList())
+			{
+				if (!a.Spawned || a.Downed || a.interactions == null || !hall.Contains(a.Position)) continue;
+				Faction ha = HouseOfGuest(c, a);
+				Pawn b = c.lord.ownedPawns
+					.Where(p => p != a && p.Spawned && !p.Downed && hall.Contains(p.Position)
+						&& Feud(ha, HouseOfGuest(c, p)) && a.interactions.SocialFightPossible(p))
+					.RandomElementWithFallback();
+				if (b == null) continue;
+				a.interactions.StartSocialFight(b, "RimFeast_MessageBrawl");
+				Note(c, ChronicleLine.Brawl, Who(a), Who(b));
+				c.brawled = true;
+				c.brawlTick = Find.TickManager.TicksGame;
+				c.brawlerA = a;
+				c.brawlerB = b;
+				GrandBrawl(c, a, b);
+				return;
+			}
+		}
+
+		// la note d'une maison: la salle et la table sont a tout le monde, mais ses gens ont-ils mange,
+		// l'a-t-on saluee d'un toast, s'est-elle battue
+		private int ScoreFor(FeastCase c, Faction h)
+		{
+			float score = Mathf.Clamp01(c.maxImpressiveness / ImpressivenessCap) * 20f + c.maxTableScore
+				+ Mathf.Min(c.maxVariety, 5) * 3f;
+			if (c.guestCount > 0) score += Mathf.Min((float)c.maxDrinkUnits / c.guestCount, 1f) * 10f;
+			if (c.drankAny) score += 5f;
+
+			int own = 0;
+			int fed = 0;
+			for (int i = 0; i < c.guests.Count && i < c.guestHouse.Count; i++)
+			{
+				Pawn p = c.guests[i];
+				if (p == null || c.guestHouse[i] != h) continue;
+				own++;
+				if (p.Spawned && !p.Dead && p.needs?.food != null && p.needs.food.CurLevelPercentage > 0.6f) fed++;
+			}
+			if (own > 0) score += (float)fed / own * 15f;
+
+			bool music = FeastUtility.MusicPossible;
+			if (c.toasted.Contains(h)) score += Mathf.Min(c.toastsGiven / (float)ToastsForFull, 1f) * (music ? 10f : 15f);
+			if (music) score += Mathf.Min((c.samples > 0 ? (float)c.musicSamples / c.samples : 0f) / 0.5f, 1f) * 5f;
+			if (c.brawlHouses.Contains(h)) score -= 10f;
+			return Mathf.Clamp(Mathf.RoundToInt(score), 0, 100);
+		}
+
+		private void ApplyGrandOutcome(FeastCase c)
+		{
+			ChronicleEntry entry = EntryFor(c);
+			var lines = new StringBuilder();
+			var scores = new Dictionary<Faction, int>();
+			int sum = 0;
+			foreach (Faction h in c.houses)
+			{
+				if (h == null || h.defeated) continue;
+				int score = ScoreFor(c, h);
+				int tier = TierOf(score);
+				int goodwill = tier == 3 ? 25 : tier == 2 ? 15 : tier == 1 ? 8 : -5;
+				// calcule avant d'enregistrer ce banquet, sinon il se penalise lui-meme
+				int remembered = FeastsRemembered(h);
+				if (goodwill > 0 && remembered > 0)
+					goodwill = Mathf.Max(1, Mathf.RoundToInt(goodwill * GoodwillFactorFor(h)));
+				if (c.leaderHouses.Contains(h)) goodwill = Mathf.RoundToInt(goodwill * 1.5f);
+				h.TryAffectGoodwillWith(Faction.OfPlayer, goodwill, canSendMessage: false, canSendHostilityLetter: goodwill < 0);
+				HouseFeastMemory m = MemoryFor(h, true);
+				if (m != null)
+				{
+					m.timesFeasted = remembered + 1;
+					m.lastFeastTick = Find.TickManager.TicksGame;
+				}
+				scores[h] = score;
+				sum += score;
+
+				string why = !c.toasted.Contains(h) ? "RimFeast_GrandNoToast"
+					: c.brawlHouses.Contains(h) ? "RimFeast_GrandBrawled" : null;
+				lines.Append("RimFeast_GrandVerdictLine".Translate(h.Name, TierLabel(tier), goodwill.ToStringWithSign()));
+				if (why != null) lines.Append(" " + why.Translate());
+				lines.AppendLine();
+				entry.Add(ChronicleLine.HouseVerdict, h.Name, tier.ToString(), goodwill);
+			}
+			if (scores.Count == 0) return;
+			int average = sum / scores.Count;
+
+			// une belle soiree sans rixe entre elles referme une vieille querelle, et les deux maisons vous en savent gre
+			if (!c.feudBrawl)
+				foreach (Pair<Faction, Faction> f in Feuds(c.houses))
+				{
+					if (!scores.TryGetValue(f.First, out int a) || !scores.TryGetValue(f.Second, out int b)) continue;
+					if (a < GoodScore || b < GoodScore) continue;
+					peace.Add(PairKey(f.First, f.Second));
+					f.First.TryAffectGoodwillWith(Faction.OfPlayer, 10, canSendMessage: false, canSendHostilityLetter: false);
+					f.Second.TryAffectGoodwillWith(Faction.OfPlayer, 10, canSendMessage: false, canSendHostilityLetter: false);
+					lines.AppendLine();
+					lines.Append("RimFeast_GrandPeace".Translate(f.First.Name, f.Second.Name));
+					entry.Add(ChronicleLine.Peace, f.First.Name, f.Second.Name);
+				}
+
+			entry.score = average;
+			entry.tier = TierOf(average);
+			Stamp(entry, c);
+
+			TaggedString text = "RimFeast_TextGrandVerdict".Translate() + "\n\n" + lines.ToString().TrimEnd();
+			if (average >= TriumphScore)
+			{
+				DropGift(c);
+				Note(c, ChronicleLine.Silver, null, null, GiftSilver);
+				text += "\n\n" + "RimFeast_GrandSilver".Translate(GiftSilver);
+			}
+			text += "\n\n" + HallReport(c);
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelGrandVerdict".Translate(), text,
+				average >= DecentScore ? LetterDefOf.PositiveEvent : LetterDefOf.NegativeEvent,
+				new TargetInfo(c.spotCell, c.map));
+
+			// une seule caravane promise: celle de la maison qui vous estime le plus, si elle repart contente
+			if (c.map != null && scores.TryGetValue(c.house, out int first) && first >= GoodScore)
+				OfferTradePact(c, first >= TriumphScore);
+		}
+
+		// le banquet rouge de toutes les maisons a la fois: la guerre avec chacune
+		private void ResolveGrandBetrayal(FeastCase c, ChronicleEntry entry, int total, int slain)
+		{
+			int now = Find.TickManager.TicksGame;
+			List<Faction> there = c.houses.Where(h => h != null && !h.defeated).ToList();
+			if (total > 0 && slain * 2 >= total)
+			{
+				redWeddingTick = now;
+				for (int i = 0; i < there.Count; i++)
+				{
+					Faction h = there[i];
+					HouseFeastMemory m = MemoryFor(h, true);
+					if (m != null) m.betrayed = true;
+					// faction a goodwill: l'hostilite passe par le goodwill, SetRelationDirect refuse en silence
+					h.TryAffectGoodwillWith(Faction.OfPlayer, -200, canSendMessage: false, canSendHostilityLetter: false);
+					raids.Add(new PendingRaid
+					{
+						house = h,
+						map = c.map,
+						fireTick = now + (Rand.Range(3, 8) + i * 2) * 60000,
+						points = StorytellerUtility.DefaultThreatPointsNow(c.map) * 0.8f,
+					});
+					entry.Add(ChronicleLine.War, h.Name);
+				}
+				foreach (Faction f in FeastUtility.InvitableHouses().ToList())
+					if (!there.Contains(f))
+						f.TryAffectGoodwillWith(Faction.OfPlayer, -25, canSendMessage: false, canSendHostilityLetter: false);
+				foreach (Pawn col in c.map.mapPawns.FreeColonistsSpawned)
+					col.needs?.mood?.thoughts?.memories?.TryGainMemory(RimFeastDefOf.RimFeast_GuestRightBroken);
+				Find.LetterStack.ReceiveLetter("RimFeast_LabelRedWedding".Translate(),
+					"RimFeast_TextRedGrand".Translate(slain, there.Count),
+					LetterDefOf.ThreatBig, new TargetInfo(c.spotCell, c.map));
+				return;
+			}
+			entry.Add(ChronicleLine.Blood);
+			entry.goodwill -= 40;
+			Blame(c, -40);
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelGuestsHarmed".Translate(),
+				"RimFeast_TextBloodSpilled".Translate(GuestsName(c)),
+				LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map));
+		}
+
 		public void StartInvite(Map map, Faction house, Thing spot, bool planned = false)
 		{
 			if (Busy || map == null || house == null || spot == null) return;
@@ -792,6 +1258,7 @@ namespace RimFeast
 					if (Find.TickManager.TicksGame - c.lastSummonTick >= ResummonTicks)
 						SummonColonists(c);
 					Sample(c);
+					TryFeudBrawl(c);
 					TryBrawl(c);
 					BreakUpBrawl(c);
 					TryProposal(c);
@@ -847,13 +1314,18 @@ namespace RimFeast
 			Map map = c.map;
 			if (c.spotThing == null || c.spotThing.Destroyed)
 			{
-				Messages.Message("RimFeast_MessageSpotDestroyed".Translate(c.house?.Name),
+				Messages.Message("RimFeast_MessageSpotDestroyed".Translate(GuestsName(c)),
 					MessageTypeDefOf.NegativeEvent);
 				WeddingUndone(c, true);
 				current = null;
 				return;
 			}
 
+			if (c.grand)
+			{
+				SpawnGrandCortege(c);
+				return;
+			}
 			if (c.house == null || c.house.defeated || c.house.HostileTo(Faction.OfPlayer))
 			{
 				Messages.Message("RimFeast_MessageInviteVoid".Translate(c.house?.Name ?? "?"),
@@ -986,7 +1458,7 @@ namespace RimFeast
 			if (c == null || c.id != id || c.state != FeastCase.Traveling) return;
 			c.state = FeastCase.Feasting;
 			c.arrivedTick = Find.TickManager.TicksGame;
-			Messages.Message("RimFeast_MessageFeastBegins".Translate(c.house?.Name),
+			Messages.Message("RimFeast_MessageFeastBegins".Translate(GuestsName(c)),
 				new TargetInfo(c.spotCell, c.map), MessageTypeDefOf.PositiveEvent);
 			StartColonistLord(c);
 			TryBringGift(c);
@@ -1033,7 +1505,7 @@ namespace RimFeast
 			Messages.Message(vows
 					? "RimFeast_MessageWeddingToast".Translate(c.betrothedNoble.LabelShortCap,
 						c.betrothedColonist.LabelShortCap)
-					: "RimFeast_MessageToast".Translate(c.house?.Name),
+					: "RimFeast_MessageToast".Translate(ToastedName(c)),
 				new TargetInfo(c.spotCell, c.map), MessageTypeDefOf.PositiveEvent, historical: false);
 		}
 
@@ -1043,7 +1515,71 @@ namespace RimFeast
 			FeastCase c = current;
 			if (c == null || c.id != id || c.state != FeastCase.Feasting) return;
 			TryWed(c, false);
+			Cheer(c);
 		}
+
+		public void Notify_ColonyToastOver() => Cheer(colony);
+
+		// la ola a la fin d'un toast. les invites sortent tout juste du toast.
+		// un colon qui porte son assiette, qui joue ou qu'on a envoye danser reste a ce qu'il fait
+		private void Cheer(FeastCase c)
+		{
+			if (c?.map == null) return;
+			FeastUtility.FeastArea area = FeastUtility.FeastArea.For(c.spotCell, c.map);
+			var crowd = new List<Pawn>();
+			if (c.lord != null) crowd.AddRange(c.lord.ownedPawns);
+			if (c.colonistLord != null && c.colonistLord != c.lord) crowd.AddRange(c.colonistLord.ownedPawns);
+			foreach (Pawn p in crowd)
+			{
+				if (!p.Spawned || p.Drafted || !area.Contains(p.Position) || !FeastUtility.CanDance(p)) continue;
+				if (p.carryTracker?.CarriedThing != null || (p.CurJob != null && p.CurJob.playerForced)) continue;
+				if (p.jobs.curDriver is JobDriver_PlayMusicalInstrument) continue;
+				p.jobs.TryTakeOrderedJob(JobMaker.MakeJob(RimFeastDefOf.RimFeast_CheerJob, c.spotCell), JobTag.Misc);
+			}
+		}
+
+		public void DebugCheer()
+		{
+			FeastCase c = current != null && current.state == FeastCase.Feasting ? current : colony;
+			if (c == null)
+				Messages.Message("RimFeast: no feast at the table right now.", MessageTypeDefOf.RejectInput,
+					historical: false);
+			else Cheer(c);
+		}
+
+		private const int MaxContests = 2;
+
+		public bool ContestAllowed(Pawn p)
+		{
+			FeastCase c = CaseAt(p);
+			return c != null && c.contests < MaxContests;
+		}
+
+		public void Notify_ContestStarted(Pawn p)
+		{
+			FeastCase c = CaseAt(p);
+			if (c != null) c.contests++;
+		}
+
+		public void Notify_Contest(Pawn a, Pawn b, Pawn winner, int mugs)
+		{
+			if (a == null || b == null) return;
+			if (winner == null)
+			{
+				Note(CaseAt(a), ChronicleLine.ContestDraw, Who(a), Who(b), mugs);
+				Messages.Message("RimFeast_ContestDraw".Translate(a.LabelShort, b.LabelShort, mugs), a,
+					MessageTypeDefOf.NeutralEvent, historical: false);
+				return;
+			}
+			Pawn loser = winner == a ? b : a;
+			winner.needs?.mood?.thoughts?.memories?.TryGainMemory(RimFeastDefOf.RimFeast_WonContest);
+			Note(CaseAt(winner), ChronicleLine.Contest, Who(winner), Who(loser), mugs);
+			Messages.Message("RimFeast_ContestWon".Translate(winner.LabelShort, loser.LabelShort, mugs), winner,
+				MessageTypeDefOf.PositiveEvent, historical: false);
+		}
+
+		public void Notify_SetDance(Pawn leader, int size) =>
+			Note(CaseAt(leader), ChronicleLine.SetDance, Who(leader), null, size);
 
 		public void Notify_FeastEnded(int id)
 		{
@@ -1052,7 +1588,7 @@ namespace RimFeast
 
 			if (c.state != FeastCase.Feasting)
 			{
-				Messages.Message("RimFeast_MessageGuestsLeftNoFeast".Translate(c.house?.Name),
+				Messages.Message("RimFeast_MessageGuestsLeftNoFeast".Translate(GuestsName(c)),
 					MessageTypeDefOf.NegativeEvent);
 				WeddingUndone(c, true);
 				current = null;
@@ -1164,7 +1700,7 @@ namespace RimFeast
 			}
 
 			Find.LetterStack.ReceiveLetter("RimFeast_LabelBetrayed".Translate(),
-				"RimFeast_TextBetrayed".Translate(c.house?.Name),
+				"RimFeast_TextBetrayed".Translate(GuestsName(c)),
 				LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map), c.house);
 
 			if (c.slaughterOrdered) LaunchAttackWave(c);
@@ -1427,6 +1963,13 @@ namespace RimFeast
 			if (c.hosts != null)
 				foreach (Pawn h in c.hosts)
 					if (h != null && h.Dead) entry.Add(ChronicleLine.Lost, Who(h));
+
+			if (c.grand)
+			{
+				ResolveGrandBetrayal(c, entry, total, slain);
+				current = null;
+				return;
+			}
 
 			HouseFeastMemory m = MemoryFor(c.house, true);
 			if (total > 0 && slain * 2 >= total)
@@ -1871,7 +2414,7 @@ namespace RimFeast
 			{
 				Note(c, ChronicleLine.BrawlDeath);
 				Find.LetterStack.ReceiveLetter("RimFeast_LabelBrawlDeath".Translate(),
-					"RimFeast_TextBrawlDeath".Translate(c.house?.Name),
+					"RimFeast_TextBrawlDeath".Translate(GuestsName(c)),
 					LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map), c.house);
 				LeaveUnderOurRoof(c);
 				return;
@@ -1882,7 +2425,7 @@ namespace RimFeast
 			{
 				bool judged = c.state == FeastCase.Feasting
 					&& Find.TickManager.TicksGame - c.arrivedTick >= FeastDurationTicks / 2;
-				TaggedString text = "RimFeast_TextGuestsLeaveFighting".Translate(c.house?.Name);
+				TaggedString text = "RimFeast_TextGuestsLeaveFighting".Translate(GuestsName(c));
 				if (judged) text += "\n\n" + "RimFeast_TextGuestsLeaveFightingJudged".Translate();
 				Find.LetterStack.ReceiveLetter("RimFeast_LabelGuestsLeaveFighting".Translate(), text,
 					LetterDefOf.NeutralEvent, new TargetInfo(c.spotCell, c.map), c.house);
@@ -1893,10 +2436,9 @@ namespace RimFeast
 
 			Note(c, ChronicleLine.Blood);
 			EntryFor(c).goodwill -= 15;
-			c.house?.TryAffectGoodwillWith(Faction.OfPlayer, -15, canSendMessage: true,
-				canSendHostilityLetter: false);
+			Blame(c, -15);
 			Find.LetterStack.ReceiveLetter("RimFeast_LabelGuestsHarmed".Translate(),
-				"RimFeast_TextGuestsHarmed".Translate(c.house?.Name),
+				"RimFeast_TextGuestsHarmed".Translate(GuestsName(c)),
 				LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map), c.house);
 			LeaveUnderOurRoof(c);
 		}
@@ -1968,9 +2510,17 @@ namespace RimFeast
 		// pas les heures ni le nombre de colons des fetes vanilla: c'est le joueur qui lance
 		public string ColonyFeastBlocked(Map map)
 		{
-			if (Busy) return "RimFeast_InviteDisabledBusy".Translate();
+			string gather = ColonyGatherBlocked(map);
+			if (gather != null) return gather;
 			int days = ColonyFeastDaysLeft();
 			if (days > 0) return "RimFeast_ColonyDisabledCooldown".Translate(days);
+			return null;
+		}
+
+		// ce qui empeche tout banquet de la colonie. le delai entre deux banquets ne vaut que pour le banquet ordinaire
+		public string ColonyGatherBlocked(Map map)
+		{
+			if (Busy) return "RimFeast_InviteDisabledBusy".Translate();
 			if (map == null) return "";
 			// le seuil ou vanilla interrompt une fete: une bete hostile au fond de la carte suffit a sortir de None
 			if (map.dangerWatcher.DangerRating == StoryDanger.High) return "RimFeast_ColonyDisabledDanger".Translate();
@@ -1978,10 +2528,124 @@ namespace RimFeast
 			return null;
 		}
 
-		public void StartColonyFeast(Thing spot)
+		public const int OccasionNone = 0;
+		public const int OccasionWake = 1;
+		public const int OccasionVictory = 2;
+		public const int OccasionHarvest = 3;
+
+		private const int VictoryDays = 3;
+		private const int HarvestStockDays = 12;
+		// la part du chagrin qui reste apres la veillee, du pire banquet au meilleur
+		private static readonly float[] WakeEase = { 0.75f, 0.6f, 0.5f, 0.4f };
+
+		public static ThoughtDef OccasionThought(int occasion) =>
+			occasion == OccasionWake ? RimFeastDefOf.RimFeast_Wake
+			: occasion == OccasionVictory ? RimFeastDefOf.RimFeast_VictoryFeast
+			: occasion == OccasionHarvest ? RimFeastDefOf.RimFeast_HarvestFeast
+			: RimFeastDefOf.RimFeast_ColonyFeast;
+
+		public ThoughtDef ColonyThought() => OccasionThought(colony?.occasion ?? OccasionNone);
+
+		// un chagrin: un souvenir d'humeur negatif qui porte sur un mort
+		private static bool Grief(Thought_Memory m) =>
+			m.otherPawn != null && m.otherPawn.Dead && !m.def.IsSocial && m.CurStage != null
+			&& m.CurStage.baseMoodEffect < 0f;
+
+		// les morts que la colonie pleure encore et qui n'ont pas eu leur veillee.
+		// on les lit dans les souvenirs des colons: rien a suivre, et une vieille sauvegarde marche
+		public List<Pawn> Mourned(Map map)
+		{
+			var dead = new List<Pawn>();
+			if (map == null) return dead;
+			foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
+			{
+				List<Thought_Memory> memories = p.needs?.mood?.thoughts?.memories?.Memories;
+				if (memories == null) continue;
+				for (int i = 0; i < memories.Count; i++)
+				{
+					if (!Grief(memories[i])) continue;
+					Pawn o = memories[i].otherPawn;
+					if (dead.Contains(o) || wakesHeld.Contains(o.thingIDNumber) || !o.RaceProps.Humanlike) continue;
+					if (o.Faction != Faction.OfPlayer && !PawnUtility.EverBeenColonistOrTameAnimal(o)) continue;
+					dead.Add(o);
+				}
+			}
+			return dead;
+		}
+
+		// null si le banquet de victoire peut se tenir, sinon la ligne grisee du menu
+		public string VictoryBlocked(Map map)
+		{
+			int threat = map?.StoryState?.LastThreatBigTick ?? -1;
+			if (threat < 0 || Find.TickManager.TicksGame - threat > VictoryDays * GenDate.TicksPerDay
+				|| GenHostility.AnyHostileActiveThreatToPlayer(map))
+				return "RimFeast_OccasionVictoryNone".Translate(VictoryDays);
+			if (threat == lastVictoryThreatTick) return "RimFeast_OccasionVictoryHeld".Translate();
+			return null;
+		}
+
+		// une fois l'an, quand les reserves tiennent assez de jours pour tout le monde
+		public string HarvestBlocked(Map map)
+		{
+			if (map == null) return "";
+			int wait = lastHarvestFeastTick < 0 ? 0
+				: lastHarvestFeastTick + GenDate.TicksPerYear - Find.TickManager.TicksGame;
+			if (wait > 0)
+				return "RimFeast_OccasionHarvestHeld".Translate(Mathf.CeilToInt(wait / (float)GenDate.TicksPerDay));
+			int mouths = Mathf.Max(1, map.mapPawns.FreeColonistsSpawned.Count(p => !p.DevelopmentalStage.Baby()));
+			int days = Mathf.FloorToInt(map.resourceCounter.TotalHumanEdibleNutrition / (mouths * 1.6f));
+			if (days < HarvestStockDays) return "RimFeast_OccasionHarvestLow".Translate(HarvestStockDays, days);
+			return null;
+		}
+
+		private bool OccasionBlocked(Map map, int occasion, Pawn honored)
+		{
+			if (occasion == OccasionNone) return ColonyFeastBlocked(map) != null;
+			if (ColonyGatherBlocked(map) != null) return true;
+			if (occasion == OccasionWake) return honored == null || !Mourned(map).Contains(honored);
+			if (occasion == OccasionVictory) return VictoryBlocked(map) != null;
+			return HarvestBlocked(map) != null;
+		}
+
+		private static TaggedString BeginsText(FeastCase c, string who) =>
+			c.occasion == OccasionWake ? "RimFeast_WakeBegins".Translate(who, c.honoredName)
+			: c.occasion == OccasionVictory ? "RimFeast_VictoryBegins".Translate(who)
+			: c.occasion == OccasionHarvest ? "RimFeast_HarvestBegins".Translate(who)
+			: "RimFeast_ColonyFeastBegins".Translate(who);
+
+		private static TaggedString ToastText(FeastCase c, string who) =>
+			c.occasion == OccasionWake ? "RimFeast_WakeToast".Translate(who, c.honoredName)
+			: c.occasion == OccasionVictory ? "RimFeast_VictoryToast".Translate(who)
+			: c.occasion == OccasionHarvest ? "RimFeast_HarvestToast".Translate(who)
+			: "RimFeast_ColonyToast".Translate(who);
+
+		public string ColonySpotLine()
+		{
+			FeastCase c = colony;
+			if (c == null) return null;
+			return c.occasion == OccasionWake ? "RimFeast_SpotWake".Translate(c.honoredName)
+				: c.occasion == OccasionVictory ? "RimFeast_SpotVictory".Translate()
+				: c.occasion == OccasionHarvest ? "RimFeast_SpotHarvest".Translate()
+				: "RimFeast_SpotColonyFeast".Translate();
+		}
+
+		// pour chaque colon present a la fin de la soiree: la veillee allege son chagrin pour le mort qu'on a veille
+		public void ApplyOccasion(Pawn p, int stage)
+		{
+			FeastCase c = colony;
+			if (c == null || c.occasion != OccasionWake) return;
+			List<Thought_Memory> memories = p.needs?.mood?.thoughts?.memories?.Memories;
+			if (memories == null) return;
+			float ease = WakeEase[Mathf.Clamp(stage, 0, WakeEase.Length - 1)];
+			for (int i = 0; i < memories.Count; i++)
+				if (Grief(memories[i]) && memories[i].otherPawn.thingIDNumber == c.honoredId)
+					memories[i].moodPowerFactor *= ease;
+		}
+
+		public void StartColonyFeast(Thing spot, int occasion = OccasionNone, Pawn honored = null)
 		{
 			Map map = spot?.Map;
-			if (map == null || ColonyFeastBlocked(map) != null) return;
+			if (map == null || OccasionBlocked(map, occasion, honored)) return;
 			GatheringDef def = RimFeastDefOf.RimFeast_Feast;
 			Pawn organizer = GatheringsUtility.FindRandomGatheringOrganizer(Faction.OfPlayer, map, def);
 			if (organizer == null)
@@ -2000,14 +2664,23 @@ namespace RimFeast
 				arrivedTick = Find.TickManager.TicksGame,
 				guestCount = Mathf.Max(1, map.mapPawns.FreeColonistsSpawned.Count(p => !p.DevelopmentalStage.Baby())),
 			};
+			c.occasion = occasion;
+			if (occasion == OccasionWake)
+			{
+				c.honoredId = honored.thingIDNumber;
+				c.honoredName = honored.LabelShortCap;
+			}
+			// eventTick ne sert pas a un banquet de la colonie: il garde l'attaque que l'on fete
+			if (occasion == OccasionVictory) c.eventTick = map.StoryState.LastThreatBigTick;
 			var job = new LordJob_FeastColonists(spot.Position, organizer, def, trap: false, colony: true);
 			c.colonistLord = LordMaker.MakeNewLord(Faction.OfPlayer, job, map,
 				job.OrganizerIsStartingPawn ? new List<Pawn> { organizer } : null);
 			c.lord = c.colonistLord;
 			colony = c;
-			lastColonyFeastTick = Find.TickManager.TicksGame;
+			// une occasion ne lance pas le delai du banquet ordinaire
+			if (occasion == OccasionNone) lastColonyFeastTick = Find.TickManager.TicksGame;
 			SummonColonists(c);
-			Messages.Message("RimFeast_ColonyFeastBegins".Translate(organizer.LabelShort),
+			Messages.Message(BeginsText(c, organizer.LabelShort),
 				new TargetInfo(spot.Position, map), MessageTypeDefOf.PositiveEvent);
 		}
 
@@ -2030,7 +2703,7 @@ namespace RimFeast
 			if (c == null) return;
 			c.toastsGiven++;
 			if (speaker != null)
-				Messages.Message("RimFeast_ColonyToast".Translate(speaker.LabelShort), new TargetInfo(c.spotCell, c.map),
+				Messages.Message(ToastText(c, speaker.LabelShort), new TargetInfo(c.spotCell, c.map),
 					MessageTypeDefOf.PositiveEvent, historical: false);
 		}
 
@@ -2072,8 +2745,14 @@ namespace RimFeast
 			}
 			colony = null;
 			if (c?.map == null || report.NullOrEmpty()) return;
-			Messages.Message("RimFeast_ColonyFeastOver".Translate(report), new TargetInfo(c.spotCell, c.map),
-				MessageTypeDefOf.PositiveEvent);
+			// l'occasion n'est consommee que si la soiree est allee au bout
+			if (c.occasion == OccasionWake) wakesHeld.Add(c.honoredId);
+			else if (c.occasion == OccasionVictory) lastVictoryThreatTick = c.eventTick;
+			else if (c.occasion == OccasionHarvest) lastHarvestFeastTick = Find.TickManager.TicksGame;
+			Messages.Message(c.occasion == OccasionWake
+					? "RimFeast_WakeOver".Translate(c.honoredName, report)
+					: "RimFeast_ColonyFeastOver".Translate(report),
+				new TargetInfo(c.spotCell, c.map), MessageTypeDefOf.PositiveEvent);
 		}
 
 		private void Sample(FeastCase c)
@@ -2184,6 +2863,7 @@ namespace RimFeast
 
 				drunk.interactions.StartSocialFight(other, "RimFeast_MessageBrawl");
 				Note(c, ChronicleLine.Brawl, Who(drunk), Who(other));
+				if (c.grand) GrandBrawl(c, drunk, other);
 				c.brawled = true;
 				c.brawlTick = Find.TickManager.TicksGame;
 				c.brawlerA = drunk;
@@ -3001,6 +3681,11 @@ namespace RimFeast
 
 		private void ApplyOutcome(FeastCase c)
 		{
+			if (c.grand)
+			{
+				ApplyGrandOutcome(c);
+				return;
+			}
 			int score = ComputeScore(c);
 
 			string label, text;
@@ -3169,8 +3854,18 @@ namespace RimFeast
 				house = c.house,
 				houseName = c.house?.Name,
 				guests = c.guestCount,
+				occasion = c.occasion,
+				grand = c.grand,
 			};
-			Pawn head = c.leaderCame ? c.house?.leader : null;
+			if (c.occasion == OccasionWake) entry.Add(ChronicleLine.InMemory, c.honoredName);
+			if (c.grand)
+			{
+				entry.house = null;
+				entry.houseName = null;
+				foreach (Faction h in c.leaderHouses)
+					if (h?.leader != null) entry.Add(ChronicleLine.Leader, Who(h.leader));
+			}
+			Pawn head = c.leaderCame && !c.grand ? c.house?.leader : null;
 			if (head != null) entry.Add(ChronicleLine.Leader, Who(head));
 			chronicle.Add(entry);
 			if (chronicle.Count > MaxChronicle) chronicle.RemoveAt(0);
@@ -3306,6 +4001,11 @@ namespace RimFeast
 			Scribe_Values.Look(ref lastColonyFeastTick, "lastColonyFeastTick", -1);
 			Scribe_Collections.Look(ref weddings, "weddings", LookMode.Deep);
 			Scribe_Collections.Look(ref chronicle, "chronicle", LookMode.Deep);
+			Scribe_Collections.Look(ref wakesHeld, "wakesHeld", LookMode.Value);
+			Scribe_Values.Look(ref lastVictoryThreatTick, "lastVictoryThreatTick", -1);
+			Scribe_Values.Look(ref lastHarvestFeastTick, "lastHarvestFeastTick", -1);
+			Scribe_Values.Look(ref lastGrandFeastTick, "lastGrandFeastTick", -1);
+			Scribe_Collections.Look(ref peace, "peace", LookMode.Value);
 			if (Scribe.mode == LoadSaveMode.PostLoadInit)
 			{
 				if (memories == null) memories = new List<HouseFeastMemory>();
@@ -3322,6 +4022,8 @@ namespace RimFeast
 				weddings.RemoveAll(x => x == null);
 				if (chronicle == null) chronicle = new List<ChronicleEntry>();
 				chronicle.RemoveAll(x => x == null);
+				if (wakesHeld == null) wakesHeld = new List<int>();
+				if (peace == null) peace = new List<int>();
 			}
 		}
 	}

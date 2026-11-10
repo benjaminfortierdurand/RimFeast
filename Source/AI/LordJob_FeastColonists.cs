@@ -80,6 +80,10 @@ namespace RimFeast.AI
 				var sitDown = new Transition(toast, party);
 				sitDown.AddTrigger(new Trigger_TicksPassed(GameComponent_FeastState.ToastDurationTicks));
 				sitDown.AddPostAction(new TransitionAction_EndAllJobs());
+				sitDown.AddPostAction(new TransitionAction_Custom((Action)delegate
+				{
+					GameComponent_FeastState.Get()?.Notify_ColonyToastOver();
+				}));
 				graph.AddTransition(sitDown);
 			}
 			return graph;
@@ -97,7 +101,8 @@ namespace RimFeast.AI
 			GameComponent_FeastState comp = colony ? GameComponent_FeastState.Get() : null;
 			string report = null;
 			int stage = comp?.ColonyFeastStage(out report) ?? 0;
-			ThoughtDef def = colony ? RimFeastDefOf.RimFeast_ColonyFeast : RimFeastDefOf.RimFeast_AttendedFeast;
+			ThoughtDef def = colony ? comp?.ColonyThought() ?? RimFeastDefOf.RimFeast_ColonyFeast
+				: RimFeastDefOf.RimFeast_AttendedFeast;
 			LordToilData_Gathering data = ((LordToil_Gathering)toil).Data;
 			if (data != null)
 				foreach (Pawn p in lord.ownedPawns)
@@ -115,6 +120,7 @@ namespace RimFeast.AI
 						}
 						memory.moodPowerFactor = Mathf.Min((float)ticks / durationTicks + floor, 1f);
 						p.needs.mood.thoughts.memories.TryGainMemory(memory);
+						if (finished) comp?.ApplyOccasion(p, stage);
 					}
 					TaleRecorder.RecordTale(TaleDefOf.AttendedParty, p, organizer ?? p);
 				}

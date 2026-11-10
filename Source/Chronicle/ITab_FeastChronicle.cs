@@ -21,6 +21,10 @@ namespace RimFeast
 		{
 			"RimFeast_ChronKindFeast", "RimFeast_ChronKindWedding", "RimFeast_ChronKindColony", "RimFeast_ChronKindAway",
 		};
+		private static readonly string[] OccasionKeys =
+		{
+			null, "RimFeast_ChronKindWake", "RimFeast_ChronKindVictory", "RimFeast_ChronKindHarvest",
+		};
 		private static readonly string[] TierKeys =
 		{
 			"RimFeast_LabelFeastPoor", "RimFeast_LabelFeastDecent", "RimFeast_LabelFeastGood", "RimFeast_LabelFeastTriumph",
@@ -104,8 +108,18 @@ namespace RimFeast
 			if (e.kind == ChronicleEntry.Away)
 				return e.tier >= 1 && e.tier < AwayKeys.Length ? (string)AwayKeys[e.tier].Translate() : null;
 			if (e.tier > 3) return null;
-			if (e.kind == ChronicleEntry.Colony) return RimFeastDefOf.RimFeast_ColonyFeast.stages[e.tier].LabelCap;
+			if (e.kind == ChronicleEntry.Colony)
+				return GameComponent_FeastState.OccasionThought(e.occasion).stages[e.tier].LabelCap;
 			return TierKeys[e.tier].Translate();
+		}
+
+		private static string KindKey(ChronicleEntry e)
+		{
+			if (e.red) return "RimFeast_ChronKindRed";
+			if (e.grand) return "RimFeast_ChronKindGrand";
+			if (e.kind == ChronicleEntry.Colony && e.occasion >= 1 && e.occasion < OccasionKeys.Length)
+				return OccasionKeys[e.occasion];
+			return KindKeys[Mathf.Clamp(e.kind, 0, 3)];
 		}
 
 		// meme code pour mesurer et pour dessiner: la hauteur rendue est celle du cadre
@@ -126,8 +140,7 @@ namespace RimFeast
 				Widgets.Label(new Rect(x, y, w, 20f), GenDate.DateFullStringAt(e.absTick, e.place));
 				Text.Anchor = TextAnchor.UpperRight;
 				if (e.red) GUI.color = Red;
-				Widgets.Label(new Rect(x, y, w, 20f),
-					(e.red ? "RimFeast_ChronKindRed" : KindKeys[Mathf.Clamp(e.kind, 0, 3)]).Translate());
+				Widgets.Label(new Rect(x, y, w, 20f), KindKey(e).Translate());
 				Text.Anchor = TextAnchor.UpperLeft;
 
 				Faction f = own ? Faction.OfPlayer : e.house;
@@ -135,7 +148,8 @@ namespace RimFeast
 				GUI.color = own || f == null ? Color.white : f.Color;
 				if (icon != null) GUI.DrawTexture(new Rect(x, y + 22f, 26f, 26f), icon);
 				Text.Font = GameFont.Medium;
-				string name = (own ? f?.Name : e.houseName ?? f?.Name) ?? "?";
+				string name = e.grand ? (string)"RimFeast_GrandGuests".Translate().CapitalizeFirst()
+					: (own ? f?.Name : e.houseName ?? f?.Name) ?? "?";
 				Widgets.Label(new Rect(x + 34f, y + 20f, w - 34f, 32f), name.Truncate(w - 34f));
 				GUI.color = Color.white;
 			}
@@ -161,7 +175,8 @@ namespace RimFeast
 					bool good = true;
 					if (own && e.tier >= 0 && e.tier <= 3)
 						gain = "RimFeast_ChronMood".Translate(
-							((int)RimFeastDefOf.RimFeast_ColonyFeast.stages[e.tier].baseMoodEffect).ToStringWithSign());
+							((int)GameComponent_FeastState.OccasionThought(e.occasion).stages[e.tier].baseMoodEffect)
+								.ToStringWithSign());
 					else if (!own && e.goodwill != 0)
 					{
 						gain = "RimFeast_ChronGoodwill".Translate(e.goodwill.ToStringWithSign());

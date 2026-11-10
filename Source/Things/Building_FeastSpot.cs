@@ -67,9 +67,9 @@ namespace RimFeast
 				defaultLabel = "RimFeast_ColonyGizmoLabel".Translate(),
 				defaultDesc = "RimFeast_ColonyGizmoDesc".Translate(RimFeastMod.S.colonyFeastDays),
 				icon = RimFeastTex.ColonyFeast,
-				action = () => GameComponent_FeastState.Get()?.StartColonyFeast(this),
+				action = OpenColonyMenu,
 			};
-			string blocked = comp?.ColonyFeastBlocked(Map);
+			string blocked = comp?.ColonyGatherBlocked(Map);
 			if (blocked != null) party.Disable(blocked);
 			yield return party;
 
@@ -79,7 +79,7 @@ namespace RimFeast
 				yield return new Command_Action
 				{
 					defaultLabel = "RimFeast_CancelInviteLabel".Translate(),
-					defaultDesc = "RimFeast_CancelInviteDesc".Translate(cur.house?.Name),
+					defaultDesc = "RimFeast_CancelInviteDesc".Translate(GameComponent_FeastState.GuestsName(cur)),
 					icon = RimFeastTex.Cancel,
 					action = () => GameComponent_FeastState.Get()?.CancelInvite(this),
 				};
@@ -113,10 +113,74 @@ namespace RimFeast
 			}
 		}
 
+		// le banquet ordinaire et les trois occasions. une occasion indisponible reste affichee, grisee, avec sa raison
+		private void OpenColonyMenu()
+		{
+			GameComponent_FeastState comp = GameComponent_FeastState.Get();
+			if (comp == null) return;
+			var options = new List<FloatMenuOption>();
+
+			string plain = comp.ColonyFeastBlocked(Map);
+			options.Add(plain == null
+				? new FloatMenuOption("RimFeast_OccasionPlain".Translate(), () => comp.StartColonyFeast(this))
+				: new FloatMenuOption("RimFeast_OccasionPlain".Translate() + " (" + plain + ")", null));
+
+			List<Pawn> mourned = comp.Mourned(Map);
+			if (mourned.Count == 0) options.Add(new FloatMenuOption("RimFeast_OccasionWakeNone".Translate(), null));
+			foreach (Pawn dead in mourned)
+			{
+				Pawn d = dead;
+				options.Add(new FloatMenuOption("RimFeast_OccasionWake".Translate(d.LabelShortCap),
+					() => comp.StartColonyFeast(this, GameComponent_FeastState.OccasionWake, d)));
+			}
+
+			string victory = comp.VictoryBlocked(Map);
+			options.Add(victory == null
+				? new FloatMenuOption("RimFeast_OccasionVictory".Translate(),
+					() => comp.StartColonyFeast(this, GameComponent_FeastState.OccasionVictory))
+				: new FloatMenuOption(victory, null));
+
+			string harvest = comp.HarvestBlocked(Map);
+			options.Add(harvest == null
+				? new FloatMenuOption("RimFeast_OccasionHarvest".Translate(),
+					() => comp.StartColonyFeast(this, GameComponent_FeastState.OccasionHarvest))
+				: new FloatMenuOption(harvest, null));
+
+			Find.WindowStack.Add(new FloatMenu(options));
+		}
+
+		// le grand banquet: toutes les maisons d'un coup, en tete du menu d'invitation. confirmation avant de payer
+		private FloatMenuOption GrandOption(GameComponent_FeastState comp, bool planned)
+		{
+			string blocked = comp.GrandBlocked(Map, out List<Faction> houses, out int cost);
+			if (blocked != null) return new FloatMenuOption("RimFeast_GrandOptionBlocked".Translate(blocked), null);
+			return new FloatMenuOption("RimFeast_GrandOption".Translate(houses.Count, cost), delegate
+			{
+				Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(comp.GrandConfirmText(houses, cost, planned),
+					delegate
+					{
+						if (GameComponent_FeastState.Get()?.Busy ?? true)
+						{
+							Messages.Message("RimFeast_InviteDisabledBusy".Translate().CapitalizeFirst(),
+								MessageTypeDefOf.RejectInput, historical: false);
+							return;
+						}
+						if (!FeastUtility.TryPaySilver(Map, cost))
+						{
+							Messages.Message("RimFeast_NotEnoughSilver".Translate(cost),
+								MessageTypeDefOf.RejectInput, historical: false);
+							return;
+						}
+						GameComponent_FeastState.Get()?.StartGrandInvite(Map, this, planned);
+					}));
+			});
+		}
+
 		private void OpenInviteMenu(bool planned)
 		{
 			GameComponent_FeastState comp = GameComponent_FeastState.Get();
 			var options = new List<FloatMenuOption>();
+			if (comp != null) options.Add(GrandOption(comp, planned));
 			foreach (Faction house in FeastUtility.InvitableHouses())
 			{
 				Faction h = house;
@@ -165,11 +229,11 @@ namespace RimFeast
 			FeastCase colonyCase = GameComponent_FeastState.Get()?.ColonyCase;
 			if (c == null || c.spotThing != this)
 				line = colonyCase != null && colonyCase.spotThing == this
-					? "RimFeast_SpotColonyFeast".Translate()
-					: "RimFeast_SpotIdle".Translate();
+					? GameComponent_FeastState.Get().ColonySpotLine()
+					: (string)"RimFeast_SpotIdle".Translate();
 			else if (c.state == FeastCase.Invited)
 			{
-				line = (c.wedding ? "RimFeast_SpotWeddingInvited" : "RimFeast_SpotInvited").Translate(c.house?.Name);
+				line = (c.wedding ? "RimFeast_SpotWeddingInvited" : "RimFeast_SpotInvited").Translate(GameComponent_FeastState.GuestsName(c));
 				string eta = GameComponent_FeastState.ArrivalEta(c);
 				if (!eta.NullOrEmpty()) line += "\n" + eta;
 				if (Find.TickManager.TicksGame - cachedPreviewTick > 250)
@@ -180,13 +244,13 @@ namespace RimFeast
 				if (!cachedPreview.NullOrEmpty()) line += "\n" + cachedPreview;
 			}
 			else if (c.state == FeastCase.Traveling)
-				line = "RimFeast_SpotTraveling".Translate(c.house?.Name);
+				line = "RimFeast_SpotTraveling".Translate(GameComponent_FeastState.GuestsName(c));
 			else if (c.state == FeastCase.Fleeing)
-				line = "RimFeast_SpotFleeing".Translate(c.house?.Name);
+				line = "RimFeast_SpotFleeing".Translate(GameComponent_FeastState.GuestsName(c));
 			else if (c.state == FeastCase.Leaving)
-				line = "RimFeast_SpotLeaving".Translate(c.house?.Name);
+				line = "RimFeast_SpotLeaving".Translate(GameComponent_FeastState.GuestsName(c));
 			else
-				line = "RimFeast_SpotFeasting".Translate(c.house?.Name)
+				line = "RimFeast_SpotFeasting".Translate(GameComponent_FeastState.GuestsName(c))
 					+ "\n" + GameComponent_FeastState.HallReport(c);
 
 			Pawn head = c != null && c.leaderCame ? c.house?.leader : null;

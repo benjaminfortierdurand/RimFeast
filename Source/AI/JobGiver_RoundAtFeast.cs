@@ -96,7 +96,7 @@ namespace RimFeast.AI
 			return room;
 		}
 
-		private static bool Taken(IntVec3 c, Map map, Pawn pawn, List<Pawn> ring)
+		internal static bool Taken(IntVec3 c, Map map, Pawn pawn, List<Pawn> ring)
 		{
 			List<Thing> things = c.GetThingList(map);
 			for (int i = 0; i < things.Count; i++)

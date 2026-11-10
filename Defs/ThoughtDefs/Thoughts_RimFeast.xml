@@ -43,6 +43,107 @@
 			</li>
 		</stages>
 	</ThoughtDef>
+
+	<ThoughtDef>
+		<defName>RimFeast_Wake</defName>
+		<thoughtClass>Thought_Memory</thoughtClass>
+		<durationDays>3</durationDays>
+		<stackLimit>1</stackLimit>
+		<stages>
+			<li>
+				<label>a bare wake</label>
+				<description>We raised what little we had to their memory.</description>
+				<baseMoodEffect>2</baseMoodEffect>
+			</li>
+			<li>
+				<label>a decent wake</label>
+				<description>We sat together and spoke of the dead. It helped.</description>
+				<baseMoodEffect>3</baseMoodEffect>
+			</li>
+			<li>
+				<label>a fine wake</label>
+				<description>A full table and full cups for one of ours. They would have liked it.</description>
+				<baseMoodEffect>4</baseMoodEffect>
+			</li>
+			<li>
+				<label>a wake they deserved</label>
+				<description>The whole hall drank to their name. Nobody leaves this colony unsung.</description>
+				<baseMoodEffect>5</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+
+	<ThoughtDef>
+		<defName>RimFeast_VictoryFeast</defName>
+		<thoughtClass>Thought_Memory</thoughtClass>
+		<durationDays>3</durationDays>
+		<stackLimit>1</stackLimit>
+		<stages>
+			<li>
+				<label>a thin victory feast</label>
+				<description>We won, and there was not much to celebrate it with.</description>
+				<baseMoodEffect>3</baseMoodEffect>
+			</li>
+			<li>
+				<label>a modest victory feast</label>
+				<description>We held the walls, and we drank to it.</description>
+				<baseMoodEffect>5</baseMoodEffect>
+			</li>
+			<li>
+				<label>a fine victory feast</label>
+				<description>They came for us, and we are the ones feasting tonight.</description>
+				<baseMoodEffect>7</baseMoodEffect>
+			</li>
+			<li>
+				<label>a victory feast to remember</label>
+				<description>The hall roared. Let them come again.</description>
+				<baseMoodEffect>9</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+
+	<ThoughtDef>
+		<defName>RimFeast_HarvestFeast</defName>
+		<thoughtClass>Thought_Memory</thoughtClass>
+		<durationDays>4</durationDays>
+		<stackLimit>1</stackLimit>
+		<stages>
+			<li>
+				<label>a thin harvest feast</label>
+				<description>The stores are full, even if the table was not.</description>
+				<baseMoodEffect>3</baseMoodEffect>
+			</li>
+			<li>
+				<label>a modest harvest feast</label>
+				<description>A year of work, and a night to enjoy it.</description>
+				<baseMoodEffect>5</baseMoodEffect>
+			</li>
+			<li>
+				<label>a fine harvest feast</label>
+				<description>The granary is full and so are we.</description>
+				<baseMoodEffect>7</baseMoodEffect>
+			</li>
+			<li>
+				<label>a harvest feast to remember</label>
+				<description>Whatever winter brings, we ate like lords tonight.</description>
+				<baseMoodEffect>10</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
+
+	<ThoughtDef>
+		<defName>RimFeast_WonContest</defName>
+		<thoughtClass>Thought_Memory</thoughtClass>
+		<durationDays>2</durationDays>
+		<stackLimit>1</stackLimit>
+		<stages>
+			<li>
+				<label>won a drinking contest</label>
+				<description>I drank them under the table, and the whole hall saw it.</description>
+				<baseMoodEffect>4</baseMoodEffect>
+			</li>
+		</stages>
+	</ThoughtDef>
 	<ThoughtDef>
 		<defName>RimFeast_DancedWith</defName>
 		<thoughtClass>Thought_MemorySocial</thoughtClass>

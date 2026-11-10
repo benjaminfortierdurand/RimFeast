@@ -36,13 +36,21 @@ namespace RimFeast
 		public const int Unwed = 26;
 		public const int Caravan = 27;
 		public const int Silver = 28;
+		public const int InMemory = 29;
+		public const int SetDance = 30;
+		public const int Contest = 31;
+		public const int ContestDraw = 32;
+		public const int HouseVerdict = 33;
+		public const int Peace = 34;
+		public const int FeudBrawl = 35;
 
 		// meme ordre que les constantes, et le numero est sauvegarde: on ajoute a la fin, on ne deplace rien
 		private static readonly string[] Keys =
 		{
 			null, "Leader", "Gift", "Dance", "Conga", "Round", "Brawl", "Betrothed", "Declined", "Wed", "FirstDance",
 			"Gave", "Rival", "Ward", "Refused", "BedYes", "BedNo", "Poisoner", "Poisoned", "Slain", "Fallen", "Lost",
-			"Nameless", "War", "Blood", "BrawlDeath", "Unwed", "Caravan", "Silver",
+			"Nameless", "War", "Blood", "BrawlDeath", "Unwed", "Caravan", "Silver", "InMemory", "SetDance", "Contest",
+			"ContestDraw", "HouseVerdict", "Peace", "FeudBrawl",
 		};
 
 		public int kind;
@@ -53,10 +61,23 @@ namespace RimFeast
 		public bool Grim => kind == Slain || kind == Lost || kind == Nameless || kind == War || kind == Poisoned
 			|| kind == BrawlDeath;
 
-		public bool Glad => kind == Betrothed || kind == Wed || kind == FirstDance;
+		public bool Glad => kind == Betrothed || kind == Wed || kind == FirstDance || kind == Peace;
 
-		public string Label => kind > 0 && kind < Keys.Length
-			? (string)("RimFeast_Chron" + Keys[kind]).Translate(a ?? "", b ?? "", n) : "";
+		// le verdict d'une maison garde le numero du palier, pas son texte: il se traduit a l'affichage
+		public string Label
+		{
+			get
+			{
+				if (kind <= 0 || kind >= Keys.Length) return "";
+				if (kind == HouseVerdict)
+				{
+					int.TryParse(b, out int tier);
+					return "RimFeast_ChronHouseVerdict".Translate(a ?? "", GameComponent_FeastState.TierLabel(tier),
+						n.ToStringWithSign());
+				}
+				return ("RimFeast_Chron" + Keys[kind]).Translate(a ?? "", b ?? "", n);
+			}
+		}
 
 		public void ExposeData()
 		{
@@ -92,6 +113,9 @@ namespace RimFeast
 		public float drink = -1f;
 		public float ent = -1f;
 		public bool red;
+		// banquet de la colonie: 0 ordinaire, 1 veillee, 2 victoire, 3 moissons
+		public int occasion;
+		public bool grand;
 		public List<ChronicleLine> lines = new List<ChronicleLine>();
 
 		public void Add(int lineKind, string a = null, string b = null, int n = 0)
@@ -128,6 +152,8 @@ namespace RimFeast
 			Scribe_Values.Look(ref drink, "drink", -1f);
 			Scribe_Values.Look(ref ent, "ent", -1f);
 			Scribe_Values.Look(ref red, "red");
+			Scribe_Values.Look(ref occasion, "occasion");
+			Scribe_Values.Look(ref grand, "grand");
 			Scribe_Collections.Look(ref lines, "lines", LookMode.Deep);
 			if (Scribe.mode == LoadSaveMode.PostLoadInit && lines == null) lines = new List<ChronicleLine>();
 		}

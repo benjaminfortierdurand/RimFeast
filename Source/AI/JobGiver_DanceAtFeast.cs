@@ -101,14 +101,15 @@ namespace RimFeast.AI
 			Job cur = p.CurJob;
 			if (cur == null) return true;
 			if (cur.playerForced || cur.def == RimFeastDefOf.RimFeast_DanceJob || cur.def == RimFeastDefOf.RimFeast_CongaJob
-				|| cur.def == RimFeastDefOf.RimFeast_RoundJob)
+				|| cur.def == RimFeastDefOf.RimFeast_RoundJob || cur.def == RimFeastDefOf.RimFeast_SetDanceJob
+				|| cur.def == RimFeastDefOf.RimFeast_ContestJob)
 				return false;
 			if (cur.def == JobDefOf.Ingest || cur.def == RimFeastDefOf.RimFeast_EatAtSeatJob) return false;
 			if (p.jobs.curDriver is JobDriver_PlayMusicalInstrument) return false;
 			return cur.def.casualInterruptible;
 		}
 
-		private static bool FindFloor(Pawn a, Pawn b, IntVec3 spot, FeastUtility.FeastArea area, out IntVec3 ca, out IntVec3 cb)
+		internal static bool FindFloor(Pawn a, Pawn b, IntVec3 spot, FeastUtility.FeastArea area, out IntVec3 ca, out IntVec3 cb)
 		{
 			Map map = a.Map;
 			int n = GenRadial.NumCellsInRadius(area.Reach());

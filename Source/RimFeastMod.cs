@@ -37,6 +37,7 @@ namespace RimFeast
 		public int fadeDays = 20;
 		public int redWeddingDays = 60;
 		public bool censoredMusic;
+		public bool neutralWording;
 
 		public override void ExposeData()
 		{
@@ -67,6 +68,7 @@ namespace RimFeast
 			Scribe_Values.Look(ref fadeDays, "fadeDays", 20);
 			Scribe_Values.Look(ref redWeddingDays, "redWeddingDays", 60);
 			Scribe_Values.Look(ref censoredMusic, "censoredMusic", false);
+			Scribe_Values.Look(ref neutralWording, "neutralWording", false);
 		}
 	}
 
@@ -96,6 +98,13 @@ namespace RimFeast
 		}
 
 		public override string SettingsCategory() => "RimFeast";
+
+		// a la fermeture de la fenetre: le vocabulaire suit la case tout de suite
+		public override void WriteSettings()
+		{
+			base.WriteSettings();
+			Wording.Apply();
+		}
 
 		public override void DoSettingsWindowContents(Rect inRect)
 		{
@@ -175,6 +184,8 @@ namespace RimFeast
 
 			l.CheckboxLabeled("RimFeast_SetCensoredMusic".Translate(), ref S.censoredMusic,
 				"RimFeast_SetCensoredMusicTip".Translate());
+			l.CheckboxLabeled("RimFeast_SetNeutral".Translate(), ref S.neutralWording,
+				"RimFeast_SetNeutralTip".Translate());
 
 			l.GapLine();
 			l.Label("RimFeast_SetFadeDays".Translate(S.fadeDays));

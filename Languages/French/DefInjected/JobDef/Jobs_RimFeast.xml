@@ -7,5 +7,9 @@
 	<RimFeast_DanceJob.reportString>danse avec TargetA.</RimFeast_DanceJob.reportString>
 	<RimFeast_CongaJob.reportString>fait la chenille.</RimFeast_CongaJob.reportString>
 	<RimFeast_RoundJob.reportString>danse la ronde.</RimFeast_RoundJob.reportString>
+	<RimFeast_SetDanceJob.reportString>danse la contredanse.</RimFeast_SetDanceJob.reportString>
+	<RimFeast_CheerJob.reportString>acclame.</RimFeast_CheerJob.reportString>
+	<RimFeast_ContestJob.reportString>en concours de boisson avec TargetA.</RimFeast_ContestJob.reportString>
+	<RimFeast_WatchContestJob.reportString>regarde le concours de boisson.</RimFeast_WatchContestJob.reportString>
 
 </LanguageData>

@@ -6,7 +6,7 @@
 	<RimFeast_InviteGizmoDesc>Send a messenger with gifts to invite a noble house to a feast at this spot. Costs {0} silver for a house that has never dined with you. A house that has feasted here recently asks for richer gifts, and is harder to impress a second time. Let a season pass and the novelty returns.</RimFeast_InviteGizmoDesc>
 	<RimFeast_InviteDisabledBusy>a feast is already planned or underway</RimFeast_InviteDisabledBusy>
 	<RimFeast_ColonyGizmoLabel>feast for the colony</RimFeast_ColonyGizmoLabel>
-	<RimFeast_ColonyGizmoDesc>Hold a feast for your own people, no guests. Your colonists gather in the feast area to eat, drink and listen to music. How good they feel afterwards depends on the hall, the table and the drink. Once every {0} days.</RimFeast_ColonyGizmoDesc>
+	<RimFeast_ColonyGizmoDesc>Hold a feast for your own people, no guests. Your colonists gather in the feast area to eat, drink and listen to music. How good they feel afterwards depends on the hall, the table and the drink. An ordinary feast once every {0} days. A wake, a victory feast or a harvest feast can be held on top of that, when the occasion is there.</RimFeast_ColonyGizmoDesc>
 	<RimFeast_ColonyDisabledCooldown>your people feasted recently, again in {0} days</RimFeast_ColonyDisabledCooldown>
 	<RimFeast_ColonyDisabledDanger>not with danger on the map</RimFeast_ColonyDisabledDanger>
 	<RimFeast_ColonyDisabledGathering>a party, ceremony or caravan is already gathering your people</RimFeast_ColonyDisabledGathering>
@@ -15,8 +15,55 @@
 	<RimFeast_CongaStarts>{0} starts a conga line.</RimFeast_CongaStarts>
 	<RimFeast_DanceInvite>{0} asks {1} to dance.</RimFeast_DanceInvite>
 	<RimFeast_RoundStarts>{0} gets a circle dance going.</RimFeast_RoundStarts>
+	<RimFeast_SetDanceStarts>{0} calls a country dance.</RimFeast_SetDanceStarts>
+	<RimFeast_ContestStarts>{0} challenges {1} to a drinking contest.</RimFeast_ContestStarts>
+	<RimFeast_ContestWon>{0} drinks {1} under the table after {2} mugs.</RimFeast_ContestWon>
+	<RimFeast_ContestDraw>{0} and {1} call it a draw after {2} mugs.</RimFeast_ContestDraw>
+	<RimFeast_GrandGuests>the noble houses</RimFeast_GrandGuests>
+	<RimFeast_GrandOption>The Grand Feast: every house at once ({0} houses, {1} silver)</RimFeast_GrandOption>
+	<RimFeast_GrandOptionBlocked>The Grand Feast ({0})</RimFeast_GrandOptionBlocked>
+	<RimFeast_GrandCooldown>once a year, again in {0} days</RimFeast_GrandCooldown>
+	<RimFeast_GrandNeedHouses>it takes at least {0} houses willing to come</RimFeast_GrandNeedHouses>
+	<RimFeast_GrandConfirm>Send a messenger to every house: {0}.\n\nThey all ride in the same evening and share your hall. Each house judges the feast for itself. It costs {1} silver, and it can be done once a year.</RimFeast_GrandConfirm>
+	<RimFeast_GrandConfirmPlanned>Send a messenger to every house: {0}.\n\nThey all ride in the same evening, and none of them is meant to ride home. Spill the blood of half of them and it is war with every house at the table. It costs {1} silver, and it can be done once a year.</RimFeast_GrandConfirmPlanned>
+	<RimFeast_GrandFeuds>Old feuds will sit at the same table: {0}.</RimFeast_GrandFeuds>
+	<RimFeast_GrandFeudPair>{0} and {1}</RimFeast_GrandFeudPair>
+	<RimFeast_LabelGrandSent>The Grand Feast is called</RimFeast_LabelGrandSent>
+	<RimFeast_TextGrandSent>Your messengers ride out to {0} houses: {1}. They will all arrive the same evening. Set a table for a crowd.</RimFeast_TextGrandSent>
+	<RimFeast_TextGrandSentPlanned>Your messengers ride out to {0} houses: {1}. They will all arrive the same evening, and you mean to bury them together.</RimFeast_TextGrandSentPlanned>
+	<RimFeast_LabelGrandArrive>The houses arrive</RimFeast_LabelGrandArrive>
+	<RimFeast_TextGrandArrive>{0} corteges ride in from every side, {1} guests under their banners: {2}. They are making for your feast hall.</RimFeast_TextGrandArrive>
+	<RimFeast_GrandHead>{0}, head of {1}, rides in person.</RimFeast_GrandHead>
+	<RimFeast_GrandFeudBrawl>The old feud between {0} and {1} comes out over the cups.</RimFeast_GrandFeudBrawl>
+	<RimFeast_LabelGrandVerdict>The Grand Feast: the verdict</RimFeast_LabelGrandVerdict>
+	<RimFeast_TextGrandVerdict>The houses ride home, and each one carries its own account of the evening.</RimFeast_TextGrandVerdict>
+	<RimFeast_GrandVerdictLine>{0}: {1} ({2})</RimFeast_GrandVerdictLine>
+	<RimFeast_GrandNoToast>Nobody raised a cup to them.</RimFeast_GrandNoToast>
+	<RimFeast_GrandBrawled>Their people came to blows.</RimFeast_GrandBrawled>
+	<RimFeast_GrandPeace>{0} and {1} buried an old feud at your table. Both are grateful.</RimFeast_GrandPeace>
+	<RimFeast_GrandSilver>A night like that gets paid for: {0} silver is left on the table.</RimFeast_GrandSilver>
+	<RimFeast_TextRedGrand>You have butchered the nobility of the rim under your own roof: {0} guests lie dead or broken, from {1} houses. Every one of those houses is at war with you now, and their riders will not be long.</RimFeast_TextRedGrand>
 	<RimFeast_ColonyToast>{0} raises a toast. The hall falls quiet to listen.</RimFeast_ColonyToast>
 	<RimFeast_ColonyFeastOver>The colony feast is over. {0}</RimFeast_ColonyFeastOver>
+	<RimFeast_OccasionPlain>An ordinary feast</RimFeast_OccasionPlain>
+	<RimFeast_OccasionWake>A wake for {0}</RimFeast_OccasionWake>
+	<RimFeast_OccasionWakeNone>A wake (nobody to mourn)</RimFeast_OccasionWakeNone>
+	<RimFeast_OccasionVictory>A victory feast</RimFeast_OccasionVictory>
+	<RimFeast_OccasionVictoryNone>A victory feast (no attack beaten back in the last {0} days)</RimFeast_OccasionVictoryNone>
+	<RimFeast_OccasionVictoryHeld>A victory feast (already held for the last attack)</RimFeast_OccasionVictoryHeld>
+	<RimFeast_OccasionHarvest>A harvest feast</RimFeast_OccasionHarvest>
+	<RimFeast_OccasionHarvestLow>A harvest feast (the stores must hold {0} days of food, they hold {1})</RimFeast_OccasionHarvestLow>
+	<RimFeast_OccasionHarvestHeld>A harvest feast (once a year, again in {0} days)</RimFeast_OccasionHarvestHeld>
+	<RimFeast_WakeBegins>{0} calls the colony to a wake for {1}.</RimFeast_WakeBegins>
+	<RimFeast_VictoryBegins>{0} calls the colony to a victory feast.</RimFeast_VictoryBegins>
+	<RimFeast_HarvestBegins>{0} calls the colony to the harvest feast.</RimFeast_HarvestBegins>
+	<RimFeast_WakeToast>{0} raises a cup to {1}. The hall falls quiet.</RimFeast_WakeToast>
+	<RimFeast_VictoryToast>{0} raises a toast to the victory. The hall roars.</RimFeast_VictoryToast>
+	<RimFeast_HarvestToast>{0} raises a toast to the harvest and the hands that brought it in.</RimFeast_HarvestToast>
+	<RimFeast_WakeOver>The wake is over. Those who sat at it carry the loss of {0} a little lighter. {1}</RimFeast_WakeOver>
+	<RimFeast_SpotWake>The colony is holding a wake for {0}.</RimFeast_SpotWake>
+	<RimFeast_SpotVictory>The colony is feasting its victory.</RimFeast_SpotVictory>
+	<RimFeast_SpotHarvest>The colony is holding its harvest feast.</RimFeast_SpotHarvest>
 	<RimFeast_InviteDisabledNoHouses>No noble house will treat with you.</RimFeast_InviteDisabledNoHouses>
 	<RimFeast_InviteOption>Invite {0} (goodwill {1}, {2} silver)</RimFeast_InviteOption>
 	<RimFeast_InviteOptionAgain>Invite {0} (goodwill {1}, {2} silver, has feasted here {3}x)</RimFeast_InviteOptionAgain>
@@ -106,6 +153,9 @@
 	<RimFeast_SetTreacheryGoodwill>Treachery goodwill threshold: {0}</RimFeast_SetTreacheryGoodwill>
 	<RimFeast_SetCensoredMusic>Use the alternate red feast tune</RimFeast_SetCensoredMusic>
 	<RimFeast_SetCensoredMusicTip>The red feast plays a cover of a certain song from a certain show. Tick this to use a different track instead, same scene, same cue, no copyright worries.</RimFeast_SetCensoredMusicTip>
+	<RimFeast_SetNeutral>Neutral wording</RimFeast_SetNeutral>
+	<RimFeast_SetNeutralTip>For runs that are not medieval. The texts say faction, delegation and delegate where they said house, cortege and noble, and nobody rides anywhere. Takes effect when you close this window.</RimFeast_SetNeutralTip>
+	<RimFeast_NeutralWords>noble houses=factions|noble house=faction|a noble table=their table|house banner=colours|head of house=head of|houses=factions|house=faction|corteges=delegations|cortege=delegation|the nobility of the rim=the leaders of the rim|among the nobility=among their people|nobility=leaders|nobles=delegates|noble=delegate|lords=leaders|lord=leader|knights=guards|knight=guard|banners=colours|banner=colours|riders=fighters|rider=runner|rides in person=comes in person|riding under=under|rides out=sets out|ride out=set out|rode out=got out|riding out=leaving|rides home=heads home|ride home=head home|rode home=went home|riding home=going home|rides back=comes back|ride back=come back|rides in=arrives|ride in=arrive|riding in=coming in|rides=travels|ride=travel|riding=travelling|rode=travelled|mead=beer</RimFeast_NeutralWords>
 	<RimFeast_SetFadeDays>A house forgets one feast every {0} days</RimFeast_SetFadeDays>
 	<RimFeast_SetRedWeddingDays>Word of a red feast travels for {0} days</RimFeast_SetRedWeddingDays>
 
@@ -300,5 +350,16 @@
 	<RimFeast_ChronUnwed>The wedding of {0} and {1} did not take place.</RimFeast_ChronUnwed>
 	<RimFeast_ChronCaravan>They promised a trade caravan.</RimFeast_ChronCaravan>
 	<RimFeast_ChronSilver>They left {2} silver on the table.</RimFeast_ChronSilver>
+	<RimFeast_ChronKindWake>Wake</RimFeast_ChronKindWake>
+	<RimFeast_ChronKindVictory>Victory feast</RimFeast_ChronKindVictory>
+	<RimFeast_ChronKindHarvest>Harvest feast</RimFeast_ChronKindHarvest>
+	<RimFeast_ChronInMemory>Held in memory of {0}.</RimFeast_ChronInMemory>
+	<RimFeast_ChronSetDance>{0} called a country dance of {2}.</RimFeast_ChronSetDance>
+	<RimFeast_ChronContest>{0} drank {1} under the table in {2} mugs.</RimFeast_ChronContest>
+	<RimFeast_ChronContestDraw>{0} and {1} drank each other to a standstill.</RimFeast_ChronContestDraw>
+	<RimFeast_ChronKindGrand>Grand Feast</RimFeast_ChronKindGrand>
+	<RimFeast_ChronHouseVerdict>{0}: {1} ({2})</RimFeast_ChronHouseVerdict>
+	<RimFeast_ChronPeace>{0} and {1} buried an old feud at your table.</RimFeast_ChronPeace>
+	<RimFeast_ChronFeudBrawl>The feud between {0} and {1} came out over the cups.</RimFeast_ChronFeudBrawl>
 
 </LanguageData>
