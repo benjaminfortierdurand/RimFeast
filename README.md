@@ -16,6 +16,8 @@ Requires [Harmony](https://steamcommunity.com/sharedfiles/filedetails/?id=200946
 
 Build with `dotnet build Source/RimFeast.csproj -c Release` for 1.7, the dll lands in `1.7/Assemblies/`. Add `-p:GameVersion=1.6` for 1.6, it lands in `1.6/Assemblies/`. The paths to the game and to Harmony are set in the csproj.
 
+The tavern music is from Kingdom Come: Deliverance and belongs to its owners. This mod is not affiliated with or endorsed by Warhorse Studios, Deep Silver or PLAION.
+
 Bug reports welcome here or on the workshop page.
 
 BenFD
