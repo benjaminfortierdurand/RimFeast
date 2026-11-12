@@ -363,4 +363,76 @@
 	<RimFeast_ChronPeace>{0} and {1} buried an old feud at your table.</RimFeast_ChronPeace>
 	<RimFeast_ChronFeudBrawl>The feud between {0} and {1} came out over the cups.</RimFeast_ChronFeudBrawl>
 
+	<!-- guide -->
+	<RimFeast_GuideGizmoLabel>guide</RimFeast_GuideGizmoLabel>
+	<RimFeast_GuideGizmoDesc>Open the feast guide: what your hall still needs, step by step, and why a feast cannot be held right now.</RimFeast_GuideGizmoDesc>
+	<RimFeast_SetOpenGuide>Open the feast guide</RimFeast_SetOpenGuide>
+	<RimFeast_GuideLetterLabel>Your first feast spot</RimFeast_GuideLetterLabel>
+	<RimFeast_GuideLetterText>The feast spot is down. Put chairs at a table inside its area, bring meals and drink there, then select the spot and invite a house.\n\nSelect the spot and press Guide to see, step by step, what your hall still needs and why a feast cannot be held right now.</RimFeast_GuideLetterText>
+	<RimFeast_GuideTitle>Feast guide</RimFeast_GuideTitle>
+	<RimFeast_GuideProgress>Your hall: {0} of {1} steps done</RimFeast_GuideProgress>
+	<RimFeast_GuideNoMap>Load a colony to see where your hall stands.</RimFeast_GuideNoMap>
+	<RimFeast_GuideOptional>optional</RimFeast_GuideOptional>
+	<RimFeast_GuideMore>More</RimFeast_GuideMore>
+	<RimFeast_GuideOn>on</RimFeast_GuideOn>
+	<RimFeast_GuideOff>off</RimFeast_GuideOff>
+	<RimFeast_GuideSetting>{0}: {1}</RimFeast_GuideSetting>
+	<RimFeast_GuidePlaceSpot>Place a feast spot</RimFeast_GuidePlaceSpot>
+	<RimFeast_GuideShowSpot>Show the feast spot</RimFeast_GuideShowSpot>
+	<RimFeast_GuideOpenSettings>Open the settings</RimFeast_GuideOpenSettings>
+	<RimFeast_GuideNoSpot>Place a feast spot first.</RimFeast_GuideNoSpot>
+	<RimFeast_GuideNoMusic>Music and dancing need Royalty or Ideology.</RimFeast_GuideNoMusic>
+	<RimFeast_GuideSpotTitle>The feast spot</RimFeast_GuideSpotTitle>
+	<RimFeast_GuideSpotBody>Everything starts with the feast spot (Architect, Misc). Put it in the room that will be your hall. By default the feast area is that room, up to 18 cells around the spot.\n\nSelect the spot to paint the area by hand like a stockpile zone, or to erase part of it, up to 30 cells away. Only the food, drink, chairs and instruments inside the area count, and the guests stay inside it. Once you know where it is you can hide the marker.</RimFeast_GuideSpotBody>
+	<RimFeast_GuideSpotPlaced>A feast spot is placed</RimFeast_GuideSpotPlaced>
+	<RimFeast_GuideSpotIndoors>The spot is indoors, so the room counts as your hall</RimFeast_GuideSpotIndoors>
+	<RimFeast_GuideHallTitle>The hall and the table</RimFeast_GuideHallTitle>
+	<RimFeast_GuideHallBody>The guests judge five things: the hall, the food, the drink, how full they leave, and the toasts and music. The hall is how impressive the room is. For the food, lavish meals score more than fine ones, fine more than simple, and several different dishes beat one. Count one drink per guest.\n\nKeep the meals and the drink inside the feast area before the guests arrive. While you wait for them, the feast spot shows how the hall, the table and the drink look.</RimFeast_GuideHallBody>
+	<RimFeast_GuideHallChairs>Chairs beside a table inside the feast area: {0}</RimFeast_GuideHallChairs>
+	<RimFeast_GuideHallMeals>Meals inside the feast area</RimFeast_GuideHallMeals>
+	<RimFeast_GuideHallDrinks>One drink per guest: {0} inside the area for the {1} guests of a usual cortege</RimFeast_GuideHallDrinks>
+	<RimFeast_GuideHallInstrument>An instrument inside the feast area</RimFeast_GuideHallInstrument>
+	<RimFeast_GuideInviteTitle>Inviting a house</RimFeast_GuideInviteTitle>
+	<RimFeast_GuideInviteBody>Select the feast spot, press Invite a house and pick one. Any house that is not at war with you can be invited. The messenger costs silver, more for a house that dined with you recently, and the guests arrive a day or two later, late in the afternoon. Until then you can cancel.\n\nA house that thinks badly of you may accept with poison in mind. The more of your people at the table, the better the chance someone sees it.</RimFeast_GuideInviteBody>
+	<RimFeast_GuideInviteHouses>Houses that can be invited: {0}</RimFeast_GuideInviteHouses>
+	<RimFeast_GuideInviteSilver>Silver for the messenger: {0} in store, {1} needed</RimFeast_GuideInviteSilver>
+	<RimFeast_GuideInviteBusy>A feast is already planned or under way.</RimFeast_GuideInviteBusy>
+	<RimFeast_GuideEveningTitle>The evening and the verdict</RimFeast_GuideEveningTitle>
+	<RimFeast_GuideEveningBody>When the guests sit down your colonists drop their work and join them. There are toasts along the way. Halfway through, the one who leads the guests may ask for a favour, and after a good feast a guest may ask to marry one of your single colonists.\n\nA letter gives the verdict when they leave. At 60 or more they send a trade caravan. At 85 or more they also leave silver on the table and you pick the caravan. A poor table costs goodwill.</RimFeast_GuideEveningBody>
+	<RimFeast_GuideEveningHours>The feast lasts {0} hours</RimFeast_GuideEveningHours>
+	<RimFeast_GuideSeatsTitle>Feast seats</RimFeast_GuideSeatsTitle>
+	<RimFeast_GuideSeatsBody>Chairs, stools and benches inside the feast area have an Assign feast seat button, like a bed. The colonist sits there at feasts, and for everyday meals too if the setting is on.\n\nEveryone else leaves that seat alone while its owner is on the map. They only eat on it when no other chair is free.</RimFeast_GuideSeatsBody>
+	<RimFeast_GuideSeatsAssigned>A seat is assigned to a colonist</RimFeast_GuideSeatsAssigned>
+	<RimFeast_GuideColonyTitle>Feast for the colony</RimFeast_GuideColonyTitle>
+	<RimFeast_GuideColonyBody>Feast for the colony is for your own people: no messenger, no guests. Someone presides and raises a few toasts, and the rest eat, drink and dance like at any feast. How they feel after depends on the hall, the table, the drink and the music.\n\nAn ordinary feast can be held every few days. A wake, a victory feast and a harvest feast come on top of that when their moment is there.</RimFeast_GuideColonyBody>
+	<RimFeast_GuideColonyOk>An ordinary feast can be held now</RimFeast_GuideColonyOk>
+	<RimFeast_GuideColonyNo>Ordinary feast: {0}</RimFeast_GuideColonyNo>
+	<RimFeast_GuideColonyWake>Wakes that can be held: {0}</RimFeast_GuideColonyWake>
+	<RimFeast_GuideColonyVictoryOk>A victory feast can be held now</RimFeast_GuideColonyVictoryOk>
+	<RimFeast_GuideColonyHarvestOk>A harvest feast can be held now</RimFeast_GuideColonyHarvestOk>
+	<RimFeast_GuideDanceTitle>Music and dancing</RimFeast_GuideDanceTitle>
+	<RimFeast_GuideDanceBody>With Royalty or Ideology, put an instrument inside the feast area and one of your colonists plays through the evening. Once or twice a feast, while someone plays, people get up and dance: couples, a conga line, a circle, a country dance.\n\nWithout an instrument nobody dances, and only the toasts count for that part of the verdict.</RimFeast_GuideDanceBody>
+	<RimFeast_GuideGrandTitle>The Grand Feast</RimFeast_GuideGrandTitle>
+	<RimFeast_GuideGrandBody>Once a year, the first line of the invite menu calls every house at once. Two to five of them come the same evening from different sides of the map, up to 28 guests, and the messenger costs the sum of their invitations.\n\nEach house gives its own verdict, and an old feud between two of them can come to blows.</RimFeast_GuideGrandBody>
+	<RimFeast_GuideGrandOk>It can be held now: {0} houses, {1} silver</RimFeast_GuideGrandOk>
+	<RimFeast_GuideGrandNo>Not now: {0}</RimFeast_GuideGrandNo>
+	<RimFeast_GuideRedTitle>The red feast</RimFeast_GuideRedTitle>
+	<RimFeast_GuideRedBody>Plan a red feast sends the same invitation with the same gifts. Once the guests are seated, press Begin the killings and pick who dies first. Your nearest fighter opens their throat and every colonist who can fight is drafted.\n\nIt is war with their house from the first blow. If half the guests or more end up dead, downed or captured, a raid follows, everyone else thinks less of you, no house accepts an invitation for a while, and that house never will again.</RimFeast_GuideRedBody>
+	<RimFeast_GuideAwayTitle>Their table</RimFeast_GuideAwayTitle>
+	<RimFeast_GuideAwayBody>From time to time a house that dined with you or thinks well of you sets its own table and sends a messenger. Form a caravan with someone who can hold a conversation and send it to the marked settlement before the invitation runs out.</RimFeast_GuideAwayBody>
+	<RimFeast_GuideAwayEvery>An invitation about every {0} days</RimFeast_GuideAwayEvery>
+	<RimFeast_GuideDiagTitle>Why can't I hold a feast?</RimFeast_GuideDiagTitle>
+	<RimFeast_GuideDiagBody>If a button is greyed out or no house answers, the reason is in the list below. A ticked line is fine, an empty box is what stands in the way.</RimFeast_GuideDiagBody>
+	<RimFeast_GuideDiagFree>No other feast is planned or under way</RimFeast_GuideDiagFree>
+	<RimFeast_GuideDiagHouses>Houses not at war with you: {0}</RimFeast_GuideDiagHouses>
+	<RimFeast_GuideDiagRefuse>{0}: {1}</RimFeast_GuideDiagRefuse>
+	<RimFeast_GuideDiagNoRefuse>No house refuses your invitations</RimFeast_GuideDiagNoRefuse>
+	<RimFeast_GuideDiagNoDance>No instrument inside the feast area: no music, no dancing</RimFeast_GuideDiagNoDance>
+	<RimFeast_SetMisfortune>Breaking guest right brings misfortune</RimFeast_SetMisfortune>
+	<RimFeast_SetMisfortuneTip>After a red feast where half the guests or more went down, {0} misfortunes strike the colony over the next {1} days: sickness, blight, a maddened animal, a psychic drone, foul weather. Off by default.</RimFeast_SetMisfortuneTip>
+	<RimFeast_LabelMisfortune>Guest right broken</RimFeast_LabelMisfortune>
+	<RimFeast_TextMisfortune>Guests were killed under your roof. People say misfortune follows a host who does that. Over the next {1} days, {0} misfortunes will strike this colony.</RimFeast_TextMisfortune>
+	<RimFeast_MessageMisfortune>Misfortune {0} of {1} for breaking guest right.</RimFeast_MessageMisfortune>
+	<RimFeast_SetTavernMusic>Tavern music when someone plays at a feast</RimFeast_SetTavernMusic>
+	<RimFeast_SetTavernMusicTip>While someone plays an instrument during a feast, it plays one of two tavern tunes instead of its own notes, and the game music goes quiet while you watch the hall. Needs Royalty or Ideology, like all feast music.</RimFeast_SetTavernMusicTip>
 </LanguageData>

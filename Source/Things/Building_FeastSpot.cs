@@ -24,9 +24,25 @@ namespace RimFeast
 			Scribe_Values.Look(ref hideMarker, "hideMarker");
 		}
 
+		public override void SpawnSetup(Map map, bool respawningAfterLoad)
+		{
+			base.SpawnSetup(map, respawningAfterLoad);
+			if (!respawningAfterLoad && Faction == Faction.OfPlayer) GameComponent_FeastState.Get()?.OfferGuide(this);
+		}
+
 		public override IEnumerable<Gizmo> GetGizmos()
 		{
 			foreach (Gizmo g in base.GetGizmos()) yield return g;
+			if (Faction == Faction.OfPlayer)
+				LessonAutoActivator.TeachOpportunity(RimFeastDefOf.RimFeast_Concept_Guide, OpportunityType.GoodToKnow);
+
+			yield return new Command_Action
+			{
+				defaultLabel = "RimFeast_GuideGizmoLabel".Translate(),
+				defaultDesc = "RimFeast_GuideGizmoDesc".Translate(),
+				icon = TexButton.Info,
+				action = () => Window_FeastGuide.Open(),
+			};
 
 			yield return new Command_Toggle
 			{

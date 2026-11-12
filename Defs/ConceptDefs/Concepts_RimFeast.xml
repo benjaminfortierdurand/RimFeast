@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+	<ConceptDef>
+		<defName>RimFeast_Concept_Guide</defName>
+		<label>the feast guide</label>
+		<priority>70</priority>
+		<helpText>Your feast spot has a Guide button. It shows, step by step, what your hall still needs on this map, and a page that explains why a feast cannot be held right now.</helpText>
+	</ConceptDef>
+
+</Defs>

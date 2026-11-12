@@ -36,6 +36,8 @@ namespace RimFeast
 		public static SoundDef RimFeast_RedWeddingPerformance;
 		public static SongDef RimFeast_CensoredSong;
 		public static SoundDef RimFeast_CensoredPerformance;
+		public static SoundDef RimFeast_TavernPerformance1;
+		public static SoundDef RimFeast_TavernPerformance2;
 
 		public static ThoughtDef RimFeast_AttendedFeast;
 		public static ThoughtDef RimFeast_ColonyFeast;
@@ -46,6 +48,8 @@ namespace RimFeast
 		public static ThoughtDef RimFeast_DancedWith;
 		public static ThoughtDef RimFeast_NightWithNoble;
 		public static ThoughtDef RimFeast_GuestRightBroken;
+
+		public static ConceptDef RimFeast_Concept_Guide;
 
 		static RimFeastDefOf()
 		{

@@ -135,6 +135,13 @@ namespace RimFeast.Debug
 			comp.DebugRush();
 		}
 
+		[DebugAction("RimFeast", "Misfortune now (as after a red feast)",
+			allowedGameStates = AllowedGameStates.PlayingOnMap)]
+		private static void MisfortuneNow()
+		{
+			GameComponent_FeastState.Get()?.StartMisfortune(Find.CurrentMap, force: true);
+		}
+
 		[DebugAction("RimFeast", "Log why nobody plays music",
 			allowedGameStates = AllowedGameStates.PlayingOnMap)]
 		private static void LogMusic()

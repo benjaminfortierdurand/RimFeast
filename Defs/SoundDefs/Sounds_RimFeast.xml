@@ -43,4 +43,46 @@
 		</subSounds>
 	</SoundDef>
 
+	<SoundDef>
+		<defName>RimFeast_TavernPerformance1</defName>
+		<context>MapOnly</context>
+		<maxSimultaneous>1</maxSimultaneous>
+		<sustain>True</sustain>
+		<priorityMode>PrioritizeNearest</priorityMode>
+		<sustainFadeoutTime>4</sustainFadeoutTime>
+		<subSounds>
+			<li>
+				<grains>
+					<li Class="AudioGrain_Clip">
+						<clipPath>Song/Tavern/RimFeast_Tavern1</clipPath>
+					</li>
+				</grains>
+				<volumeRange>50</volumeRange>
+				<distRange>15~60</distRange>
+				<muteWhenPaused>True</muteWhenPaused>
+			</li>
+		</subSounds>
+	</SoundDef>
+
+	<SoundDef>
+		<defName>RimFeast_TavernPerformance2</defName>
+		<context>MapOnly</context>
+		<maxSimultaneous>1</maxSimultaneous>
+		<sustain>True</sustain>
+		<priorityMode>PrioritizeNearest</priorityMode>
+		<sustainFadeoutTime>4</sustainFadeoutTime>
+		<subSounds>
+			<li>
+				<grains>
+					<li Class="AudioGrain_Clip">
+						<clipPath>Song/Tavern/RimFeast_Tavern2</clipPath>
+					</li>
+				</grains>
+				<volumeRange>50</volumeRange>
+				<distRange>15~60</distRange>
+				<muteWhenPaused>True</muteWhenPaused>
+			</li>
+		</subSounds>
+	</SoundDef>
+
 </Defs>

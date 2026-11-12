@@ -40,6 +40,8 @@ namespace RimFeast
 		public int redWeddingDays = 60;
 		public bool censoredMusic;
 		public bool neutralWording;
+		public bool misfortune;
+		public bool tavernMusic = true;
 
 		public override void ExposeData()
 		{
@@ -71,6 +73,8 @@ namespace RimFeast
 			Scribe_Values.Look(ref redWeddingDays, "redWeddingDays", 60);
 			Scribe_Values.Look(ref censoredMusic, "censoredMusic", false);
 			Scribe_Values.Look(ref neutralWording, "neutralWording", false);
+			Scribe_Values.Look(ref misfortune, "misfortune", false);
+			Scribe_Values.Look(ref tavernMusic, "tavernMusic", true);
 		}
 	}
 
@@ -122,6 +126,8 @@ namespace RimFeast
 			l.maxOneColumn = true;
 			l.Begin(view);
 
+			if (l.ButtonText("RimFeast_SetOpenGuide".Translate())) Window_FeastGuide.Open();
+			l.Gap(6f);
 			l.Label("RimFeast_SetInviteCost".Translate(S.inviteCost));
 			S.inviteCost = Mathf.RoundToInt(l.Slider(S.inviteCost, 0f, 1000f) / 25f) * 25;
 			l.Label("RimFeast_SetGift".Translate(S.giftSilver));
@@ -187,6 +193,8 @@ namespace RimFeast
 				S.treacheryGoodwillMax = Mathf.RoundToInt(l.Slider(S.treacheryGoodwillMax, -100f, 0f) / 5f) * 5;
 			}
 
+			l.CheckboxLabeled("RimFeast_SetTavernMusic".Translate(), ref S.tavernMusic,
+				"RimFeast_SetTavernMusicTip".Translate());
 			l.CheckboxLabeled("RimFeast_SetCensoredMusic".Translate(), ref S.censoredMusic,
 				"RimFeast_SetCensoredMusicTip".Translate());
 			l.CheckboxLabeled("RimFeast_SetNeutral".Translate(), ref S.neutralWording,
@@ -195,6 +203,8 @@ namespace RimFeast
 			l.GapLine();
 			l.Label("RimFeast_SetFadeDays".Translate(S.fadeDays));
 			S.fadeDays = Mathf.RoundToInt(l.Slider(S.fadeDays, 1f, 60f));
+			l.CheckboxLabeled("RimFeast_SetMisfortune".Translate(), ref S.misfortune,
+				"RimFeast_SetMisfortuneTip".Translate(GameComponent_FeastState.MisfortuneCount, GameComponent_FeastState.MisfortuneDays));
 			l.Label("RimFeast_SetRedWeddingDays".Translate(S.redWeddingDays));
 			S.redWeddingDays = Mathf.RoundToInt(l.Slider(S.redWeddingDays, 0f, 180f) / 5f) * 5;
 

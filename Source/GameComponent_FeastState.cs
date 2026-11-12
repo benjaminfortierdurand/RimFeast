@@ -551,7 +551,8 @@ namespace RimFeast
 
 		public void DebugRushCaravans()
 		{
-			if (caravans.Count == 0 && raids.Count == 0)
+			for (int i = 0; i < misfortuneTicks.Count; i++) misfortuneTicks[i] = Find.TickManager.TicksGame;
+			if (caravans.Count == 0 && raids.Count == 0 && misfortuneTicks.Count == 0)
 			{
 				Messages.Message("RimFeast: nothing pending.", MessageTypeDefOf.RejectInput, historical: false);
 				return;
@@ -580,17 +581,30 @@ namespace RimFeast
 		public static string HallPreview(FeastCase c)
 		{
 			if (c?.map == null || c.house == null) return null;
-			Map map = c.map;
-			Room room = c.spotCell.GetRoom(map);
-			float hall = room != null && !room.PsychologicallyOutdoors
-				? room.GetStat(RoomStatDefOf.Impressiveness) : 0f;
-
 			int expected = c.grand ? GrandExpected(c) : Mathf.Max(2, RimFeastMod.S.corteges
 				+ Mathf.RoundToInt(Mathf.Clamp(c.house.PlayerGoodwill, -100f, 100f) / 50f));
+			return HallPreview(c.map, c.spotCell, expected);
+		}
+
+		public static string HallPreview(Map map, IntVec3 spot, int expected)
+		{
+			Assess(map, spot, expected, out float hall, out float table, out float drink, out _);
+			return "RimFeast_PreviewHeader".Translate(expected) + "\n"
+				+ Qual(hall, "RimFeast_QualHall") + " " + Qual(table, "RimFeast_QualTable")
+				+ " " + Qual(drink, "RimFeast_QualDrink");
+		}
+
+		// ce que la zone offre a cet instant pour ce nombre d'invites, de 0 a 1. drinks: le nombre de verres
+		public static void Assess(Map map, IntVec3 spot, int expected, out float hall, out float table, out float drink,
+			out int drinks)
+		{
+			Room room = spot.GetRoom(map);
+			float impressiveness = room != null && !room.PsychologicallyOutdoors
+				? room.GetStat(RoomStatDefOf.Impressiveness) : 0f;
 
 			var tierNutrition = new float[TierValue.Length];
-			int drinkUnits = 0;
-			FeastUtility.FeastArea area = FeastUtility.FeastArea.For(c.spotCell, map);
+			drinks = 0;
+			FeastUtility.FeastArea area = FeastUtility.FeastArea.For(spot, map);
 			List<Thing> foods = map.listerThings.ThingsInGroup(ThingRequestGroup.FoodSourceNotPlantOrTree);
 			for (int i = 0; i < foods.Count; i++)
 			{
@@ -599,17 +613,28 @@ namespace RimFeast
 				if (!area.Contains(t.Position)) continue;
 				if (t.def.IsDrug)
 				{
-					if (t.def.ingestible?.drugCategory == DrugCategory.Social) drinkUnits += t.stackCount;
+					if (t.def.ingestible?.drugCategory == DrugCategory.Social) drinks += t.stackCount;
 				}
 				else if ((int)t.def.ingestible.preferability > (int)FoodPreferability.RawBad)
 					tierNutrition[TierIndexOf(t.def.ingestible.preferability)] +=
 						t.stackCount * t.def.ingestible.CachedNutrition;
 			}
 
-			return "RimFeast_PreviewHeader".Translate(expected) + "\n"
-				+ Qual(Mathf.Clamp01(hall / ImpressivenessCap), "RimFeast_QualHall")
-				+ " " + Qual(Mathf.Clamp01(TableScore(tierNutrition, expected) / 20f), "RimFeast_QualTable")
-				+ " " + Qual(Mathf.Min((float)drinkUnits / expected, 1f), "RimFeast_QualDrink");
+			expected = Mathf.Max(1, expected);
+			hall = Mathf.Clamp01(impressiveness / ImpressivenessCap);
+			table = Mathf.Clamp01(TableScore(tierNutrition, expected) / 20f);
+			drink = Mathf.Min((float)drinks / expected, 1f);
+		}
+
+		private bool guideOffered;
+
+		// une lettre au premier point de banquet de la partie, pas aux suivants
+		public void OfferGuide(Thing spot)
+		{
+			if (guideOffered) return;
+			guideOffered = true;
+			Find.LetterStack.ReceiveLetter("RimFeast_GuideLetterLabel".Translate(), "RimFeast_GuideLetterText".Translate(),
+				LetterDefOf.NeutralEvent, new LookTargets(spot));
 		}
 
 		public void CancelInvite(Thing spot)
@@ -1149,6 +1174,7 @@ namespace RimFeast
 						f.TryAffectGoodwillWith(Faction.OfPlayer, -25, canSendMessage: false, canSendHostilityLetter: false);
 				foreach (Pawn col in c.map.mapPawns.FreeColonistsSpawned)
 					col.needs?.mood?.thoughts?.memories?.TryGainMemory(RimFeastDefOf.RimFeast_GuestRightBroken);
+				StartMisfortune(c.map);
 				Find.LetterStack.ReceiveLetter("RimFeast_LabelRedWedding".Translate(),
 					"RimFeast_TextRedGrand".Translate(slain, there.Count),
 					LetterDefOf.ThreatBig, new TargetInfo(c.spotCell, c.map));
@@ -1261,11 +1287,23 @@ namespace RimFeast
 				else redWeddingSound.Maintain();
 			}
 
+			if (tavernSound != null)
+			{
+				if (tavernSound.Ended) tavernSound = null;
+				else if (!TavernGoesOn()) EndTavern();
+				else
+				{
+					tavernSound.Maintain();
+					if (Find.TickManager.TicksGame % TavernQuietTicks == 0) TavernQuiet();
+				}
+			}
+
 			if (Find.TickManager.TicksGame % CheckInterval != 0) return;
 
 			// caravanes et raids vivent apres la fin du banquet, hors de current
 			if (caravans.Count > 0) TickCaravans();
 			if (raids.Count > 0) TickRaids();
+			if (misfortuneTicks.Count > 0) TickMisfortunes();
 			if (reveals.Count > 0) TickReveals();
 			if (wards.Count > 0) TickWards();
 			if (lovin != null) TickLovin();
@@ -1673,10 +1711,94 @@ namespace RimFeast
 		private static SoundDef RedWeddingPerformance => RimFeastMod.S.censoredMusic
 			? RimFeastDefOf.RimFeast_CensoredPerformance : RimFeastDefOf.RimFeast_RedWeddingPerformance;
 
+		// la musique de taverne (reglage tavernMusic, coche par defaut). tant qu'on joue d'un instrument dans la salle
+		// d'un banquet, il fait entendre un des deux airs a la place de ses notes (Patch_Building_MusicalInstrument_Tick).
+		// l'air tient pendant les pauses du menestrel, et la musique du jeu se tait quand la camera est a portee
+		private const int TavernGraceTicks = 1500;
+		private const int TavernQuietTicks = 600;
+		private const float TavernEarshot = 60f;
+		private Sustainer tavernSound;
+		private Map tavernMap;
+		private IntVec3 tavernCell;
+		private int tavernHeardTick = -1;
+		private int tavernLast = -1;
+		private bool tavernQuiet;
+
+		public static bool IsTavern(SoundDef def) =>
+			def == RimFeastDefOf.RimFeast_TavernPerformance1 || def == RimFeastDefOf.RimFeast_TavernPerformance2;
+
+		private bool FeastOnAt(Map map) =>
+			(current != null && current.state == FeastCase.Feasting && current.map == map)
+			|| (colony != null && colony.map == map);
+
+		// l'air en cours, ou un nouveau. null: l'instrument garde son propre son
+		public Sustainer TavernFor(Building_MusicalInstrument inst)
+		{
+			if (!RimFeastMod.S.tavernMusic || !inst.Spawned || !FeastOnAt(inst.Map)) return null;
+			int now = Find.TickManager.TicksGame;
+			if (tavernSound != null && !tavernSound.Ended)
+			{
+				if (tavernMap != inst.Map) return null;
+				tavernHeardTick = now;
+				return tavernSound;
+			}
+			FeastCase c = current != null && current.state == FeastCase.Feasting && current.map == inst.Map ? current : colony;
+			if (!FeastUtility.FeastArea.For(c.spotCell, inst.Map).Contains(inst.InteractionCell)) return null;
+			// jamais deux fois le meme air de suite
+			int pick = tavernLast < 0 ? Rand.Range(0, 2) : 1 - tavernLast;
+			SoundDef def = pick == 0 ? RimFeastDefOf.RimFeast_TavernPerformance1 : RimFeastDefOf.RimFeast_TavernPerformance2;
+			Sustainer s = def.TrySpawnSustainer(SoundInfo.InMap(new TargetInfo(inst.Position, inst.Map), MaintenanceType.PerTick));
+			if (s == null) return null;
+			tavernSound = s;
+			tavernMap = inst.Map;
+			tavernCell = inst.Position;
+			tavernHeardTick = now;
+			tavernLast = pick;
+			tavernQuiet = false;
+			TavernQuiet();
+			return s;
+		}
+
+		public void TavernHeard(Sustainer s)
+		{
+			if (s == tavernSound) tavernHeardTick = Find.TickManager.TicksGame;
+		}
+
+		private bool TavernGoesOn() =>
+			RimFeastMod.S.tavernMusic && FeastOnAt(tavernMap)
+			&& Find.TickManager.TicksGame - tavernHeardTick <= TavernGraceTicks;
+
+		// la musique du jeu se tait tant que la camera entend la salle. ailleurs elle revient d'elle-meme en trente secondes
+		private void TavernQuiet()
+		{
+			MusicManagerPlay music = Find.MusicManagerPlay;
+			if (music == null) return;
+			bool near = Find.CurrentMap == tavernMap && Find.CameraDriver.MapPosition.InHorDistOf(tavernCell, TavernEarshot);
+			if (!near)
+			{
+				tavernQuiet = false;
+				return;
+			}
+			if (tavernQuiet) music.ForceSilenceFor(30f);
+			else music.ForceFadeoutAndSilenceFor(30f, 3f);
+			tavernQuiet = true;
+		}
+
+		private void EndTavern()
+		{
+			if (tavernSound == null) return;
+			// le fondu vient du sustainFadeoutTime du def
+			if (!tavernSound.Ended) tavernSound.End();
+			tavernSound = null;
+			if (tavernQuiet) Find.MusicManagerPlay?.ForceSilenceFor(4f);
+			tavernQuiet = false;
+		}
+
 		public void StartRedWeddingMusic(FeastCase c)
 		{
 			if (c == null || c.musicStarted) return;
 			c.musicStarted = true;
+			EndTavern();
 			try
 			{
 				Building_MusicalInstrument inst = HallInstruments(c)
@@ -2037,6 +2159,7 @@ namespace RimFeast
 
 				foreach (Pawn col in c.map.mapPawns.FreeColonistsSpawned)
 					col.needs?.mood?.thoughts?.memories?.TryGainMemory(RimFeastDefOf.RimFeast_GuestRightBroken);
+				StartMisfortune(c.map);
 
 				entry.Add(ChronicleLine.War, c.house?.Name);
 				Find.LetterStack.ReceiveLetter("RimFeast_LabelRedWedding".Translate(),
@@ -2053,6 +2176,75 @@ namespace RimFeast
 					LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map), c.house);
 			}
 			current = null;
+		}
+
+		// reglage "misfortune", decoche par defaut (idee de Leonineus): qui egorge ses invites sous son toit
+		// voit le malheur s'abattre sur la colonie. trois incidents du jeu, un par tranche de cinq jours
+		public const int MisfortuneCount = 3;
+		public const int MisfortuneDays = 15;
+		private static readonly string[] MisfortuneKinds =
+			{ "CropBlight", "AnimalInsanitySingle", "PsychicDrone", "Flashstorm", "ColdSnap", "HeatWave", "ShortCircuit", "Disease" };
+
+		private List<int> misfortuneTicks = new List<int>();
+		private List<string> misfortunesDone = new List<string>();
+		private Map misfortuneMap;
+		private int misfortuneUntil = -1;
+
+		public void StartMisfortune(Map map, bool force = false)
+		{
+			if (map == null || (!force && !RimFeastMod.S.misfortune)) return;
+			int now = Find.TickManager.TicksGame;
+			int slice = MisfortuneDays * GenDate.TicksPerDay / MisfortuneCount;
+			misfortuneMap = map;
+			misfortunesDone.Clear();
+			misfortuneTicks.Clear();
+			for (int i = 0; i < MisfortuneCount; i++)
+				misfortuneTicks.Add(now + i * slice + Rand.Range(GenDate.TicksPerDay, slice));
+			// passe ce delai, ce qui n'a pas pu tomber est abandonne
+			misfortuneUntil = now + (MisfortuneDays + 5) * GenDate.TicksPerDay;
+			Find.LetterStack.ReceiveLetter("RimFeast_LabelMisfortune".Translate(),
+				"RimFeast_TextMisfortune".Translate(MisfortuneCount, MisfortuneDays),
+				LetterDefOf.NegativeEvent, new TargetInfo(map.Center, map));
+		}
+
+		private void TickMisfortunes()
+		{
+			int now = Find.TickManager.TicksGame;
+			if (misfortuneMap == null || !Find.Maps.Contains(misfortuneMap) || now > misfortuneUntil)
+			{
+				misfortuneTicks.Clear();
+				return;
+			}
+			for (int i = misfortuneTicks.Count - 1; i >= 0; i--)
+			{
+				if (now < misfortuneTicks[i]) continue;
+				if (TryMisfortune(misfortuneMap)) misfortuneTicks.RemoveAt(i);
+				else misfortuneTicks[i] = now + CaravanRetryTicks;
+			}
+		}
+
+		// un incident du jeu qui peut tomber maintenant, jamais deux fois le meme genre. les maladies comptent pour un genre
+		private bool TryMisfortune(Map map)
+		{
+			foreach (string kind in MisfortuneKinds.Where(k => !misfortunesDone.Contains(k)).InRandomOrder())
+			{
+				IEnumerable<IncidentDef> defs = kind == "Disease"
+					? DefDatabase<IncidentDef>.AllDefsListForReading
+						.Where(d => d.category == IncidentCategoryDefOf.DiseaseHuman).InRandomOrder()
+					: Gen.YieldSingle(DefDatabase<IncidentDef>.GetNamedSilentFail(kind));
+				foreach (IncidentDef def in defs)
+				{
+					if (def?.Worker == null) continue;
+					IncidentParms parms = StorytellerUtility.DefaultParmsNow(def.category, map);
+					parms.forced = true;
+					if (!def.Worker.CanFireNow(parms) || !def.Worker.TryExecute(parms)) continue;
+					misfortunesDone.Add(kind);
+					Messages.Message("RimFeast_MessageMisfortune".Translate(misfortunesDone.Count, MisfortuneCount),
+						new TargetInfo(map.Center, map), MessageTypeDefOf.NegativeEvent);
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private void TickRaids()
@@ -4047,6 +4239,11 @@ namespace RimFeast
 			Scribe_Values.Look(ref lastVictoryThreatTick, "lastVictoryThreatTick", -1);
 			Scribe_Values.Look(ref lastHarvestFeastTick, "lastHarvestFeastTick", -1);
 			Scribe_Values.Look(ref lastGrandFeastTick, "lastGrandFeastTick", -1);
+			Scribe_Values.Look(ref guideOffered, "guideOffered");
+			Scribe_Collections.Look(ref misfortuneTicks, "misfortuneTicks", LookMode.Value);
+			Scribe_Collections.Look(ref misfortunesDone, "misfortunesDone", LookMode.Value);
+			Scribe_References.Look(ref misfortuneMap, "misfortuneMap");
+			Scribe_Values.Look(ref misfortuneUntil, "misfortuneUntil", -1);
 			Scribe_Collections.Look(ref peace, "peace", LookMode.Value);
 			if (Scribe.mode == LoadSaveMode.PostLoadInit)
 			{
@@ -4065,6 +4262,8 @@ namespace RimFeast
 				if (chronicle == null) chronicle = new List<ChronicleEntry>();
 				chronicle.RemoveAll(x => x == null);
 				if (wakesHeld == null) wakesHeld = new List<int>();
+				if (misfortuneTicks == null) misfortuneTicks = new List<int>();
+				if (misfortunesDone == null) misfortunesDone = new List<string>();
 				if (peace == null) peace = new List<int>();
 			}
 		}
