@@ -104,7 +104,7 @@ namespace RimFeast.AI
 				|| cur.def == RimFeastDefOf.RimFeast_RoundJob || cur.def == RimFeastDefOf.RimFeast_SetDanceJob
 				|| cur.def == RimFeastDefOf.RimFeast_ContestJob)
 				return false;
-			if (cur.def == JobDefOf.Ingest || cur.def == RimFeastDefOf.RimFeast_EatAtSeatJob) return false;
+			if (cur.def == JobDefOf.Ingest) return false;
 			if (p.jobs.curDriver is JobDriver_PlayMusicalInstrument) return false;
 			return cur.def.casualInterruptible;
 		}

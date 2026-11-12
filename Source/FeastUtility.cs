@@ -99,18 +99,6 @@ namespace RimFeast
 
 		private static bool IsHumanlike(PawnKindDef k) => k?.race?.race?.Humanlike ?? false;
 
-		public static Faction GuestFaction()
-		{
-			Faction f = Find.FactionManager.FirstFactionOfDef(RimFeastDefOf.RimFeast_Guests);
-			if (f == null)
-			{
-				// les vieilles saves n'en ont jamais genere
-				FactionGenerator.CreateFactionAndAddToManager(RimFeastDefOf.RimFeast_Guests);
-				f = Find.FactionManager.FirstFactionOfDef(RimFeastDefOf.RimFeast_Guests);
-			}
-			return f;
-		}
-
 		public static bool SingleAndFree(Pawn p) =>
 			p.relations != null
 			&& p.relations.GetFirstDirectRelationPawn(PawnRelationDefOf.Spouse) == null

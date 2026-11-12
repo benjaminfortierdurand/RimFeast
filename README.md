@@ -11,7 +11,7 @@ It started as a trilogy and got out of hand:
 
 [Steam Workshop page](https://steamcommunity.com/sharedfiles/filedetails/?id=3771681153)
 
-No required dependencies, no Harmony. Works in any run, Medieval Overhaul is optional and makes the houses look the part.
+Requires Harmony. Works in any run, Medieval Overhaul is optional and makes the houses look the part.
 
 Build with `dotnet build Source/RimFeast.csproj -c Release`, the dll lands in `1.6/Assemblies/`.
 

@@ -25,7 +25,7 @@
 	<RimFeast_GrandCooldown>once a year, again in {0} days</RimFeast_GrandCooldown>
 	<RimFeast_GrandNeedHouses>it takes at least {0} houses willing to come</RimFeast_GrandNeedHouses>
 	<RimFeast_GrandConfirm>Send a messenger to every house: {0}.\n\nThey all ride in the same evening and share your hall. Each house judges the feast for itself. It costs {1} silver, and it can be done once a year.</RimFeast_GrandConfirm>
-	<RimFeast_GrandConfirmPlanned>Send a messenger to every house: {0}.\n\nThey all ride in the same evening, and none of them is meant to ride home. Spill the blood of half of them and it is war with every house at the table. It costs {1} silver, and it can be done once a year.</RimFeast_GrandConfirmPlanned>
+	<RimFeast_GrandConfirmPlanned>Send a messenger to every house: {0}.\n\nThey all ride in the same evening, and none of them is meant to ride home. From the first blow it is war with every house at the table. It costs {1} silver, and it can be done once a year.</RimFeast_GrandConfirmPlanned>
 	<RimFeast_GrandFeuds>Old feuds will sit at the same table: {0}.</RimFeast_GrandFeuds>
 	<RimFeast_GrandFeudPair>{0} and {1}</RimFeast_GrandFeudPair>
 	<RimFeast_LabelGrandSent>The Grand Feast is called</RimFeast_LabelGrandSent>
@@ -93,10 +93,11 @@
 	<RimFeast_TextLeaderShamed>The head of the house saw it all in person. A thin table served under those eyes costs more than a thin table.</RimFeast_TextLeaderShamed>
 	<RimFeast_TextPoorTravels>A poor table travels as far as a rich one. House {0} thinks a little less of you.</RimFeast_TextPoorTravels>
 	<RimFeast_LabelBetrayed>Hospitality broken</RimFeast_LabelBetrayed>
-	<RimFeast_TextBetrayed>Blood has been drawn by your hand, under your own roof. The guests of {0} draw steel and fight their way toward the gates. What the house makes of it will depend on how many make it home.</RimFeast_TextBetrayed>
+	<RimFeast_TextBetrayed>Blood has been drawn by your hand, under your own roof. It is war with {0} from this moment. Their guests draw steel and fight their way toward the gates. How far the word travels will depend on how many make it home.</RimFeast_TextBetrayed>
+	<RimFeast_TextTurnedHostile>It is war with {0}, and their guests are still under your roof. They draw steel and fight their way toward the gates. How far the word travels will depend on how many make it home.</RimFeast_TextTurnedHostile>
 	<RimFeast_LabelRedWedding>A red feast</RimFeast_LabelRedWedding>
 	<RimFeast_TextRedWedding>Of the cortege of {0}, {1} never left your hall alive and free. Word of a host who slaughters guests at table will reach every house on the rim: {0} swears vengeance and will come for blood, and no house will break bread under your roof for a long while.</RimFeast_TextRedWedding>
-	<RimFeast_TextBloodSpilled>A guest of {0} came to harm by your hand, and the cortege fled your hall. The house will remember this breach of the guest right.</RimFeast_TextBloodSpilled>
+	<RimFeast_TextBloodSpilled>Guests of {0} came to harm under your roof, and the rest fought their way out. The war that began in your hall goes on. Enough of them made it home: the other houses stay out of it.</RimFeast_TextBloodSpilled>
 	<RimFeast_InviteRefusedBetrayed>will never break bread with you again</RimFeast_InviteRefusedBetrayed>
 	<RimFeast_InviteRefusedWord>word of the red feast still travels</RimFeast_InviteRefusedWord>
 	<RimFeast_InviteOptionRefused>{0} refuses: {1}</RimFeast_InviteOptionRefused>

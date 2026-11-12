@@ -9,6 +9,7 @@
 		<joyDuration>3000</joyDuration>
 	</JobDef>
 
+	<!-- plus donne depuis la 2.0: les repas a sa place passent par le travail Ingest du jeu. garde pour les sauvegardes faites en plein repas -->
 	<JobDef>
 		<defName>RimFeast_EatAtSeatJob</defName>
 		<driverClass>RimFeast.Jobs.JobDriver_EatAtSeat</driverClass>

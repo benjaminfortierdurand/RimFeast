@@ -405,31 +405,25 @@ namespace RimFeast
 		// pas de toast pendant la scene: EndAllJobs couperait le noble
 		public bool LovinUnderway(int id) => lovin != null && lovin.caseId == id && lovin.state == LovinScene.Running;
 
-		// SetRelationDirect ecrit un sens, notifie (peut jeter), puis l'autre: on ecrit les deux avant de notifier
-		private static void SetMutualRelation(Faction a, Faction b, FactionRelationKind kind)
+		// vrai entre le moment ou un empoisonneur est demasque et le depart de son cortege
+		private static bool anyExposed;
+
+		// le cortege d'un empoisonneur demasque: ce qui lui arrive en sortant ne coute rien aupres de sa maison.
+		// les invites sont de leur vraie faction, il faut donc le dire au jeu: HarmonyPatches/Patch_Faction_ExposedGuests
+		public static bool FairGame(Pawn member)
 		{
-			if (a == null || b == null) return;
+			if (!anyExposed || member == null) return false;
+			FeastCase c = Get()?.current;
+			return c != null && c.exposed && c.guests.Contains(member);
+		}
 
-			// faction cachee: le kind ecrit a la main ne suit pas le goodwill, CheckKindThresholds le rebasculerait hostile
-			bool puppet = a.def == RimFeastDefOf.RimFeast_Guests || b.def == RimFeastDefOf.RimFeast_Guests;
-			if (puppet && kind == FactionRelationKind.Neutral)
-			{
-				a.RelationWith(b).baseGoodwill = 0;
-				b.RelationWith(a).baseGoodwill = 0;
-			}
-
-			// lire les deux sens: une vieille save peut avoir laisse une relation boiteuse
-			if (a.RelationKindWith(b) == kind && b.RelationKindWith(a) == kind) return;
-			FactionRelationKind prev = a.RelationKindWith(b);
-			a.RelationWith(b).kind = kind;
-			b.RelationWith(a).kind = kind;
-			try { a.Notify_RelationKindChanged(b, prev, false, null, GlobalTargetInfo.Invalid, out _); }
-			catch (System.Exception e) { Log.Warning("RimFeast: relation notify: " + e.Message); }
-			try { b.Notify_RelationKindChanged(a, prev, false, null, GlobalTargetInfo.Invalid, out _); }
-			catch (System.Exception e) { Log.Warning("RimFeast: relation notify: " + e.Message); }
-			// la notif a pu echouer avant de rafraichir le cache des cibles
-			foreach (Map m in Find.Maps)
-				m.attackTargetsCache.Notify_FactionHostilityChanged(a, b);
+		private static Faction HostileHouse(FeastCase c)
+		{
+			if (!c.grand || c.houses == null)
+				return c.house != null && c.house.HostileTo(Faction.OfPlayer) ? c.house : null;
+			for (int i = 0; i < c.houses.Count; i++)
+				if (c.houses[i] != null && c.houses[i].HostileTo(Faction.OfPlayer)) return c.houses[i];
+			return null;
 		}
 
 		private HouseFeastMemory MemoryFor(Faction f, bool create)
@@ -659,9 +653,8 @@ namespace RimFeast
 			sb.AppendLine("  state=" + c.state + " planned=" + c.planned + " guests=" + c.guestCount);
 			sb.AppendLine("  map danger: " + c.map.dangerWatcher.DangerRating
 				+ "  (High blocks any vanilla gathering)");
-			Faction gf = FeastUtility.GuestFaction();
-			sb.AppendLine("  guests->player: " + gf?.RelationKindWith(Faction.OfPlayer)
-				+ "   player->guests: " + Faction.OfPlayer.RelationKindWith(gf));
+			sb.AppendLine("  house->player: " + c.house?.RelationKindWith(Faction.OfPlayer)
+				+ "   goodwill: " + c.house?.PlayerGoodwill);
 
 			bool lordAlive = c.colonistLord != null && c.map.lordManager.lords.Contains(c.colonistLord);
 			sb.AppendLine("  colonist lord: " + (c.colonistLord == null ? "NEVER CREATED"
@@ -884,22 +877,25 @@ namespace RimFeast
 			GenSpawn.Spawn(p, CellFinder.RandomClosewalkCellNear(entry, map, 6), map);
 		}
 
+		// un vrai membre de sa maison, comme un visiteur du jeu: ce qu'on lui fait, le jeu le compte a la maison
+		private static Pawn MakeGuest(PawnKindDef kind, Faction house, Map map) =>
+			PawnGenerator.GeneratePawn(new PawnGenerationRequest(
+				kind, house, PawnGenerationContext.NonPlayer,
+				tile: map.Tile, forceGenerateNewPawn: true, canGeneratePawnRelations: false));
+
 		// chaque maison entre par un bord different et toutes convergent vers la salle.
-		// un seul cortege et une seule faction cachee: tout le reste du banquet marche tel quel
+		// un seul cortege et un seul lord, au nom de la premiere maison: tout le reste du banquet marche tel quel
 		private void SpawnGrandCortege(FeastCase c)
 		{
 			Map map = c.map;
-			Faction guestFaction = FeastUtility.GuestFaction();
 			c.houses.RemoveAll(h => h == null || h.defeated || h.HostileTo(Faction.OfPlayer));
-			if (guestFaction == null || c.houses.Count < 2)
+			if (c.houses.Count < 2)
 			{
 				Messages.Message("RimFeast_MessageInviteVoid".Translate(GuestsName(c)), MessageTypeDefOf.NegativeEvent);
 				current = null;
 				return;
 			}
 			c.house = c.houses[0];
-			guestFaction.Name = "RimFeast_GrandGuests".Translate();
-			SetMutualRelation(guestFaction, Faction.OfPlayer, FactionRelationKind.Neutral);
 
 			var guests = new List<Pawn>();
 			var heads = new List<string>();
@@ -929,9 +925,7 @@ namespace RimFeast
 				Pawn first = null;
 				foreach (PawnKindDef kind in kinds)
 				{
-					Pawn p = PawnGenerator.GeneratePawn(new PawnGenerationRequest(
-						kind, guestFaction, PawnGenerationContext.NonPlayer,
-						tile: map.Tile, forceGenerateNewPawn: true, canGeneratePawnRelations: false));
+					Pawn p = MakeGuest(kind, h, map);
 					Welcome(p, map, entry);
 					guests.Add(p);
 					c.guestHouse.Add(h);
@@ -954,7 +948,7 @@ namespace RimFeast
 				return;
 			}
 
-			c.lord = LordMaker.MakeNewLord(guestFaction,
+			c.lord = LordMaker.MakeNewLord(c.house,
 				new LordJob_FeastGuests(c.id, c.house, c.spotCell, speaker ?? guests[0]), map, guests);
 			c.guests = guests;
 			c.guestCount = guests.Count;
@@ -1161,8 +1155,8 @@ namespace RimFeast
 				return;
 			}
 			entry.Add(ChronicleLine.Blood);
-			entry.goodwill -= 40;
-			Blame(c, -40);
+			foreach (Faction h in there)
+				if (h.HostileTo(Faction.OfPlayer)) entry.Add(ChronicleLine.War, h.Name);
 			Find.LetterStack.ReceiveLetter("RimFeast_LabelGuestsHarmed".Translate(),
 				"RimFeast_TextBloodSpilled".Translate(GuestsName(c)),
 				LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map));
@@ -1196,10 +1190,10 @@ namespace RimFeast
 				LetterDefOf.PositiveEvent, new TargetInfo(current.spotCell, map), house);
 		}
 
-		// faction cachee restee hostile = danger eleve, et vanilla annule les fetes
 		public override void FinalizeInit()
 		{
 			base.FinalizeInit();
+			anyExposed = current != null && current.exposed;
 
 			// le set est sauvegarde, mais perdre un enfant du joueur serait irreparable
 			foreach (PendingWard w in wards)
@@ -1212,10 +1206,50 @@ namespace RimFeast
 			if (current != null && current.wedding && current.state == FeastCase.Invited && current.betrothedNoble != null)
 				Find.WorldPawns.ForcefullyKeptPawns.Add(current.betrothedNoble);
 
-			if (current != null && current.state == FeastCase.Fleeing) return;
-			Faction guests = Find.FactionManager.FirstFactionOfDef(RimFeastDefOf.RimFeast_Guests);
-			if (guests != null)
-				SetMutualRelation(guests, Faction.OfPlayer, FactionRelationKind.Neutral);
+			// une sauvegarde d'avant la 2.0 faite en plein repas: ce travail est vide, le colon en reprend un au tick suivant
+			foreach (Map map in Find.Maps)
+				foreach (Pawn p in map.mapPawns.AllPawnsSpawned.ToList())
+					if (p.CurJobDef == RimFeastDefOf.RimFeast_EatAtSeatJob)
+						p.jobs.EndCurrentJob(JobCondition.InterruptForced, startNewJob: false);
+		}
+
+		private bool oldGuestsChecked;
+
+		// avant la 2.0 les invites vivaient dans une faction cachee, rendue hostile le temps d'un combat.
+		// ceux d'un banquet sauvegarde en cours rejoignent leur vraie maison. sans SetFaction: il les sortirait du lord
+		private void MoveOldGuestsHome()
+		{
+			FeastCase c = current;
+			if (c == null) return;
+			bool moved = false;
+			foreach (Pawn p in c.guests)
+			{
+				if (p == null || p.Dead || p.Faction?.def != RimFeastDefOf.RimFeast_Guests) continue;
+				Faction home = HouseOfGuest(c, p);
+				if (home == null) continue;
+				if (p.Spawned) p.Map.mapPawns.DeRegisterPawn(p);
+				p.SetFactionDirect(home);
+				if (p.Spawned)
+				{
+					p.Map.mapPawns.RegisterPawn(p);
+					p.Map.attackTargetsCache.UpdateTarget(p);
+				}
+				moved = true;
+			}
+			if (!moved) return;
+			if (c.lord != null) c.lord.faction = c.house;
+			// le combat etait engage: sous la nouvelle regle, c'est la guerre avec la maison
+			if (c.state == FeastCase.Fleeing && !c.exposed) Blame(c, -200);
+		}
+
+		// meme sortie que la transition betrayed du lord, pour une hostilite qui ne vient pas d'un invite tombe
+		private static void SendFighting(Lord lord)
+		{
+			LordToil fight = lord?.Graph?.lordToils.FirstOrDefault(t => t is LordToil_FightOut);
+			if (fight == null || lord.CurLordToil == fight) return;
+			lord.GotoToil(fight);
+			foreach (Pawn p in lord.ownedPawns)
+				if (p.jobs?.curJob != null) p.jobs.EndCurrentJob(JobCondition.InterruptForced);
 		}
 
 		public override void GameComponentTick()
@@ -1239,11 +1273,28 @@ namespace RimFeast
 			if (colony != null) TickColony();
 			if (weddings.Count > 0) TickWeddings();
 
+			if (!oldGuestsChecked)
+			{
+				oldGuestsChecked = true;
+				MoveOldGuestsHome();
+			}
 			if (current == null) return;
 
 			FeastCase c = current;
 			if (c.map == null || !Find.Maps.Contains(c.map)) { AbandonCase(c); return; }
 			DropDeadLords(c);
+
+			// une maison devenue hostile par les regles du jeu (coups portes a ses gens, capture, verdict de la soiree):
+			// ses invites ne restent pas a table, ils sortent en se battant
+			if (c.state != FeastCase.Invited && c.state != FeastCase.Fleeing)
+			{
+				Faction enemy = HostileHouse(c);
+				if (enemy != null)
+				{
+					SendFighting(c.lord);
+					TurnOnHost(c, "RimFeast_TextTurnedHostile", enemy.Name);
+				}
+			}
 
 			switch (c.state)
 			{
@@ -1281,7 +1332,6 @@ namespace RimFeast
 			}
 		}
 
-		// sinon le prochain cortege arrive hostile sur une autre carte
 		private void AbandonCase(FeastCase c)
 		{
 			if (redWeddingSound != null)
@@ -1290,8 +1340,7 @@ namespace RimFeast
 				redWeddingSound = null;
 				Find.MusicManagerPlay?.ForceSilenceFor(1f);
 			}
-			if (c.state == FeastCase.Fleeing)
-				SetMutualRelation(FeastUtility.GuestFaction(), Faction.OfPlayer, FactionRelationKind.Neutral);
+			anyExposed = false;
 			WeddingUndone(c, false);
 			current = null;
 		}
@@ -1335,13 +1384,6 @@ namespace RimFeast
 				return;
 			}
 
-			Faction guestFaction = FeastUtility.GuestFaction();
-			if (guestFaction == null) { current = null; return; }
-
-			// la faction cachee prend le nom de la maison recue
-			if (c.house.HasName || c.house.def != null) guestFaction.Name = c.house.Name;
-			SetMutualRelation(guestFaction, Faction.OfPlayer, FactionRelationKind.Neutral);
-
 			if (!RCellFinder.TryFindRandomPawnEntryCell(out IntVec3 entry, map, CellFinder.EdgeRoadChance_Neutral))
 				entry = CellFinder.RandomEdgeCell(map);
 
@@ -1376,6 +1418,8 @@ namespace RimFeast
 					return;
 				}
 				Find.WorldPawns.ForcefullyKeptPawns.Remove(groom);
+				// fiance d'avant la 2.0: il attendait dans la faction cachee
+				if (groom.Faction != c.house) groom.SetFaction(c.house);
 			}
 
 			// le vrai chef garde sa vraie faction, pas une copie
@@ -1390,9 +1434,7 @@ namespace RimFeast
 			var guests = new List<Pawn>();
 			foreach (PawnKindDef kind in kinds)
 			{
-				Pawn p = PawnGenerator.GeneratePawn(new PawnGenerationRequest(
-					kind, guestFaction, PawnGenerationContext.NonPlayer,
-					tile: map.Tile, forceGenerateNewPawn: true, canGeneratePawnRelations: false));
+				Pawn p = MakeGuest(kind, c.house, map);
 				if (p.needs?.food != null) p.needs.food.CurLevel = 0.35f * p.needs.food.MaxLevel;
 				if (p.needs?.rest != null) p.needs.rest.CurLevel = Mathf.Max(p.needs.rest.CurLevel, 0.8f);
 				GenSpawn.Spawn(p, CellFinder.RandomClosewalkCellNear(entry, map, 6), map);
@@ -1421,7 +1463,7 @@ namespace RimFeast
 				c.poisoner = guests.Where(p => p != speaker && p.kindDef != standard)
 					.RandomElementWithFallback() ?? guests.FirstOrDefault(p => p != speaker);
 
-			c.lord = LordMaker.MakeNewLord(guestFaction,
+			c.lord = LordMaker.MakeNewLord(c.house,
 				new LordJob_FeastGuests(c.id, c.house, c.spotCell, speaker), map, guests);
 			c.guests = guests;
 			c.guestCount = guests.Count;
@@ -1680,17 +1722,22 @@ namespace RimFeast
 			if (c == null || c.id != id) return;
 			if (c.state != FeastCase.Feasting && c.state != FeastCase.Traveling
 				&& c.state != FeastCase.Leaving) return;
+
+			// la guerre pour de bon, des le premier coup: le ciblage ignore les neutres, et les invites sont de leur vraie maison
+			Blame(c, -200);
+			StartRedWeddingMusic(c);
+			FlashRed(c);
+			TurnOnHost(c, "RimFeast_TextBetrayed", GuestsName(c));
+		}
+
+		// des ennemis sous le toit: la soiree est finie, le bilan se fait quand ils ont quitte la carte
+		private void TurnOnHost(FeastCase c, string textKey, string who)
+		{
 			c.state = FeastCase.Fleeing;
 			c.fleeStartTick = Find.TickManager.TicksGame;
 			// pour la chronique: qui tenait la salle quand les lames sont sorties
 			c.hosts = c.map.mapPawns.FreeColonistsSpawned.ToList();
 			WeddingUndone(c, false);
-
-			StartRedWeddingMusic(c);
-			FlashRed(c);
-
-			// hostiles le temps du combat, le ciblage ignore les neutres
-			SetMutualRelation(FeastUtility.GuestFaction(), Faction.OfPlayer, FactionRelationKind.Hostile);
 
 			if (c.colonistLord != null)
 			{
@@ -1700,7 +1747,7 @@ namespace RimFeast
 			}
 
 			Find.LetterStack.ReceiveLetter("RimFeast_LabelBetrayed".Translate(),
-				"RimFeast_TextBetrayed".Translate(GuestsName(c)),
+				textKey.Translate(who),
 				LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map), c.house);
 
 			if (c.slaughterOrdered) LaunchAttackWave(c);
@@ -1732,7 +1779,7 @@ namespace RimFeast
 			if (Prefs.DevMode)
 				Log.Message("RimFeast: attack wave, " + sent + " sent. skipped: "
 					+ (skipped.Length == 0 ? "none" : skipped.ToString())
-					+ " | guests hostile=" + (FeastUtility.GuestFaction()?.HostileTo(Faction.OfPlayer)));
+					+ " | house hostile=" + (c.house?.HostileTo(Faction.OfPlayer)));
 		}
 
 		private static Pawn NearestGuest(FeastCase c, IntVec3 from)
@@ -1800,6 +1847,7 @@ namespace RimFeast
 		private void Expose(FeastCase c, bool harmDone)
 		{
 			c.exposed = true;
+			anyExposed = true;
 			c.state = FeastCase.Fleeing;
 			c.fleeStartTick = Find.TickManager.TicksGame;
 			if (c.colonistLord != null)
@@ -1929,16 +1977,9 @@ namespace RimFeast
 				Log.Warning("RimFeast: fadeout: " + e.Message);
 			}
 
-			Faction guests = FeastUtility.GuestFaction();
-			SetMutualRelation(guests, Faction.OfPlayer, FactionRelationKind.Neutral);
-
-			// les blesses qui rampent gardent leur enemyTarget, sinon la fuite des colons spamme
-			if (guests != null && c.map != null)
-				foreach (Pawn p in c.map.mapPawns.SpawnedPawnsInFaction(guests))
-					p.mindState.enemyTarget = null;
-
 			if (c.exposed)
 			{
+				anyExposed = false;
 				current = null;
 				return;
 			}
@@ -2004,10 +2045,9 @@ namespace RimFeast
 			}
 			else
 			{
+				// la guerre est la depuis le premier coup. assez d'invites sont rentres: les autres maisons ne s'en melent pas
 				entry.Add(ChronicleLine.Blood);
-				entry.goodwill -= 40;
-				c.house?.TryAffectGoodwillWith(Faction.OfPlayer, -40, canSendMessage: true,
-					canSendHostilityLetter: false);
+				if (c.house != null && c.house.HostileTo(Faction.OfPlayer)) entry.Add(ChronicleLine.War, c.house.Name);
 				Find.LetterStack.ReceiveLetter("RimFeast_LabelGuestsHarmed".Translate(),
 					"RimFeast_TextBloodSpilled".Translate(c.house?.Name),
 					LetterDefOf.NegativeEvent, new TargetInfo(c.spotCell, c.map), c.house);
@@ -2420,7 +2460,7 @@ namespace RimFeast
 				return;
 			}
 
-			// le trigger excuse deja l'hote quand des lames sortent sur la carte, le bilan doit suivre
+			// des lames sorties sur la carte: l'hote n'y est pour rien
 			if (GenHostility.AnyHostileActiveThreatToPlayer(c.map))
 			{
 				bool judged = c.state == FeastCase.Feasting
@@ -3041,7 +3081,6 @@ namespace RimFeast
 			if (colonist.Drafted) colonist.drafter.Drafted = false;
 			colonist.jobs?.StopAll();
 			colonist.GetLord()?.Notify_PawnLost(colonist, PawnLostCondition.LeftVoluntarily);
-			// dans la maison, pas la faction cachee: sinon hostile au prochain massacre
 			colonist.SetFaction(c.house);
 			c.lord.AddPawn(colonist);
 			c.guests.Add(colonist);
@@ -3255,11 +3294,14 @@ namespace RimFeast
 				.FirstOrDefault();
 			if (child != null && c.map.mapPawns.FreeColonistsSpawnedCount >= 4) options.Add(ReqWard);
 
+			// pas de nuit qui creerait un lien psychique (gene des highmates): l'invite repart le soir meme
+			// et le colon garderait le malus de l'eloignement
 			Pawn desired = null;
 			if (Brazen(speaker, c.house) || forceKind == ReqBed)
 				desired = c.map.mapPawns.FreeColonistsSpawned
 					.Where(p => p.DevelopmentalStage.Adult() && !p.Downed && !p.InMentalState
-						&& RelationsUtility.AttractedToGender(speaker, p.gender))
+						&& RelationsUtility.AttractedToGender(speaker, p.gender)
+						&& !InteractionWorker_RomanceAttempt.CanCreatePsychicBondBetween(speaker, p))
 					.InRandomOrder()
 					.OrderByDescending(p => PartnerOf(p) != null ? 1 : 0)
 					.FirstOrDefault();

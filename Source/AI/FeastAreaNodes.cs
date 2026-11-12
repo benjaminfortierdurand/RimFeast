@@ -37,10 +37,6 @@ namespace RimFeast.AI
 				TraverseParms.For(TraverseMode.NoPassClosedDoors), 14f, validator, null, 0, 12);
 			if (food == null) return null;
 
-			if (FeastSeats.Carriable(food, food.def) && FeastSeats.CanEatAtTable(pawn)
-				&& FeastSeats.TryGetSeat(pawn, out IntVec3 seat, area))
-				return FeastSeats.EatJob(pawn, food, food.def, seat);
-
 			Job job = JobMaker.MakeJob(JobDefOf.Ingest, food);
 			job.count = FoodUtility.WillIngestStackCountOf(pawn, food.def, FoodUtility.NutritionForEater(pawn, food));
 			return job;

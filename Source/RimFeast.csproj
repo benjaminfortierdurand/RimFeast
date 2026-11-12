@@ -29,6 +29,7 @@
 	<PropertyGroup>
 		<RimWorldDir>D:\Steam\steamapps\common\RimWorld</RimWorldDir>
 		<Refs17Dir>D:\RimWorldMods\_refs\1.7</Refs17Dir>
+		<HarmonyDir>D:\Steam\steamapps\workshop\content\294100\2009463077\$(GameVersion)\Assemblies</HarmonyDir>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(GameVersion)' == '1.6'">
@@ -47,6 +48,14 @@
 	<!-- RimWorld 1.7 : copie des DLL du jeu 1.7 dans _refs\1.7 (a recopier apres une MAJ de la beta) (runtime .NET 10, Unity remplace par UnityStubs) -->
 	<ItemGroup Condition="'$(GameVersion)' == '1.7'">
 		<Reference Include="$(Refs17Dir)\Assembly-CSharp.dll;$(Refs17Dir)\UnityStubs.dll;$(Refs17Dir)\Waylith.UnityCompat.dll;$(Refs17Dir)\Waylith.dll;$(Refs17Dir)\Brutal.Core.Logging.dll">
+			<Private>false</Private>
+		</Reference>
+	</ItemGroup>
+
+	<!-- Harmony : la DLL du mod Harmony installe, une par version du jeu. jamais copiee dans Assemblies -->
+	<ItemGroup>
+		<Reference Include="0Harmony">
+			<HintPath>$(HarmonyDir)\0Harmony.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 	</ItemGroup>

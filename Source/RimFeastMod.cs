@@ -1,3 +1,5 @@
+using System;
+using HarmonyLib;
 using UnityEngine;
 using Verse;
 
@@ -95,6 +97,9 @@ namespace RimFeast
 		public RimFeastMod(ModContentPack content) : base(content)
 		{
 			settings = GetSettings<RimFeastSettings>();
+			// un patch qui ne trouve plus sa cible apres une mise a jour du jeu ne doit pas emporter les reglages avec lui
+			try { new Harmony("forti.rimfeast").PatchAll(); }
+			catch (Exception e) { Log.Error("RimFeast: Harmony patch failed, colonists will not eat at their own seat. " + e); }
 		}
 
 		public override string SettingsCategory() => "RimFeast";

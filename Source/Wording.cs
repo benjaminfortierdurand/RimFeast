@@ -38,8 +38,14 @@ namespace RimFeast
 				List<KeyValuePair<Regex, string>> table = Table(active);
 				Keyed(active, table);
 				// une cle absente de la langue active retombe sur l'anglais
-				if (fallback != null && fallback != active) Keyed(fallback, Table(fallback));
-				// les defs portent deja le texte de la langue active
+				if (fallback != null && fallback != active)
+				{
+					List<KeyValuePair<Regex, string>> english = Table(fallback);
+					Keyed(fallback, english);
+					// langue sans traduction du mod: ses defs sont restees en anglais
+					if (table.Count == 0 && !Translated(active)) table = english;
+				}
+				// les defs portent le texte de la langue active
 				if (table.Count > 0) Defs(table);
 			}
 			catch (Exception e)
@@ -53,7 +59,9 @@ namespace RimFeast
 		private static List<KeyValuePair<Regex, string>> Table(LoadedLanguage lang)
 		{
 			var table = new List<KeyValuePair<Regex, string>>();
-			if (lang == null || !lang.keyedReplacements.TryGetValue(TableKey, out LoadedLanguage.KeyedReplacement raw)
+			// HaveTextForKey lit la langue si le jeu ne l'a pas encore fait: l'anglais, quand le jeu tourne dans une autre langue
+			if (lang == null || !lang.HaveTextForKey(TableKey)
+				|| !lang.keyedReplacements.TryGetValue(TableKey, out LoadedLanguage.KeyedReplacement raw)
 				|| raw.value.NullOrEmpty())
 				return table;
 			foreach (string pair in raw.value.Split('|').OrderByDescending(p => p.IndexOf('=')))
@@ -67,6 +75,9 @@ namespace RimFeast
 			}
 			return table;
 		}
+
+		private static bool Translated(LoadedLanguage lang) =>
+			lang != null && lang.keyedReplacements.Keys.Any(k => k.StartsWith("RimFeast_"));
 
 		// la majuscule du mot remplace est gardee
 		private static string Swap(string text, List<KeyValuePair<Regex, string>> table)

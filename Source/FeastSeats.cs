@@ -3,6 +3,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.AI;
+using Verse.AI.Group;
 
 namespace RimFeast
 {
@@ -86,19 +87,27 @@ namespace RimFeast
 			return false;
 		}
 
-		public static bool Carriable(Thing food, ThingDef foodDef)
+		// la place ou ce colon va manger ce repas. false: le jeu cherche la chaise libre la plus proche, comme d'habitude.
+		// a un banquet la place doit etre dans la salle du banquet. hors banquet elle ne compte que si le reglage est coche
+		public static bool TryGetMealSeat(Pawn pawn, Thing food, out IntVec3 cell)
 		{
-			if (food == null || !food.Spawned || foodDef?.ingestible == null) return false;
-			if (food is Building_NutrientPasteDispenser dispenser) return dispenser.HasEnoughFeedstockInHoppers();
-			if (food is Pawn || food is Plant || food is Corpse) return false;
-			return food.def == foodDef && foodDef.ingestible.chairSearchRadius > 0f;
+			cell = IntVec3.Invalid;
+			if (pawn == null || food == null || !pawn.Spawned || !pawn.IsColonist) return false;
+			if (!GoesToTable(food) || !CanEatAtTable(pawn)) return false;
+			Lord lord = pawn.GetLord();
+			if (lord == null) return RimFeastMod.S.seatMeals && TryGetSeat(pawn, out cell);
+			if (!(lord.LordJob is AI.LordJob_FeastColonists feast)) return false;
+			return TryGetSeat(pawn, out cell, FeastUtility.FeastArea.For(feast.Spot, pawn.Map));
 		}
 
-		public static Job EatJob(Pawn pawn, Thing food, ThingDef foodDef, IntVec3 seat)
+		// un repas que le jeu porte a table. les boissons et les drogues gardent la chaise la plus proche
+		private static bool GoesToTable(Thing food)
 		{
-			Job job = JobMaker.MakeJob(RimFeastDefOf.RimFeast_EatAtSeatJob, food, LocalTargetInfo.Invalid, seat);
-			job.count = FoodUtility.WillIngestStackCountOf(pawn, foodDef, FoodUtility.GetNutrition(pawn, food, foodDef));
-			return job;
+			if (food is Building_NutrientPasteDispenser dispenser)
+				return (dispenser.DispensableDef?.ingestible?.chairSearchRadius ?? 0f) > 0f;
+			if (food is Pawn || food is Plant || food is Corpse) return false;
+			return food.def.ingestible != null && food.def.ingestible.chairSearchRadius > 0f
+				&& food.def.IsNutritionGivingIngestible && !food.def.IsDrug;
 		}
 	}
 }
