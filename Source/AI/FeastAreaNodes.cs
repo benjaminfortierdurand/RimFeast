@@ -57,6 +57,11 @@ namespace RimFeast.AI
 			Job job = base.TryGiveJobFromJoyGiverDefDirect(def, pawn);
 			if (job == null) return null;
 			if (TooMuch(pawn, job.targetA) || TooMuch(pawn, job.targetC)) return null;
+			// la detente a table du jeu prend une chaise au hasard: le colon qui a une place libre la prend
+			PawnDuty duty = pawn.mindState.duty;
+			if (job.def.driverClass == typeof(JobDriver_SocialRelax) && job.targetB.HasThing && duty != null
+				&& FeastSeats.TryGetSeat(pawn, out _, FeastUtility.FeastArea.For(duty.focus.Cell, pawn.Map), false))
+				job.targetB = FeastSeats.SeatOf(pawn).parent;
 			return job;
 		}
 

@@ -17,11 +17,11 @@ namespace RimFeast.AI
 			if (focus == null) return null;
 
 			FeastUtility.FeastArea area = FeastUtility.FeastArea.For(spot, pawn.Map);
-			if (!FeastSeats.TryGetSeat(pawn, out IntVec3 seat, area))
+			if (!FeastSeats.TryGetSeat(pawn, out IntVec3 seat, area, false))
 			{
 				Thing chair = FindChair(pawn, spot, area);
 				if (chair == null) return null;
-				if (!Toils_Ingest.TryFindFreeSittingSpotOnThing(chair, pawn, out seat))
+				if (!FeastSeats.FreeCellOn(chair, pawn, out seat))
 					seat = chair.Position;
 			}
 
@@ -49,8 +49,7 @@ namespace RimFeast.AI
 				if (edifice == null || edifice.def.building == null || !edifice.def.building.isSittable) continue;
 				if (!area.Contains(c)) continue;
 				if (edifice.IsForbidden(pawn)) continue;
-				if (!Toils_Ingest.TryFindFreeSittingSpotOnThing(edifice, pawn, out IntVec3 sitCell)) continue;
-				if (!pawn.CanReserveSittableOrSpot(sitCell)) continue;
+				if (!FeastSeats.FreeCellOn(edifice, pawn, out _)) continue;
 				if (FeastSeats.ClaimedByOther(edifice, pawn))
 				{
 					if (claimed == null) claimed = edifice;
