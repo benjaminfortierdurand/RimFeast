@@ -626,6 +626,39 @@ namespace RimFeast
 			drink = Mathf.Min((float)drinks / expected, 1f);
 		}
 
+		// la treve du banquet (Patch_GenHostility_HostileTo): les invites presents sur la carte.
+		// statique parce que le test d'hostilite du jeu passe par la des milliers de fois par seconde
+		private static readonly HashSet<Pawn> truceGuests = new HashSet<Pawn>();
+		public static bool TruceOn;
+
+		private void RefreshTruce()
+		{
+			truceGuests.Clear();
+			if (current?.guests != null)
+				foreach (Pawn p in current.guests)
+					if (p != null && !p.Dead) truceGuests.Add(p);
+			TruceOn = truceGuests.Count > 0;
+		}
+
+		// vrai si ces deux-la ne doivent pas se battre: un invite et un autre invite, ou un invite et quelqu'un
+		// d'une faction en paix avec le joueur. jamais avec les colons, jamais pour quelqu'un en crise
+		public static bool UnderTruce(Pawn a, Pawn b)
+		{
+			if (a == null || b == null || a == b) return false;
+			bool guestA = truceGuests.Contains(a);
+			bool guestB = truceGuests.Contains(b);
+			if (!guestA && !guestB) return false;
+			if (a.InMentalState || b.InMentalState) return false;
+			return AtPeace(a, guestA) && AtPeace(b, guestB);
+		}
+
+		private static bool AtPeace(Pawn p, bool guest)
+		{
+			Faction f = p.Faction;
+			if (f == null || f.IsPlayer) return false;
+			return guest || !f.HostileTo(Faction.OfPlayer);
+		}
+
 		private bool guideOffered;
 
 		// une lettre au premier point de banquet de la partie, pas aux suivants
@@ -976,6 +1009,7 @@ namespace RimFeast
 			c.lord = LordMaker.MakeNewLord(c.house,
 				new LordJob_FeastGuests(c.id, c.house, c.spotCell, speaker ?? guests[0]), map, guests);
 			c.guests = guests;
+			RefreshTruce();
 			c.guestCount = guests.Count;
 			c.leaderCame = c.leaderHouses.Count > 0;
 			c.state = FeastCase.Traveling;
@@ -1220,6 +1254,7 @@ namespace RimFeast
 		{
 			base.FinalizeInit();
 			anyExposed = current != null && current.exposed;
+			RefreshTruce();
 
 			// le set est sauvegarde, mais perdre un enfant du joueur serait irreparable
 			foreach (PendingWard w in wards)
@@ -1299,6 +1334,7 @@ namespace RimFeast
 			}
 
 			if (Find.TickManager.TicksGame % CheckInterval != 0) return;
+			RefreshTruce();
 
 			// caravanes et raids vivent apres la fin du banquet, hors de current
 			if (caravans.Count > 0) TickCaravans();
@@ -1504,6 +1540,7 @@ namespace RimFeast
 			c.lord = LordMaker.MakeNewLord(c.house,
 				new LordJob_FeastGuests(c.id, c.house, c.spotCell, speaker), map, guests);
 			c.guests = guests;
+			RefreshTruce();
 			c.guestCount = guests.Count;
 			c.leaderCame = leader != null || (groom != null && groom == c.house.leader);
 			c.state = FeastCase.Traveling;

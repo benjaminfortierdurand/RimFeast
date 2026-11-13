@@ -72,7 +72,7 @@ namespace RimFeast
 			{
 				defaultLabel = "RimFeast_TrapGizmoLabel".Translate(),
 				defaultDesc = "RimFeast_TrapGizmoDesc".Translate(),
-				icon = RimFeastTex.Slaughter,
+				icon = RimFeastMod.S.neutralWording ? RimFeastTex.SlaughterNeutral : RimFeastTex.Slaughter,
 				action = () => OpenInviteMenu(planned: true),
 			};
 			if (comp != null && comp.Busy) trap.Disable("RimFeast_InviteDisabledBusy".Translate());
